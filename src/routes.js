@@ -18,12 +18,19 @@
 import Logout from "./components/pages/Logout";
 import Login from "./components/pages/Login";
 import AdminList from "./components/pages/Admins/AdminList";
+import UserList from "./components/pages/Users/UserList";
 
 var routes = [
   {
     path: "/admins",
     name: "Admins",
     component: AdminList,
+    layout: "/admin",
+  },  
+  {
+    path: "/users",
+    name: "Users",
+    component: UserList,
     layout: "/admin",
   },  
   {

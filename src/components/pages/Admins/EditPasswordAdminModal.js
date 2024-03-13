@@ -16,7 +16,7 @@ import LoadingButton from "../../reusable/LoadingButton";
 
 export default function EditPasswordAdminPage({ isOpen, itemId, close, admin_data }) {
 
-    const [newPasswod, setNewPassword] = useState("")
+    const [newPassword, setNewPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const onSubmit = async () => {
 
@@ -25,14 +25,14 @@ export default function EditPasswordAdminPage({ isOpen, itemId, close, admin_dat
             return
         }
 
-        if (newPasswod !== confirmPassword) {
+        if (newPassword !== confirmPassword) {
             message.error({ text: "Password Baru dan Konfirmasi Password tidak sesuai", })
             return
         }
 
         try {
             let body = {
-                new_password: newPasswod,
+                new_password: newPassword,
             };
             let result2 = await Admin.edit_password(admin_data?.id, body)
             if (result2?.id) {

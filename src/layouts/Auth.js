@@ -27,6 +27,7 @@ import AuthFooter from "components/Footers/AuthFooter.js";
 
 import routes from "routes.js";
 import Login from "../components/pages/Login";
+import Palette from "utils/Palette";
 
 
 const Auth = (props) => {
@@ -71,8 +72,9 @@ const Auth = (props) => {
             justifyContent: 'center',
             display: 'flex',
             justifyContent: 'center',
+            background : "#000000"
           }}
-          className="bg-gradient-info py-7 py-lg-8">
+          className="py-7 py-lg-8">
           <Container>
             <Row className="justify-content-center">
               <Switch>

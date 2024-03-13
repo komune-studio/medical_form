@@ -63,7 +63,7 @@ const SIDEBAR = [
     //     icon: "material-symbols:bar-chart-rounded",
     //     color : Palette.THEME_YELLOW
     // },
-    {
+    /* {
         path: "/books",
         name: "Dashboard",
         icon: "bxs:book",
@@ -80,11 +80,17 @@ const SIDEBAR = [
         name: "Kategori",
         icon: "material-symbols:view-list-rounded",
         color : Palette.BARCODE_ORANGE
-    },
+    }, */
     {
         path: "/admins",
         name: "Admin",
         icon: "material-symbols:person",
+        color: Palette.BARCODE_ORANGE
+    },
+    {
+        path: "/users",
+        name: "User",
+        icon: "mdi:user-group",
         color: Palette.BARCODE_ORANGE
     },
     // {

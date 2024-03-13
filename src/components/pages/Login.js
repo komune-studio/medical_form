@@ -17,7 +17,7 @@ import Admin from "../../models/AdminModel"
 import React, {useEffect, useState} from 'react'
 import {useHistory} from 'react-router-dom'
 
-import logo from "../../assets/img/brand/elib.png"
+import logo from "../../assets/img/brand/barcode.png"
 import Palette from "../../utils/Palette";
 import swal from "../../components/reusable/CustomSweetAlert";
 
@@ -57,7 +57,7 @@ const Login = () => {
             sessionStorage.token = result.token;
             sessionStorage.admin_name = result.username;
             sessionStorage.id = result.id;
-            history.push('/books')
+            history.push('/admins')
             window.location.reload()
 
         } catch (e) {
@@ -86,7 +86,7 @@ const Login = () => {
             <Col lg="5" md="7">
                 <Card className="bg-secondary shadow border-0" >
 
-                    <CardBody className="px-lg-5 py-lg-5">
+                    <CardBody style={{background : Palette.BACKGROUND_DARK_GRAY}}  className="px-lg-5 py-lg-5">
                         <div className="text-center text-muted mb-4">
                             <img
                                 style={{
