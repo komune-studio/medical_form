@@ -7,13 +7,9 @@ import { Link, useHistory } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import { InputGroup, Form, Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
-import CustomTableOld from "../../reusable/CustomTableOld";
 import Palette from "../../../utils/Palette";
-/* import CreateAdminModal from "./CreateAdminModal";
-import EditAdminModal from "./EditAdminModal";
-import EditPasswordAdminModal from "./EditPasswordAdminModal"; */
-import swal from "../../reusable/CustomSweetAlert";
-import CreateUserModal from "./CreateUserModal";
+import UserFormModal from "./UserFormModal";
+import UserResetPasswordModal from "./UserResetPasswordModal";
 
 const UserList = () => {
 
@@ -22,8 +18,8 @@ const UserList = () => {
     const [dataSource, setDataSource] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null)
     const [openUserModal, setOpenUserModal] = useState(false)
-    const [isEditPaswordModalOpen, setIsEditPasswordModalOpen] = useState(false)
     const [isNewRecord, setIsNewRecord] = useState(false)
+    const [openUserResetModal, setOpenUserResetModal] = useState(false)
     const columns = [
         {
           id: 'id', label: 'ID', filter: false,
@@ -50,10 +46,13 @@ const UserList = () => {
                 return (
                     <>
                         <Space size="small">
-                            <Tooltip title="Detail">
+                            <Tooltip title="Edit">
                                 <AntButton
                                     onClick={() => {
+                                        setOpenUserResetModal(false)
+                                        setOpenUserModal(true)
                                         setSelectedUser(value)
+                                        setIsNewRecord(false)
 
 
                                     }}
@@ -66,7 +65,8 @@ const UserList = () => {
                                 <AntButton
                                     onClick={() => {
                                         setSelectedUser(value)
-                                        setIsEditPasswordModalOpen(true)
+                                        setOpenUserResetModal(true)
+                                        setOpenUserModal(false)
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
@@ -154,40 +154,41 @@ const UserList = () => {
                               <AntButton onClick={() => {
                                   setIsNewRecord(true)
                                   setOpenUserModal(true)
+                                  setOpenUserResetModal(false)
                               }} size={'middle'} type={'primary'}>Tambah User</AntButton>
                             </Col>
                         </Row>
-
-
-                        {/* <CustomTableOld
-                            toolBar={<Button size={'sm'} onClick={() => {
-                                setIsCreateAdminOpen(true)
-                            }} color="primary" style={{ float: 'right' }}>Buat baru</Button>}
-                            loading={loading} columns={columns}
-                            dataSource={dataSource}
-                        /> */}
-
                         <CustomTable 
                             pagination={false}
                             searchText={''}
                             data={dataSource}
                             columns={columns}
                         />
-
-
                     </CardBody>
                 </Card>
 
             </Container>
-            <CreateUserModal
+            <UserResetPasswordModal
+                isOpen={openUserResetModal}
+                userData={selectedUser}
+                onClose={async (refresh) => {
+                    if (refresh) {
+                        await initializeData()
+                    }
+                    setOpenUserModal(false)
+                    setOpenUserResetModal(false)
+                }}
+            />
+            <UserFormModal
                 isOpen={openUserModal}
                 isNewRecord={isNewRecord}
-                adminList={dataSource}
+                userData={selectedUser}
                 close={async (refresh) => {
                     if (refresh) {
                         await initializeData()
                     }
                     setOpenUserModal(false)
+                    setOpenUserResetModal(false)
                 }}
             />
 

@@ -1,3 +1,16 @@
 .swal2-container {
     z-index: 20000 !important;
 }
+.ant-picker-outlined{
+    z-index: 1000000000 !important;
+}
+.ant-picker-focused{
+    z-index: 1000000000 !important;
+}
+.ant-picker{
+    z-index: 1000000000 !important;
+}
+
+#date-popup > div {
+    position: relative !important;
+}

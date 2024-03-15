@@ -24,10 +24,10 @@ export default class User {
     return await ApiRequest.set(`v1/user/${id}`, "GET", body);
   }
 
-/*   static edit_password = async (id, body) => {
-    return await ApiRequest.set(`v1/user/${id}/password_reset`, "PATCH", body);
+   static edit_password = async (id, body) => {
+    return await ApiRequest.set(`v1/user/${id}/password_reset`, "PUT", body);
   }
-*/
+
 
   static delete = async (id) => {
     return await ApiRequest.set(`v1/user/${id}`, "DELETE");
