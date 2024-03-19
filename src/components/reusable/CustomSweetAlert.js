@@ -6,7 +6,7 @@ const swal = {
             ...options,
             confirmButtonColor: 'rgb(255,109,198)',
             customClass: {
-                container: 'swal-font',
+                container: 'swal-fonts',
                 ...options.customClass,
             }
         })
@@ -18,7 +18,7 @@ const swal = {
             confirmButtonText: 'Okay',
             confirmButtonColor: 'rgb(255,109,198)',
             customClass: {
-                container: 'swal-font',
+                container: 'swal-fonts',
                 ...options.customClass,
             },
             ...options,

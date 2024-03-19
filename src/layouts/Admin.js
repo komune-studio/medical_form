@@ -23,6 +23,8 @@ import { Container } from "reactstrap";
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
+import {Upload as AntUpload, message, Spin, Input} from "antd";
+
 import routes from "routes.js";
 import Palette from "utils/Palette";
 
@@ -82,19 +84,26 @@ const Admin = (props) => {
           {...props}
           brandText={getBrandText(props.location.pathname)}
         />
-        <Switch>
-          {getRoutes(routes)}
-          {/*<Redirect from="*" to="/dashboard" />*/}
-          {/* <Route path={"*"} component={Dashboard}/> */}
-        </Switch>
-        <Container 
-          style={{background : Palette.BACKGROUND_DARK_GRAY}}
-          fluid>
-            {/* <div style={{height : "100vh"}}>
 
-            </div> */}
-          <AdminFooter />
-        </Container>
+        {/*<Container*/}
+
+        {/*    fluid>*/}
+          <div
+              style={{
+                minHeight: "80vh",
+              background: Palette.BACKGROUND_DARK_GRAY
+              }}
+          >
+            <Switch>
+              {getRoutes(routes)}
+              {/*<Redirect from="*" to="/dashboard" />*/}
+              {/* <Route path={"*"} component={Dashboard}/> */}
+            </Switch>
+          </div>
+          <Container fluid>
+              <AdminFooter />
+          </Container>
+        {/*</Container>*/}
       </div>
     </>
   );

@@ -20,7 +20,7 @@ import { useLocation, Route, Switch, Redirect } from "react-router-dom";
 import Dashboard from "views/Dashboard.js";
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
-
+import authBG from '../assets/img/auth/auth_bg.png'
 // core components
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
 import AuthFooter from "components/Footers/AuthFooter.js";
@@ -64,15 +64,19 @@ const Auth = (props) => {
 
   return (
     <>
-      <div className="main-content" ref={mainContent}>
+      <div
+
+          className="main-content" ref={mainContent}>
         <div
           style={{
             height: "100vh",
             alignItems: 'center',
-            justifyContent: 'center',
             display: 'flex',
             justifyContent: 'center',
-            background : "#000000"
+            background: "#1d1d1d",
+            backgroundImage: `url("${authBG}")`,
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat'
           }}
           className="py-7 py-lg-8">
           <Container>

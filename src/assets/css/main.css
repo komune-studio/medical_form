@@ -18,7 +18,7 @@ body {
   font-size: 14px;
   line-height: 1.6;
   font-weight: 400;
-  font-family: Maison-Neue,open sans, Helvetica, Arial, sans-serif;
+  font-family: Helixa,open sans, Helvetica, Arial, sans-serif;
 }
 
 .ant-layout.ant-layout-has-sider {
@@ -650,7 +650,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav li.ant-menu-it
   border-radius: 8px;
   background: #fff;
   border: 0px;
-  font-weight: 600;
+  fonts-weight: 600;
 }
 
 ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav
@@ -2364,7 +2364,7 @@ section.ant-layout.layout-content .ant-layout-content.content-ant {
 }
 
 .widget-2 .ant-statistic-content {
-  font-family: Maison-Neue,open sans, Helvetica, Arial, sans-serif;
+  font-family: Helixa,open sans, Helvetica, Arial, sans-serif;
   font-weight: 600;
   font-size: 20px;
   padding: 12px 16px;

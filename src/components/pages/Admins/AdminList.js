@@ -87,11 +87,11 @@ const AdminList = () => {
           id: 'id', label: 'ID', filter: false,
         },
         {
-          id: 'username', label: 'Username', filter: false,
+          id: 'username', label: 'Username', filter: true,
         },
-        {
-          id: 'created_at', label: 'Created At', filter: false,
-        },
+        // {
+        //   id: 'created_at', label: 'Created At', filter: false,
+        // },
         {
           id: '', label: '', filter: false,
           render: ((value) => {

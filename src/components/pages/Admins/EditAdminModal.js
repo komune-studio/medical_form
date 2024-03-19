@@ -2,9 +2,9 @@ import Modal from 'react-bootstrap/Modal';
 import { Button, Form } from "react-bootstrap";
 import FileUpload from "../../reusable/FileUpload";
 import Swal from "sweetalert2";
-import { Upload, message } from "antd";
+import {  message } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+
 import UploadModel from "../../../models/UploadModel";
 import AdminModel from "../../../models/AdminModel";
 
@@ -12,7 +12,6 @@ import PropTypes from "prop-types";
 import Iconify from "../../reusable/Iconify";
 import swal from "../../reusable/CustomSweetAlert";
 import LoadingButton from "../../reusable/LoadingButton";
-
 EditAdminModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,

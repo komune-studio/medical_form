@@ -10,7 +10,7 @@ export default class Upload {
     static uploadPicutre = async (file) => {
         let formData = new FormData();
         formData.append('upload', file, file.name);
-        return await ApiRequest.setMultipart("v1/upload/public/image", "POST", formData);
+        return await ApiRequest.setMultipart("v1/upload/image", "POST", formData);
     }
     
     // static uploadFile = async (body) => {

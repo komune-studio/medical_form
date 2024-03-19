@@ -1,0 +1,144 @@
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-Thin.eot');
+    src: url('../fonts/Helixa-Thin.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Thin.woff2') format('woff2'),
+    url('../fonts/Helixa-Thin.woff') format('woff'),
+    url('../fonts/Helixa-Thin.svg#Helixa-Thin') format('svg');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-Light.eot');
+    src: url('../fonts/Helixa-Light.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Light.woff2') format('woff2'),
+    url('../fonts/Helixa-Light.woff') format('woff'),
+    url('../fonts/Helixa-Light.svg#Helixa-Light') format('svg');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-BoldItalic.eot');
+    src: url('../fonts/Helixa-BoldItalic.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-BoldItalic.woff2') format('woff2'),
+    url('../fonts/Helixa-BoldItalic.woff') format('woff'),
+    url('../fonts/Helixa-BoldItalic.svg#Helixa-BoldItalic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-Regular.eot');
+    src: url('../fonts/Helixa-Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Regular.woff2') format('woff2'),
+    url('../fonts/Helixa-Regular.woff') format('woff'),
+    url('../fonts/Helixa-Regular.svg#Helixa-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-LightItalic.eot');
+    src: url('../fonts/Helixa-LightItalic.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-LightItalic.woff2') format('woff2'),
+    url('../fonts/Helixa-LightItalic.woff') format('woff'),
+    url('../fonts/Helixa-LightItalic.svg#Helixa-LightItalic') format('svg');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-Black.eot');
+    src: url('../fonts/Helixa-Black.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Black.woff2') format('woff2'),
+    url('../fonts/Helixa-Black.woff') format('woff'),
+    url('../fonts/Helixa-Black.svg#Helixa-Black') format('svg');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa Book';
+    src: url('../fonts/Helixa-Book.eot');
+    src: url('../fonts/Helixa-Book.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Book.woff2') format('woff2'),
+    url('../fonts/Helixa-Book.woff') format('woff'),
+    url('../fonts/Helixa-Book.svg#Helixa-Book') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-BlackItalic.eot');
+    src: url('../fonts/Helixa-BlackItalic.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-BlackItalic.woff2') format('woff2'),
+    url('../fonts/Helixa-BlackItalic.woff') format('woff'),
+    url('../fonts/Helixa-BlackItalic.svg#Helixa-BlackItalic') format('svg');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-Bold.eot');
+    src: url('../fonts/Helixa-Bold.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Bold.woff2') format('woff2'),
+    url('../fonts/Helixa-Bold.woff') format('woff'),
+    url('../fonts/Helixa-Bold.svg#Helixa-Bold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa Book';
+    src: url('../fonts/Helixa-BookItalic.eot');
+    src: url('../fonts/Helixa-BookItalic.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-BookItalic.woff') format('woff'),
+    url('../fonts/Helixa-BookItalic.svg#Helixa-BookItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-Italic.eot');
+    src: url('../fonts/Helixa-Italic.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-Italic.woff2') format('woff2'),
+    url('../fonts/Helixa-Italic.woff') format('woff'),
+    url('../fonts/Helixa-Italic.svg#Helixa-Italic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helixa';
+    src: url('../fonts/Helixa-ThinItalic.eot');
+    src: url('../fonts/Helixa-ThinItalic.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/Helixa-ThinItalic.woff2') format('woff2'),
+    url('../fonts/Helixa-ThinItalic.woff') format('woff'),
+    url('../fonts/Helixa-ThinItalic.svg#Helixa-ThinItalic') format('svg');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+

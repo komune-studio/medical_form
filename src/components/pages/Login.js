@@ -17,7 +17,7 @@ import Admin from "../../models/AdminModel"
 import React, {useEffect, useState} from 'react'
 import {useHistory} from 'react-router-dom'
 
-import logo from "../../assets/img/brand/barcode.png"
+import logo from "../../assets/img/brand/logo_kart.png"
 import Palette from "../../utils/Palette";
 import swal from "../../components/reusable/CustomSweetAlert";
 
@@ -62,7 +62,6 @@ const Login = () => {
 
         } catch (e) {
             console.log(e)
-
             let errorMessage = "An Error Occured"
             if (e.error_message) {
                 errorMessage = "Invalid Credential"
@@ -84,9 +83,8 @@ const Login = () => {
     return (
         <>
             <Col lg="5" md="7">
-                <Card className="bg-secondary shadow border-0" >
-
-                    <CardBody style={{background : Palette.BACKGROUND_DARK_GRAY}}  className="px-lg-5 py-lg-5">
+                <Card style={{background:Palette.BACKGROUND_BLACK, borderRadius:10}} className="bg-secondary shadow border-0" >
+                    <CardBody style={{background : Palette.BACKGROUND_BLACK}}  className="px-lg-5 py-lg-5">
                         <div className="text-center text-muted mb-4">
                             <img
                                 style={{
@@ -98,12 +96,15 @@ const Login = () => {
                         <Form role="form">
                             <FormGroup className="mb-3">
                                 <InputGroup className="input-group-alternative">
-                                    <InputGroupAddon addonType="prepend">
-                                        <InputGroupText>
+                                    <InputGroupAddon addonType="prepend" style={{background:Palette.BACKGROUND_DARK_GRAY}}
+                                    >
+                                        <InputGroupText style={{background:Palette.BACKGROUND_DARK_GRAY}}
+                                        >
                                             <i className="ni ni-email-83"/>
                                         </InputGroupText>
                                     </InputGroupAddon>
                                     <Input
+                                        style={{background:Palette.BACKGROUND_DARK_GRAY}}
                                         placeholder="Username"
                                         type="text"
                                         autoComplete="username"
@@ -115,12 +116,13 @@ const Login = () => {
                             </FormGroup>
                             <FormGroup>
                                 <InputGroup className="input-group-alternative">
-                                    <InputGroupAddon addonType="prepend">
-                                        <InputGroupText>
+                                    <InputGroupAddon addonType="prepend" style={{background:Palette.BACKGROUND_DARK_GRAY}}>
+                                        <InputGroupText style={{background:Palette.BACKGROUND_DARK_GRAY}}>
                                             <i className="ni ni-lock-circle-open"/>
                                         </InputGroupText>
                                     </InputGroupAddon>
                                     <Input
+                                        style={{background:Palette.BACKGROUND_DARK_GRAY}}
                                         placeholder="Kata sandi"
                                         type="password"
                                         autoComplete="new-password"

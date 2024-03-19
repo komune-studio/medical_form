@@ -1,13 +1,13 @@
 import Modal from 'react-bootstrap/Modal';
-import {DatePicker, message} from "antd";
+import {DatePicker, message, Spin,Upload as AntUpload} from "antd";
 import { Button, Form } from 'react-bootstrap';
 import {useEffect, useState} from "react";
 import UserModel from "../../../models/UserModel";
-
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
 import moment from "moment/moment";
-
+import UploadModel from "../../../models/UploadModel"
 
 UserFormModal.propTypes = {
     close: PropTypes.func,
@@ -26,7 +26,27 @@ export default function UserFormModal({isOpen, close, isNewRecord, userData}) {
     const [gender, setGender] = useState()
     const [phoneNumber, setPhoneNumber] = useState(null)
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [avatarImage, setAvatarImage] = useState(null)
+    const [loadingUpload, setLoadingUpload] = useState(false)
 
+
+
+    const handleUpload = async (file) => {
+        try {
+            setLoadingUpload(true)
+            let result = await UploadModel.uploadPicutre(file.file?.originFileObj)
+
+            if(result?.location){
+                setAvatarImage(result?.location)
+                message.success('Successfully upload user')
+            }
+            setLoadingUpload(false)
+        }catch (e) {
+            console.log('isi e', e)
+            message.error("Failed to upload user")
+            setLoadingUpload(false)
+        }
+    }
     const onSubmit = async () => {
         if(!username){
             swal.fireError({text: "Username Wajib diisi",})
@@ -59,7 +79,7 @@ export default function UserFormModal({isOpen, close, isNewRecord, userData}) {
                 email : email,
                 phone_number : phoneNumber,
                 birth_date : new Date(birthDate),
-
+                avatar_url : avatarImage
             }
             let msg = ''
             if(isNewRecord){
@@ -108,27 +128,37 @@ export default function UserFormModal({isOpen, close, isNewRecord, userData}) {
 
     const initForm = () => {
         console.log('isi userData', userData)
-        setUsername(userData?.username)
-        setBirthDate(moment(userData?.birth_date) || null)
-        setEmail(userData?.email)
-        setGender(userData?.gender)
-        setFullName(userData?.full_name)
-        setPhoneNumber(userData?.phone_number)
+        if(!isNewRecord){
+            setUsername(userData?.username)
+            setBirthDate(moment(userData?.birth_date) || null)
+            setEmail(userData?.email)
+            setGender(userData?.gender)
+            setFullName(userData?.full_name)
+            setPhoneNumber(userData?.phone_number)
+            setAvatarImage(userData?.avatar_url)
+        }
 
     }
     useEffect(()=>{
-
-        if(!isNewRecord){
-            initForm()
-        }else{
+        if (isNewRecord){
             reset()
+        }else{
+            initForm()
         }
+
+
     }, [isOpen])
 
     const reset = () =>{
         setUsername("")
         setPassword("")
         setConfirmPassword("")
+        setFullName("")
+        setEmail("")
+        setPhoneNumber("")
+        setGender(null)
+        setAvatarImage(null)
+        setBirthDate(null)
     }
 
     return <Modal
@@ -141,6 +171,55 @@ export default function UserFormModal({isOpen, close, isNewRecord, userData}) {
         </Modal.Header>
         <Modal.Body>
 
+            <Form.Group>
+                <Form.Label style={{ fontSize: "0.8em" }}>Image</Form.Label>
+                <AntUpload
+                    rootClassName={'upload-background'}
+                    name="avatar"
+                    listType="picture-card"
+                    fileList={[]}
+                    className="avatar-uploader"
+                    showUploadList={false}
+                    onChange={(file) => {
+                        handleUpload(file)
+                    }}
+                >
+                    {avatarImage ? (
+                        <>
+                            {
+                                !loadingUpload ? <img
+                                    src={avatarImage}
+                                    alt="avatar"
+                                    style={{
+                                        width: '80%',
+                                        height: '80%',
+                                        objectFit: 'cover'
+                                    }}
+                                /> : <Spin style={{zIndex:100000}} size="large" />
+                            }
+
+                        </>
+
+                    ) : (
+                        <button
+                            style={{
+                                border: 0,
+                                background: 'none',
+                            }}
+                            type="button"
+                        >
+                            {loadingUpload ?  <Spin style={{zIndex:100000}} size="large" /> : <PlusOutlined/>}
+                            <div
+                                style={{
+                                    marginTop: 8,
+                                }}
+                            >
+                                Upload
+                            </div>
+                        </button>
+                    )}
+                </AntUpload>
+            </Form.Group>
                 {/* Admin username */}
                 <Form.Group className="mb-3">
                     <Form.Label style={{ fontSize: "0.8em" }}>Username</Form.Label>
@@ -194,6 +273,7 @@ export default function UserFormModal({isOpen, close, isNewRecord, userData}) {
                     checked={gender === "F"}
                 />
             </Form.Group>
+
             <Form.Group className="mb-3">
                 <Form.Label style={{ fontSize: "0.8em" }}>Tanggal Lahir</Form.Label>
                 <DatePicker

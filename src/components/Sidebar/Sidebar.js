@@ -96,37 +96,37 @@ const SIDEBAR = [
     {
         path: "/top-up",
         name: "Top Up",
-        icon: "ic:baseline-inventory",
+        icon: "fluent-mdl2:money",
         color: Palette.BARCODE_ORANGE
     },
     {
         path: "/schedule",
         name: "Schedule",
-        icon: "ic:baseline-inventory",
+        icon: "uiw:date",
         color: Palette.BARCODE_ORANGE
     },
     {
         path: "/loyalty-shop",
         name: "Loyalty Shop",
-        icon: "ic:baseline-inventory",
+        icon: "lets-icons:shop",
         color: Palette.BARCODE_ORANGE
     },
     {
         path: "/promotion",
         name: "Promotion",
-        icon: "ic:baseline-inventory",
+        icon: "mdi:announcement",
         color: Palette.BARCODE_ORANGE
     },
     {
         path: "/orders",
         name: "Orders",
-        icon: "ic:baseline-inventory",
+        icon: "fluent-mdl2:activate-orders",
         color: Palette.BARCODE_ORANGE
     },
     {
         path: "/referral",
         name: "Referral",
-        icon: "ic:baseline-inventory",
+        icon: "material-symbols:partner-exchange-outline-rounded",
         color: Palette.BARCODE_ORANGE
     },
     // {

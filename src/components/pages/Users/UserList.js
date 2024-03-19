@@ -25,7 +25,7 @@ const UserList = () => {
           id: 'id', label: 'ID', filter: false,
         },
         {
-            id: 'username', label: 'Username', filter: false,
+            id: 'username', label: 'Username', filter: true,
         },
         {
           id: 'full_name', label: 'Full Name', filter: false,
