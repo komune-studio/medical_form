@@ -14,6 +14,7 @@ export default function UserHistoryModal({isOpen, userData, onClose}){
             name : 'Paket A',
             price : '10.000.000',
             description : '',
+            top_up_method:'VA',
             top_up_at : '10/03/2024 11:20',
             top_up_status : 'SUCCESS'
         },
@@ -21,6 +22,7 @@ export default function UserHistoryModal({isOpen, userData, onClose}){
             id : 2,
             name : 'Paket B',
             price : '10.000.000',
+            top_up_method:'VA',
             description : '',
             top_up_at : '10/03/2024 13:32',
             top_up_status : 'PENDING'
@@ -29,6 +31,7 @@ export default function UserHistoryModal({isOpen, userData, onClose}){
             id : 3,
             name : 'Paket C',
             price : '12.000.000',
+            top_up_method:'GOPAY',
             description : '',
             top_up_at : '10/03/2024 10:12',
             top_up_status : 'PENDING'
@@ -49,6 +52,9 @@ export default function UserHistoryModal({isOpen, userData, onClose}){
         },
         {
             id: 'top_up_at', label: 'Tanggal Top Up', filter: false,
+        },
+        {
+            id: 'top_up_method', label: 'Top Up Method', filter: false,
         },
         {
             id: 'top_up_status', label: 'Status', filter: false,
