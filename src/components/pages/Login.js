@@ -82,8 +82,8 @@ const Login = () => {
     return (
         <>
             <Col lg="5" md="7">
-                <Card style={{background:Palette.BACKGROUND_BLACK, borderRadius:10}} className="bg-secondary shadow border-0" >
-                    <CardBody style={{background : Palette.BACKGROUND_BLACK}}  className="px-lg-5 py-lg-5">
+                <Card style={{background:Palette.BACKGROUND_BLACK, borderRadius:14}} >
+                    <CardBody  className="px-lg-5 py-lg-5">
                         <div className="text-center text-muted mb-4">
                             <img
                                 style={{
