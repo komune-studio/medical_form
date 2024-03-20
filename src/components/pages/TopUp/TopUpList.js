@@ -8,6 +8,7 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import TopUp from "../../../models/TopUpModel";
 import TopUpFormModal from "./TopUpFormModal";
+import Helper from "../../../utils/Helper";
 
 const TopUpList = () => {
 
@@ -29,6 +30,9 @@ const TopUpList = () => {
         },
         {
             id: 'price', label: 'Harga Paket', filter: true,
+            render : (row => {
+                return row?.price ? Helper.formatNumber(row.price) : 0
+            })
         },
         {
             id: 'description', label: 'Deskripsi', filter: true,
