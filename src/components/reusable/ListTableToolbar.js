@@ -39,6 +39,7 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
         // borderColor: `${alpha(theme.palette.grey[500], 0.32)} !important`,
         borderColor: `#2f2f2f !important`,
     },
+    color:'#ffffff',
     background:'#2f2f2f'
 }));
 

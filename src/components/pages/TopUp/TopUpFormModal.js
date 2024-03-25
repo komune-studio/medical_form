@@ -22,6 +22,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
     const [packageName, setPackageName] = useState(null)
     const [price, setPrice] = useState(null)
     const [description, setDescription] = useState(null)
+    const [currency, setCurrency] = useState(null)
     const [topUpImage, setTopUpImage] = useState(null)
     const [loadingUpload, setLoadingUpload] = useState(false)
     const handleUpload = async (file) => {
@@ -55,6 +56,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                 price: parseFloat(price),
                 description: description,
                 image: topUpImage,
+                currency : currency
             }
             let msg = ''
             if (isNewRecord) {
@@ -84,11 +86,13 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
     }
 
     const initForm = () => {
+        console.log('datax', topUpData)
         if (!isNewRecord) {
             setPackageName(topUpData?.package_name)
             setPrice(topUpData?.price)
             setDescription(topUpData?.description)
             setTopUpImage(topUpData?.image)
+            setCurrency(topUpData?.currency)
         }
 
     }
@@ -118,7 +122,6 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
             <Modal.Title>{isNewRecord ? 'Buat Paket Top Up' : `Ubah Paket Top Up`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-
             <Form.Group>
                 <Form.Label style={{fontSize: "0.8em"}}>Image</Form.Label>
                 <AntUpload
@@ -175,6 +178,16 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                     autoComplete={"packageName"}
                     onChange={(e) => setPackageName(e.target.value)} type="text" placeholder="Masukan Nama Paket"/>
             </Form.Group>
+            <Form.Group controlId="exampleForm.ControlSelect1">
+                <Form.Label>Tipe Paket</Form.Label>
+                <Form.Control value={currency} onChange={(e) => {
+                    setCurrency(e.target.value)
+                }} as="select">
+                    <option>Pilih tipe paket</option>
+                    <option value={"COIN"}>COIN</option>
+                    <option value={"RIDES"}>RIDE</option>
+                </Form.Control>
+            </Form.Group>
             <Form.Group className="mb-3">
                 <Form.Label style={{fontSize: "0.8em"}}>Harga Paket</Form.Label>
                 <Form.Control
@@ -193,8 +206,6 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                     autoComplete={"email"}
                     onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Masukan Deskripsi Paket"/>
             </Form.Group>
-
-
 
 
             <div className={"d-flex flex-row justify-content-end"}>

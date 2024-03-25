@@ -35,6 +35,9 @@ const TopUpList = () => {
             })
         },
         {
+            id: 'currency', label: 'Tipe Paket', filter: true,
+        },
+        {
             id: 'description', label: 'Deskripsi', filter: true,
         },
         {
