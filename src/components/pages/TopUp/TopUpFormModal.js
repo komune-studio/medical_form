@@ -66,7 +66,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                 msg = "Berhasil membuat Pakat Top Up"
             } else {
                 await TopUp.edit(topUpData?.id, body)
-                msg = "Berhasil membuat Pakat Top Up"
+                msg = "Berhasil ubah Pakat Top Up"
             }
             message.success(msg)
             handleClose(true)

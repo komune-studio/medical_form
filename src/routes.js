@@ -21,6 +21,7 @@ import AdminList from "./components/pages/Admins/AdminList";
 import UserList from "./components/pages/Users/UserList";
 import TopUpList from "./components/pages/TopUp/TopUpList";
 import TopUpHistory from "./components/pages/TopUp/TopUpHistory";
+import ReferralList from "./components/pages/Referral/ReferralList";
 
 var routes = [
     {
@@ -45,6 +46,12 @@ var routes = [
         path: "/top-up-list",
         name: "Top Up",
         component: TopUpList,
+        layout: "/admin",
+    },
+    {
+        path: "/referral",
+        name: "Referral",
+        component: ReferralList,
         layout: "/admin",
     },
     {
