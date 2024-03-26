@@ -11,5 +11,6 @@ export default class Palette {
     static THEME_YELLOW = "#febe10"
     static THEME_ORANGE = "#fb6340"
     static THEME_PURPLE = "#7f8fea"
-
+    static THEME_GREEN = "#43936C"
+    static THEME_RED = "#B53235"
 }

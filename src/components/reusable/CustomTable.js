@@ -99,7 +99,7 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
   },
 }));
 
-const CustomTable = ({data, columns, checkbox = false, searchText, pagination = true, showFilter = false, mode='dark'}) => {
+const CustomTable = ({data, columns, checkbox = false, searchText, pagination = true, showFilter = false, mode='dark', extendToolbar = null}) => {
 
   const [selected, setSelected] = useState([]);
   const [order, setOrder] = useState('desc');
@@ -170,7 +170,7 @@ const CustomTable = ({data, columns, checkbox = false, searchText, pagination = 
 
   return <>
   {
-    showFilter && <ListTableToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName}/>
+    showFilter && <ListTableToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} extendToolbar={extendToolbar}/>
   }
     
 

@@ -24,6 +24,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
     const [description, setDescription] = useState(null)
     const [currency, setCurrency] = useState(null)
     const [topUpImage, setTopUpImage] = useState(null)
+    const [promotionalText, setPromotionalText] = useState(null)
     const [loadingUpload, setLoadingUpload] = useState(false)
     const handleUpload = async (file) => {
         try {
@@ -55,6 +56,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                 package_name: packageName,
                 price: parseFloat(price),
                 description: description,
+                promotional_text: promotionalText,
                 image: topUpImage,
                 currency : currency
             }
@@ -93,6 +95,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
             setDescription(topUpData?.description)
             setTopUpImage(topUpData?.image)
             setCurrency(topUpData?.currency)
+            setPromotionalText(topUpData?.promotional_texnp)
         }
 
     }
@@ -109,6 +112,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
     const reset = () => {
         setDescription("")
         setPackageName("")
+        setPromotionalText("")
         setPrice(null)
         setTopUpImage(null)
     }
@@ -179,7 +183,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                     onChange={(e) => setPackageName(e.target.value)} type="text" placeholder="Masukan Nama Paket"/>
             </Form.Group>
             <Form.Group controlId="exampleForm.ControlSelect1">
-                <Form.Label>Tipe Paket</Form.Label>
+                <Form.Label style={{fontSize: "0.8em"}}>Tipe Paket</Form.Label>
                 <Form.Control value={currency} onChange={(e) => {
                     setCurrency(e.target.value)
                 }} as="select">
@@ -195,6 +199,14 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                     value={price}
                     autoComplete={"pricing"}
                     onChange={(e) => setPrice(e.target.value)} type="number" placeholder="Masukan Harga Paket"/>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+                <Form.Label style={{fontSize: "0.8em"}}>Promotional Text</Form.Label>
+                <Form.Control
+                    value={promotionalText}
+                    autoComplete={"promotionalText"}
+                    onChange={(e) => setPromotionalText(e.target.value)} type="text" placeholder="Masukan Promotional Text"/>
             </Form.Group>
 
             <Form.Group className="mb-3">

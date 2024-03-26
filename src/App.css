@@ -39,3 +39,6 @@
      margin-top: auto !important;
     color: #CCCCCC;
  }
+.MuiToolbar-root{
+    padding-left: 0 !important;
+}

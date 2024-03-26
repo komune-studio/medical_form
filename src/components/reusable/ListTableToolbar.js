@@ -52,7 +52,7 @@ ListTableToolbar.propTypes = {
     onFilterName: PropTypes.func,
 };
 
-export default function ListTableToolbar({ numSelected, filterName, onFilterName, placeholder, size }) {
+export default function ListTableToolbar({ numSelected, filterName, onFilterName, placeholder, size, extendToolbar}) {
     return (
         <StyledRoot
             sx={{
@@ -78,6 +78,7 @@ export default function ListTableToolbar({ numSelected, filterName, onFilterName
                         </InputAdornment>
                     }
                 />
+
             )}
         </StyledRoot>
     );

@@ -20,37 +20,44 @@ import Login from "./components/pages/Login";
 import AdminList from "./components/pages/Admins/AdminList";
 import UserList from "./components/pages/Users/UserList";
 import TopUpList from "./components/pages/TopUp/TopUpList";
+import TopUpHistory from "./components/pages/TopUp/TopUpHistory";
 
 var routes = [
-  {
-    path: "/admins",
-    name: "Admins",
-    component: AdminList,
-    layout: "/admin",
-  },
-  {
-    path: "/users",
-    name: "Users",
-    component: UserList,
-    layout: "/admin",
-  },
-  {
-    path: "/top-up",
-    name: "Top Up",
-    component: TopUpList,
-    layout: "/admin",
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: Login,
-    layout: "/auth",
-  },
-  {
-    path: "/logout",
-    name: "Logout",
-    layout: "/admin",
-    component: Logout,
-  },
+    {
+        path: "/admins",
+        name: "Admins",
+        component: AdminList,
+        layout: "/admin",
+    },
+    {
+        path: "/users",
+        name: "Users",
+        component: UserList,
+        layout: "/admin",
+    },
+    {
+        path: "/top-up-history",
+        name: "Top Up",
+        component: TopUpHistory,
+        layout: "/admin",
+    },
+    {
+        path: "/top-up-list",
+        name: "Top Up",
+        component: TopUpList,
+        layout: "/admin",
+    },
+    {
+        path: "/login",
+        name: "Login",
+        component: Login,
+        layout: "/auth",
+    },
+    {
+        path: "/logout",
+        name: "Logout",
+        layout: "/admin",
+        component: Logout,
+    },
 ];
 export default routes;

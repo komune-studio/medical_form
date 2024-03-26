@@ -9,6 +9,8 @@ import Palette from "../../../utils/Palette";
 import TopUp from "../../../models/TopUpModel";
 import TopUpFormModal from "./TopUpFormModal";
 import Helper from "../../../utils/Helper";
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import TopUpTitleBar from "./TopUpTitleBar";
 
 const TopUpList = () => {
 
@@ -29,17 +31,24 @@ const TopUpList = () => {
             id: 'package_name', label: 'Paket Topup', filter: true,
         },
         {
+            id: 'currency', label: 'Tipe Paket', filter: true,
+        },
+        {
             id: 'price', label: 'Harga Paket', filter: true,
-            render : (row => {
-                return row?.price ? Helper.formatNumber(row.price) : 0
+            render: (row => {
+                return row?.price ? 'Rp.' + Helper.formatNumber(row.price) : 0
             })
         },
         {
-            id: 'currency', label: 'Tipe Paket', filter: true,
+            id: 'amount', label: 'Jumlah', filter: true,
+            render: (row => {
+                return row?.amount ? Helper.formatNumber(row.amount) : 0
+            })
         },
         {
             id: 'description', label: 'Deskripsi', filter: true,
         },
+
         {
             id: 'active', label: 'Status Paket', filter: false,
             render: (row => {
@@ -76,7 +85,7 @@ const TopUpList = () => {
                                             className={"d-flex align-items-center justify-content-center"}
                                             shape="circle"
                                             icon={<Iconify icon={"material-symbols:delete-outline"}/>}/>
-                                        :  <AntButton
+                                        : <AntButton
                                             onClick={() => {
                                                 onRestore(value.id)
                                             }}
@@ -168,11 +177,9 @@ const TopUpList = () => {
                 <Card style={{background: Palette.BACKGROUND_DARK_GRAY, color: "white"}}
                       className="card-stats mb-4 mb-xl-0">
                     <CardBody>
-                        <Row>
-                            <Col className='mb-3' md={6}>
-                                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Top Up</div>
-                            </Col>
-                            <Col className='mb-3 text-right' md={6}>
+                        <TopUpTitleBar/>
+                        <Row style={{position: "relative", top: 65}}>
+                            <Col className='mb-3 text-right' md={12}>
                                 <AntButton onClick={() => {
                                     setOpenTopUpModal(true)
                                     setIsNewRecord(true)

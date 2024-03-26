@@ -94,8 +94,8 @@ const SIDEBAR = [
         color: Palette.BARCODE_ORANGE
     },
     {
-        path: "/top-up",
-        name: "Top Up",
+        path: "/top-up-history",
+        name: "Top Up History",
         icon: "fluent-mdl2:money",
         color: Palette.BARCODE_ORANGE
     },
