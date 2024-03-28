@@ -31,6 +31,12 @@ const LoyaltyShopList = () => {
             })
         },
         {
+            id: 'price', label: 'Harga', filter: true,
+            render: (row => {
+                return row?.price ? 'Rp.' + Helper.formatNumber(row.price) : 0
+            })
+        },
+        {
             id: 'description', label: 'Deskripsi', filter: true,
         },
         {
