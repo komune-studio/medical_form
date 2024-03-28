@@ -7,19 +7,24 @@ label,p,h1,h2,h3,h4,h5,h6,small {
 .modal-content .modal-header .modal-title{
     color: #FFFFFF;
 }
+.MuiInputAdornment-root{
+    color:#ffffff !important;
+}
 
+
+textarea.form-control,select.form-control,input.form-control{
+    background: #FFFFFF14;
+    border-color: #161616;
+    color:#fff;
+}
+
+textarea.form-control:focus,select.form-control:focus,input.form-control:focus{
+    background: #FFFFFF14;
+    border-color: #161616;
+    color:#fff;
+}
 .ant-picker, ant-picker-input{
-    color: #8898A9;
-    background: #FFFFFF14;
-    border-color: #161616;
-}
-
-select.form-control,input.form-control{
-    background: #FFFFFF14;
-    border-color: #161616;
-}
-
-select.form-control:focus,input.form-control:focus{
+    color:#fff;
     background: #FFFFFF14;
     border-color: #161616;
 }
@@ -36,6 +41,10 @@ select.form-control:focus,input.form-control:focus{
 .ant-picker:focus{
     background: #FFFFFF14 !important;
     border-color: #161616;
+}
+
+.ant-upload button{
+    color: #c0c0c0;
 }
 
 /*#FFFFFF14*/
