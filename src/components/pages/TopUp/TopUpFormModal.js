@@ -21,6 +21,7 @@ TopUpFormModal.propTypes = {
 export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) {
     const [packageName, setPackageName] = useState(null)
     const [price, setPrice] = useState(null)
+    const [coins, setCoins] = useState(null)
     const [description, setDescription] = useState(null)
     const [currency, setCurrency] = useState(null)
     const [topUpImage, setTopUpImage] = useState(null)
@@ -58,6 +59,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                 description: description,
                 promotional_text: promotionalText,
                 image: topUpImage,
+                amount : coins,
                 currency : currency
             }
             let msg = ''
@@ -114,6 +116,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
         setPackageName("")
         setPromotionalText("")
         setPrice(null)
+        setCoins(null)
         setTopUpImage(null)
     }
 
@@ -199,6 +202,15 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                     value={price}
                     autoComplete={"pricing"}
                     onChange={(e) => setPrice(e.target.value)} type="number" placeholder="Masukan Harga Paket"/>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+                <Form.Label style={{fontSize: "0.8em"}}>Koin Yang Didapat</Form.Label>
+                <Form.Control
+
+                    value={coins}
+                    autoComplete={"pricing"}
+                    onChange={(e) => setCoins(e.target.value)} type="number" placeholder="Masukan Koin yang didapat"/>
             </Form.Group>
 
             <Form.Group className="mb-3">

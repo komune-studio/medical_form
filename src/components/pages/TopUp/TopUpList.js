@@ -178,14 +178,22 @@ const TopUpList = () => {
                       className="card-stats mb-4 mb-xl-0">
                     <CardBody>
                         <TopUpTitleBar/>
-                        <Row style={{position: "relative", top: 65}}>
-                            <Col className='mb-3 text-right' md={12}>
+                        <Row>
+                         <Col className='mb-3 text-right' md={12}>
                                 <AntButton onClick={() => {
                                     setOpenTopUpModal(true)
                                     setIsNewRecord(true)
                                 }} size={'middle'} type={'primary'}>Tambah Top Up</AntButton>
                             </Col>
                         </Row>
+                        {/* <Row style={{position: "relative", top: 65}}>
+                            <Col className='mb-3 text-right' md={12}>
+                                <AntButton onClick={() => {
+                                    setOpenTopUpModal(true)
+                                    setIsNewRecord(true)
+                                }} size={'middle'} type={'primary'}>Tambah Top Up</AntButton>
+                            </Col>
+                        </Row> */}
                         <Row>
 
                         </Row>
