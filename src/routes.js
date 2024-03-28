@@ -22,6 +22,8 @@ import UserList from "./components/pages/Users/UserList";
 import TopUpList from "./components/pages/TopUp/TopUpList";
 import TopUpHistory from "./components/pages/TopUp/TopUpHistory";
 import ReferralList from "./components/pages/Referral/ReferralList";
+import PromotionList from "./components/pages/Promotion/PromotionList";
+import LoyaltyShopList from "./components/pages/LoyaltyShop/LoyaltyShopList.";
 
 var routes = [
     {
@@ -52,6 +54,18 @@ var routes = [
         path: "/referral",
         name: "Referral",
         component: ReferralList,
+        layout: "/admin",
+    },
+    {
+        path: "/loyalty-shop",
+        name: "Loyalty Shop",
+        component: LoyaltyShopList,
+        layout: "/admin",
+    },
+    {
+        path: "/promotion",
+        name: "Promotion",
+        component: PromotionList,
         layout: "/admin",
     },
     {
