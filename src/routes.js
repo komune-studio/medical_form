@@ -25,6 +25,7 @@ import Schedule from "./components/pages/Schedule/Schedule";
 import ReferralList from "./components/pages/Referral/ReferralList";
 import PromotionList from "./components/pages/Promotion/PromotionList";
 import LoyaltyShopList from "./components/pages/LoyaltyShop/LoyaltyShopList.";
+import OrderList from "./components/pages/Order/OrderList";
 
 var routes = [
     {
@@ -52,9 +53,15 @@ var routes = [
         layout: "/admin",
     },
     {
+<<<<<<< HEAD
         path: "/schedule",
         name: "Schedule",
         component: Schedule,
+=======
+        path: "/orders",
+        name: "Order",
+        component: OrderList,
+>>>>>>> e0d4bba88d84447f3c5fd6b809e4ced0bf5929c2
         layout: "/admin",
     },
     {
