@@ -25,6 +25,7 @@ import ReferralList from "./components/pages/Referral/ReferralList";
 import PromotionList from "./components/pages/Promotion/PromotionList";
 import LoyaltyShopList from "./components/pages/LoyaltyShop/LoyaltyShopList.";
 import OrderList from "./components/pages/Order/OrderList";
+import OrderCreate from "components/pages/Order/OrderCreate";
 
 var routes = [
     {
@@ -49,6 +50,12 @@ var routes = [
         path: "/top-up-list",
         name: "Top Up",
         component: TopUpList,
+        layout: "/admin",
+    },
+    {
+        path: "/orders/create",
+        name: "Order",
+        component: OrderCreate,
         layout: "/admin",
     },
     {
