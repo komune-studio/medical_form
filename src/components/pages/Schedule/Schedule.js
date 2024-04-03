@@ -45,7 +45,7 @@ export default function Schedule() {
     return (
         <div
             className="container-fluid"
-            style={{ color: "#FFF", fontFamily: "Helixa" }}
+            style={{ color: "#FFF", fontFamily: "Helixa", flex: 1 }}
         >
             {/* Schedule title & pagination */}
             <div className="d-flex justify-content-between">
@@ -99,11 +99,10 @@ export default function Schedule() {
             </div>
 
             {/* Schedule table */}
-            <div className="d-flex" style={{ marginTop: 34 }}>
+            <div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
                 {/* Table y-axis header */}
                 <div className="d-flex flex-column">
                     <div style={{ flex: 1 }}></div>
-
                     {/* Loop for getting the y-axis of the table (every hour in a day) */}
                     {OPERATIONAL_HOURS.map((text, index) => (
                         <TableYAxis key={index} text={text} />
@@ -111,56 +110,52 @@ export default function Schedule() {
                 </div>
 
                 {/* Table content  */}
-                <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ gap: 0, flex: 1 }}
-                >
-                    {/* Loop for each date in current pagination */}
+                <div className="d-flex" style={{ flex: 1 }}>
+                    {/* Looping through each date in current pagination */}
                     {PAST_WEEK_DATES.map((date, index) => (
                         <div
-                            className="d-flex flex-column justify-content-center align-items-center"
-                            style={{ gap: 0, flex: 1 }}
+                            className="d-flex flex-column"
+                            style={{
+                                flex: 1,
+                            }}
                             key={index}
                         >
                             {/* Current column header || current date */}
                             <div
+                                className="d-flex align-items-center justify-content-center"
                                 style={{
                                     fontSize: 14,
                                     color: Palette.INACTIVE_GRAY,
-                                    flex: 1,
-                                    marginBottom: 16,
+                                    height: "116px",
                                 }}
                             >
                                 {moment(date).format("LL")}
                             </div>
 
                             {/* Loop for getting schedule data in every hour in current date  */}
-                            {[...new Array(12).fill("08.00")].map(
-                                (text, index) => (
-                                    <div
-                                        className="d-flex flex-column"
-                                        style={{
-                                            gap: 4,
-                                            padding: "4px 4px",
-                                            border: "1px solid #404040",
-                                            flex: 1,
-                                            width: "100%",
-                                        }}
-                                        key={index}
-                                    >
-                                        {/* Loop for getting schedule data in current hour */}
-                                        {SCHEDULES.map((item, index) => (
-                                            <ScheduleItem
-                                                key={index}
-                                                backgroundColor={
-                                                    item.backgroundColor
-                                                }
-                                                color={item.color}
-                                            />
-                                        ))}
-                                    </div>
-                                )
-                            )}
+                            {OPERATIONAL_HOURS.map((text, index) => (
+                                <div
+                                    className="d-flex flex-column"
+                                    style={{
+                                        gap: 8,
+                                        padding: "4px 4px",
+                                        border: "1px solid #404040",
+                                        flex: 1,
+                                    }}
+                                    key={index}
+                                >
+                                    {/* Loop for getting schedule data in current hour */}
+                                    {SCHEDULES.map((item, index) => (
+                                        <ScheduleItem
+                                            key={index}
+                                            backgroundColor={
+                                                item.backgroundColor
+                                            }
+                                            color={item.color}
+                                        />
+                                    ))}
+                                </div>
+                            ))}
                         </div>
                     ))}
                 </div>
@@ -190,7 +185,6 @@ function ScheduleItem(props) {
                 color: props.color,
                 borderRadius: 24,
                 fontSize: 10,
-                flex: 1,
             }}
         >
             <div className="font-weight-bold">Beginner</div>

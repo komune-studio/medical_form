@@ -53,15 +53,15 @@ var routes = [
         layout: "/admin",
     },
     {
-<<<<<<< HEAD
         path: "/schedule",
         name: "Schedule",
         component: Schedule,
-=======
+        layout: "/admin",
+    },
+    {
         path: "/orders",
         name: "Order",
         component: OrderList,
->>>>>>> e0d4bba88d84447f3c5fd6b809e4ced0bf5929c2
         layout: "/admin",
     },
     {
