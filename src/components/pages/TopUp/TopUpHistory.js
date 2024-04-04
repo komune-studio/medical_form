@@ -37,7 +37,7 @@ const TopUpHistory = () => {
         {
             id: 'user_id', label: 'User', filter: true,
             render: (row => {
-                return row?.user?.name
+                return row?.users?.username
             })
         },
         // {
@@ -119,7 +119,7 @@ const TopUpHistory = () => {
                             <Dropdown>
                                 <Dropdown.Toggle style={{zIndex: 1000}} variant="outline-secondary"
                                                  id="dropdown-basic">
-                                    <span style={{color:'#fff'}}>  Minggu Ini</span>
+                                    <span style={{color: '#fff'}}>  Minggu Ini</span>
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu style={{color: '#fff'}}>
