@@ -7,6 +7,8 @@ const SCHEDULES = [
     { backgroundColor: Palette.LIGHT_GRAY, color: Palette.WHITE_GRAY },
     { backgroundColor: "#FFF3CD", color: "#664D03" },
     { backgroundColor: "#F8D7DA", color: "#842029" },
+    { backgroundColor: "#D1E7DD", color: "#0F5132" },
+    { backgroundColor: Palette.LIGHT_GRAY, color: Palette.WHITE_GRAY },
 ];
 
 const OPERATIONAL_HOURS = [
@@ -103,74 +105,68 @@ export default function Schedule() {
                 {/* Table y-axis header */}
                 <div className="d-flex flex-column">
                     <div style={{ flex: 1 }}></div>
+
                     {/* Loop for getting the y-axis of the table (every hour in a day) */}
                     {OPERATIONAL_HOURS.map((text, index) => (
-                        <TableYAxis key={index} text={text} />
-                    ))}
-                </div>
-
-                {/* Table content  */}
-                <div className="d-flex" style={{ flex: 1 }}>
-                    {/* Looping through each date in current pagination */}
-                    {PAST_WEEK_DATES.map((date, index) => (
                         <div
-                            className="d-flex flex-column"
+                            className="d-flex justify-content-center align-items-start font-weight-bold"
                             style={{
                                 flex: 1,
+                                padding: "2px 4px",
+                                fontSize: 12,
                             }}
-                            key={index}
                         >
-                            {/* Current column header || current date */}
-                            <div
-                                className="d-flex align-items-center justify-content-center"
-                                style={{
-                                    fontSize: 14,
-                                    color: Palette.INACTIVE_GRAY,
-                                    height: "116px",
-                                }}
-                            >
-                                {moment(date).format("LL")}
-                            </div>
-
-                            {/* Loop for getting schedule data in every hour in current date  */}
-                            {OPERATIONAL_HOURS.map((text, index) => (
-                                <div
-                                    className="d-flex flex-column"
-                                    style={{
-                                        gap: 8,
-                                        padding: "4px 4px",
-                                        border: "1px solid #404040",
-                                        flex: 1,
-                                    }}
-                                    key={index}
-                                >
-                                    {/* Loop for getting schedule data in current hour */}
-                                    {SCHEDULES.map((item, index) => (
-                                        <ScheduleItem
-                                            key={index}
-                                            backgroundColor={
-                                                item.backgroundColor
-                                            }
-                                            color={item.color}
-                                        />
-                                    ))}
-                                </div>
-                            ))}
+                            {text}
                         </div>
                     ))}
                 </div>
-            </div>
-        </div>
-    );
-}
 
-function TableYAxis(props) {
-    return (
-        <div
-            className="d-flex justify-content-center align-items-start font-weight-bold"
-            style={{ flex: 1, padding: "2px 4px", fontSize: 12 }}
-        >
-            {props.text}
+                {/* Looping through each date in current pagination */}
+                {PAST_WEEK_DATES.map((date, index) => (
+                    <div
+                        className="d-flex flex-column"
+                        style={{
+                            flex: 1,
+                        }}
+                        key={index}
+                    >
+                        {/* Current column header || current date */}
+                        <div
+                            className="d-flex align-items-center justify-content-center"
+                            style={{
+                                fontSize: 14,
+                                color: Palette.INACTIVE_GRAY,
+                                flex: 1,
+                            }}
+                        >
+                            {moment(date).format("LL")}
+                        </div>
+
+                        {/* Loop for getting schedule data in every hour in current date  */}
+                        {OPERATIONAL_HOURS.map((text, index) => (
+                            <div
+                                className="d-flex flex-column"
+                                style={{
+                                    gap: 8,
+                                    padding: "4px 4px",
+                                    border: "1px solid #404040",
+                                    flex: 1,
+                                }}
+                                key={index}
+                            >
+                                {/* Loop for getting schedule data in current hour */}
+                                {SCHEDULES.map((item, index) => (
+                                    <ScheduleItem
+                                        key={index}
+                                        backgroundColor={item.backgroundColor}
+                                        color={item.color}
+                                    />
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

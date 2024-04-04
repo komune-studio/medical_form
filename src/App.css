@@ -2,6 +2,15 @@
     z-index: 20000 !important;
 }
 
+.ant-switch,
+.ant-switch:not(.ant-switch-checked) > .ant-switch-inner {
+    background-color: #282828 !important;
+}
+
+.ant-switch:not(.ant-switch-checked) > .ant-switch-handle::before {
+    background-color: #FFF !important;
+}
+
 .ant-picker-outlined {
     z-index: 1000000000 !important;
 }
@@ -31,19 +40,18 @@
     color: #000 !important;
     border-top: none !important;
     border-left: none !important;
-
 }
 
 .MuiTablePagination-selectLabel {
     height: 100% !important;
     margin-top: auto !important;
-    color: #CCCCCC;
+    color: #cccccc;
 }
 
 .MuiTablePagination-displayedRows {
     height: 100% !important;
     margin-top: auto !important;
-    color: #CCCCCC;
+    color: #cccccc;
 }
 
 .MuiToolbar-root {
@@ -51,7 +59,7 @@
 }
 
 .info-hint p {
-    color: #C2C2C2;
+    color: #c2c2c2;
     font-family: Helixa;
     font-size: 12px;
     font-weight: 400;
