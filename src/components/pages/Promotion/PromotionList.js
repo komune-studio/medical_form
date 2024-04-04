@@ -36,7 +36,7 @@ const PromotionList = () => {
         {
             id: 'active', label: 'Status Promo', filter: false, width: '12%',
             render: (row => {
-                return <Switch disabled={true} defaultChecked={row.active} onChange={() => {
+                return <Switch disabled={true} defaultChecked={row.active} checked={row.active} onChange={() => {
                     changeActive(row.id, row.active)
                 }}/>
             })
