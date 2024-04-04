@@ -1,13 +1,24 @@
-import Modal from 'react-bootstrap/Modal';
-import {Button, DatePicker, message, Spin, Switch, Upload as AntUpload} from "antd";
-import {Form} from 'react-bootstrap';
-import React, {useEffect, useState} from "react";
+import Modal from "react-bootstrap/Modal";
+import {
+    Button,
+    DatePicker,
+    message,
+    Spin,
+    Switch,
+    Upload as AntUpload,
+} from "antd";
+import { Form } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 import UserModel from "../../../models/UserModel";
-import {CloseOutlined, LoadingOutlined, PlusOutlined} from '@ant-design/icons';
+import {
+    CloseOutlined,
+    LoadingOutlined,
+    PlusOutlined,
+} from "@ant-design/icons";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
 import moment from "moment/moment";
-import UploadModel from "../../../models/UploadModel"
+import UploadModel from "../../../models/UploadModel";
 import PromotionModel from "../../../models/PromotionModel";
 
 PromotionModalForm.propTypes = {
@@ -17,202 +28,262 @@ PromotionModalForm.propTypes = {
     selectedData: PropTypes.object,
 };
 
-
-export default function PromotionModalForm({isOpen, close, isNewRecord, selectedData}) {
-    const [name, setName] = useState(null)
-    const [imageUrl, setImageUrl] = useState(null)
-    const [description, setDescription] = useState(null)
-    const [loadingUpload, setLoadingUpload] = useState(false)
+export default function PromotionModalForm({
+    isOpen,
+    close,
+    isNewRecord,
+    selectedData,
+}) {
+    const [name, setName] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [description, setDescription] = useState(null);
+    const [active, setActive] = useState(true);
+    const [loadingUpload, setLoadingUpload] = useState(false);
 
     const onSubmit = async () => {
         if (!name) {
-            swal.fireError({text: "Nama Promo Wajib diisi",})
-            return
+            swal.fireError({ text: "Nama Promo Wajib diisi" });
+            return;
         }
         if (!imageUrl) {
-            swal.fireError({text: "Gambar Promo Wajib diisi",})
-            return
+            swal.fireError({ text: "Gambar Promo Wajib diisi" });
+            return;
         }
         try {
             let body = {
                 name: name,
                 description: description,
-                image_url: imageUrl
-            }
-            let msg = ''
+                image_url: imageUrl,
+                active: active,
+            };
+            let msg = "";
             if (isNewRecord) {
-                await PromotionModel.create(body)
-                msg = "Berhasil membuat Promotion"
+                await PromotionModel.create(body);
+                msg = "Berhasil membuat Promotion";
             } else {
-                await PromotionModel.edit(selectedData?.id, body)
-                msg = "Berhasil mengubah Promotion"
+                await PromotionModel.edit(selectedData?.id, body);
+                msg = "Berhasil mengubah Promotion";
             }
-            message.success(msg)
-            handleClose(true)
+            message.success(msg);
+            handleClose(true);
         } catch (e) {
-            console.log(e)
-            let errorMessage = "An Error Occured"
+            console.log(e);
+            let errorMessage = "An Error Occured";
             await swal.fire({
-                title: 'Error',
+                title: "Error",
                 text: e.error_message ? e.error_message : "An Error Occured",
-                icon: 'error',
-                confirmButtonText: 'Okay'
-            })
+                icon: "error",
+                confirmButtonText: "Okay",
+            });
         }
-
-    }
+    };
 
     const handleClose = (refresh) => {
-        close(refresh)
-    }
+        close(refresh);
+    };
 
     const initForm = () => {
         if (!isNewRecord) {
-            setName(selectedData?.name)
-            setDescription(selectedData?.description)
-            setImageUrl(selectedData?.image_url)
+            setName(selectedData?.name);
+            setDescription(selectedData?.description);
+            setImageUrl(selectedData?.image_url);
+            setActive(selectedData?.active);
         }
-
-    }
+    };
     useEffect(() => {
         if (isNewRecord) {
-            reset()
+            reset();
         } else {
-            initForm()
+            initForm();
         }
-
-
-    }, [isOpen])
+    }, [isOpen]);
 
     const reset = () => {
-        setName("")
-        setDescription("")
-        setImageUrl(null)
-    }
+        setName("");
+        setDescription("");
+        setImageUrl(null);
+    };
 
     const handleUpload = async (file) => {
         try {
-            setLoadingUpload(true)
-            let result = await UploadModel.uploadPicutre(file.file?.originFileObj)
+            setLoadingUpload(true);
+            let result = await UploadModel.uploadPicutre(
+                file.file?.originFileObj
+            );
 
             if (result?.location) {
-                setImageUrl(result?.location)
-                message.success('Successfully upload user')
+                setImageUrl(result?.location);
+                message.success("Successfully upload user");
             }
-            setLoadingUpload(false)
+            setLoadingUpload(false);
         } catch (e) {
-            console.log('isi e', e)
-            message.error("Failed to upload user")
-            setLoadingUpload(false)
+            console.log("isi e", e);
+            message.error("Failed to upload user");
+            setLoadingUpload(false);
         }
-    }
+    };
 
-    return <Modal
-        size={'lg'}
-        show={isOpen}
-        backdrop="static"
-        keyboard={false}
-    >
-
-
-        <Modal.Header>
-            <div className={'d-flex w-100 justify-content-between'}>
-                <Modal.Title>{isNewRecord ? 'Buat Promo' : `Ubah Promo`}</Modal.Title>
-                <Button onClick={() => {
-                    close()
-                }} style={{position: 'relative', top: -5, color: '#fff', fontWeight: 800}} type="link" shape="circle"
-                        icon={<CloseOutlined/>}/>
-            </div>
-        </Modal.Header>
-        <Modal.Body>
-            <Form.Group>
-                <Form.Label style={{fontSize: "0.8em"}}>Banner promo*</Form.Label>
-                <div className={'info-hint mb-2 mt-2'}>
-                    <p>Teks ini merupakan instruksi untuk foto yang perlu diupload.</p>
+    return (
+        <Modal size={"lg"} show={isOpen} backdrop="static" keyboard={false}>
+            <Modal.Header>
+                <div className={"d-flex w-100 justify-content-between"}>
+                    <Modal.Title>
+                        {isNewRecord ? "Buat Promo" : `Ubah Promo`}
+                    </Modal.Title>
+                    <Button
+                        onClick={() => {
+                            close();
+                        }}
+                        style={{
+                            position: "relative",
+                            top: -5,
+                            color: "#fff",
+                            fontWeight: 800,
+                        }}
+                        type="link"
+                        shape="circle"
+                        icon={<CloseOutlined />}
+                    />
                 </div>
-                <AntUpload
-                    rootClassName={'upload-background'}
-                    name="avatar"
-                    listType="picture-card"
-                    fileList={[]}
-                    className="avatar-uploader"
-                    showUploadList={false}
-                    onChange={(file) => {
-                        handleUpload(file)
-                    }}
-                >
-                    {imageUrl ? (
-                        <>
-                            {
-                                !loadingUpload ? <img
-                                    src={imageUrl}
-                                    alt="avatar"
-                                    style={{
-                                        width: '80%',
-                                        height: '80%',
-                                        objectFit: 'cover'
-                                    }}
-                                /> : <Spin style={{zIndex: 100000}} size="large"/>
-                            }
-
-                        </>
-
-                    ) : (
-                        <button
-                            style={{
-                                border: 0,
-                                background: 'none',
-                            }}
-                            type="button"
-                        >
-                            {loadingUpload ? <Spin style={{zIndex: 100000}} size="large"/> : <PlusOutlined/>}
-                            <div
+            </Modal.Header>
+            <Modal.Body>
+                <Form.Group>
+                    <Form.Label style={{ fontSize: "0.8em" }}>
+                        Banner promo*
+                    </Form.Label>
+                    <div className={"info-hint mb-2 mt-2"}>
+                        <p>
+                            Teks ini merupakan instruksi untuk foto yang perlu
+                            diupload.
+                        </p>
+                    </div>
+                    <AntUpload
+                        rootClassName={"upload-background"}
+                        name="avatar"
+                        listType="picture-card"
+                        fileList={[]}
+                        className="avatar-uploader"
+                        showUploadList={false}
+                        onChange={(file) => {
+                            handleUpload(file);
+                        }}
+                    >
+                        {imageUrl ? (
+                            <>
+                                {!loadingUpload ? (
+                                    <img
+                                        src={imageUrl}
+                                        alt="avatar"
+                                        style={{
+                                            width: "80%",
+                                            height: "80%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                ) : (
+                                    <Spin
+                                        style={{ zIndex: 100000 }}
+                                        size="large"
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <button
                                 style={{
-                                    marginTop: 8,
+                                    border: 0,
+                                    background: "none",
                                 }}
+                                type="button"
                             >
-                                Upload
-                            </div>
-                        </button>
-                    )}
-                </AntUpload>
-            </Form.Group>
-            <Form.Group className="mb-3">
-                <Form.Label style={{fontSize: "0.8em"}}>Nama Promo</Form.Label>
-                <Form.Control
-                    value={name}
-                    autoComplete={"referralCode"}
-                    onChange={(e) => setName(e.target.value)} type="text" placeholder="Masukan Nama Promo"/>
-            </Form.Group>
+                                {loadingUpload ? (
+                                    <Spin
+                                        style={{ zIndex: 100000 }}
+                                        size="large"
+                                    />
+                                ) : (
+                                    <PlusOutlined />
+                                )}
+                                <div
+                                    style={{
+                                        marginTop: 8,
+                                    }}
+                                >
+                                    Upload
+                                </div>
+                            </button>
+                        )}
+                    </AntUpload>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label style={{ fontSize: "0.8em" }}>
+                        Nama Promo
+                    </Form.Label>
+                    <Form.Control
+                        value={name}
+                        autoComplete={"referralCode"}
+                        onChange={(e) => setName(e.target.value)}
+                        type="text"
+                        placeholder="Masukan Nama Promo"
+                    />
+                </Form.Group>
 
-            <Form.Group className="mb-3">
-                <Form.Label style={{fontSize: "0.8em"}}>Deskripsi Promo</Form.Label>
-                <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={description}
-                    autoComplete={"description"}
-                    onChange={(e) => setDescription(e.target.value)} type="text" placeholder="Masukan Deskripsi Promo"/>
-            </Form.Group>
-            <div className={'d-flex'} style={{justifyContent: 'space-between'}}>
-                <div className={'info-hint mb-2 mt-2'}>
-                    <span className={'text-white'} style={{fontSize: 16}}>Aktifkan di Barcode Gokart App</span>
-                    <p>Promo aktif akan muncul di Barcode Gokart App dan bisa dilihat oleh pelanggan.</p>
+                <Form.Group className="mb-3">
+                    <Form.Label style={{ fontSize: "0.8em" }}>
+                        Deskripsi Promo
+                    </Form.Label>
+                    <Form.Control
+                        as="textarea"
+                        rows={3}
+                        value={description}
+                        autoComplete={"description"}
+                        onChange={(e) => setDescription(e.target.value)}
+                        type="text"
+                        placeholder="Masukan Deskripsi Promo"
+                    />
+                </Form.Group>
+                <div
+                    className={"d-flex"}
+                    style={{ justifyContent: "space-between" }}
+                >
+                    <div className={"info-hint mb-2 mt-2"}>
+                        <span className={"text-white"} style={{ fontSize: 16 }}>
+                            Aktifkan di Barcode Gokart App
+                        </span>
+                        <p>
+                            Promo aktif akan muncul di Barcode Gokart App dan
+                            bisa dilihat oleh pelanggan.
+                        </p>
+                    </div>
+                    <Switch
+                        defaultChecked={active}
+                        checked={active}
+                        onChange={() => setActive(!active)}
+                    />
                 </div>
-                <Switch defaultChecked={true}/>
-            </div>
 
-            <div className={"d-flex flex-row justify-content-end"}>
-                <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
-                        onClick={() => handleClose()} style={{marginRight: '5px'}}>
-                    Batal
-                </Button>
-                <Button type={'primary'} size="sm" variant="primary" onClick={() => {
-                    onSubmit()
-                }}>
-                    {isNewRecord ? 'Simpan' : 'Ubah'}
-                </Button>
-            </div>
-        </Modal.Body>
-    </Modal>
+                <div className={"d-flex flex-row justify-content-end"}>
+                    <Button
+                        className={"text-white"}
+                        type={"link"}
+                        size="sm"
+                        variant="outline-danger"
+                        onClick={() => handleClose()}
+                        style={{ marginRight: "5px" }}
+                    >
+                        Batal
+                    </Button>
+                    <Button
+                        type={"primary"}
+                        size="sm"
+                        variant="primary"
+                        onClick={() => {
+                            onSubmit();
+                        }}
+                    >
+                        {isNewRecord ? "Simpan" : "Ubah"}
+                    </Button>
+                </div>
+            </Modal.Body>
+        </Modal>
+    );
 }
