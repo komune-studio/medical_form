@@ -30,6 +30,8 @@ const OPERATIONAL_HOURS = [
     "22.00",
 ];
 
+const DATE_HEADER_HEIGHT = 25;
+
 const getPastWeekDates = () => {
     const result = [];
 
@@ -103,7 +105,7 @@ export default function Schedule() {
             <div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
                 {/* Table y-axis header */}
                 <div className="d-flex flex-column">
-                    <div style={{ flex: 1 }}></div>
+                    <div style={{ height: DATE_HEADER_HEIGHT }}></div>
 
                     {/* Loop for getting the y-axis of the table (every hour in a day) */}
                     {OPERATIONAL_HOURS.map((text, index) => (
@@ -135,7 +137,7 @@ export default function Schedule() {
                             style={{
                                 fontSize: 14,
                                 color: Palette.INACTIVE_GRAY,
-                                flex: 1,
+                                height: DATE_HEADER_HEIGHT,
                             }}
                         >
                             {moment(date).format("LL")}
