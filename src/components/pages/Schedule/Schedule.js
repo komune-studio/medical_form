@@ -116,6 +116,7 @@ export default function Schedule() {
                                 padding: "2px 4px",
                                 fontSize: 12,
                             }}
+                            key={index}
                         >
                             {text}
                         </div>
