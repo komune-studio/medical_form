@@ -104,9 +104,10 @@ export default function Schedule() {
             {/* Schedule table */}
             <div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
                 {/* Table y-axis header */}
-                <div className="d-flex flex-column">
-                    <div style={{ height: DATE_HEADER_HEIGHT }}></div>
-
+                <div className="d-flex flex-column">       
+                    
+                    <div style={{ height: DATE_HEADER_HEIGHT, marginBottom: 8 }}></div>
+                    
                     {/* Loop for getting the y-axis of the table (every hour in a day) */}
                     {OPERATIONAL_HOURS.map((text, index) => (
                         <div
@@ -114,7 +115,9 @@ export default function Schedule() {
                             style={{
                                 flex: 1,
                                 padding: "2px 4px",
+                                marginRight: 12,
                                 fontSize: 12,
+                                fontWeight: 700,
                             }}
                             key={index}
                         >
@@ -137,8 +140,10 @@ export default function Schedule() {
                             className="d-flex align-items-center justify-content-center"
                             style={{
                                 fontSize: 14,
+                                fontWeight: 700,
                                 color: Palette.INACTIVE_GRAY,
                                 height: DATE_HEADER_HEIGHT,
+                                marginBottom: 8,
                             }}
                         >
                             {moment(date).format("LL")}

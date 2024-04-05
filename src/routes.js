@@ -57,6 +57,7 @@ var routes = [
         path: "/schedule",
         name: "Schedule",
         component: Schedule,
+        layout: "/admin",
     },
     {
         path: "/orders/create",
