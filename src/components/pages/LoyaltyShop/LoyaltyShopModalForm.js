@@ -88,6 +88,7 @@ export default function LoyaltyModalForm({isOpen, close, isNewRecord, selectedDa
         }
 
     }
+    
     useEffect(() => {
         if (isNewRecord) {
             reset()
