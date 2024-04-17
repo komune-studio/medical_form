@@ -5,12 +5,12 @@ import TopUpTitleBar from "../TopUp/TopUpTitleBar";
 import { Dropdown } from "react-bootstrap";
 import Iconify from "../../reusable/Iconify";
 import CustomTable from "../../reusable/CustomTable";
+import swal from "../../reusable/CustomSweetAlert";
 import React, { useEffect, useState } from "react";
 import { Space, Button as AntButton } from "antd";
 import OrderModel from "models/OrderModel";
 import UserModel from "models/UserModel";
 import { useHistory } from "react-router-dom";
-import { OrderFeedbackModal } from "./OrderFeedbackModal";
 
 const ITEMS = [
     { id: 1, name: "Beginner Ticket", price: "30.000" },
@@ -26,8 +26,6 @@ export default function OrderCreate() {
     let [quantity, setQuantity] = useState([0, 0, 0]);
     let [scanTextInput, setScanTextInput] = useState("");
     let [scannedUser, setScannedUser] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [feedbackData, setFeedbackData] = useState({});
 
     const editValue = (value) => {
         setScanTextInput(value);
@@ -55,18 +53,19 @@ export default function OrderCreate() {
                 details,
             });
             console.log("QR PAYMENT SUCCESS", result);
-            setFeedbackData({ message: "QR Payment Success!", code: 200 });
+            swal.fire({
+                title: `Success`,
+                icon: 'success',
+                text: "QR payment success!",
+            });
+            history.push("/orders")
         } catch (e) {
             console.log("QR PAYMENT FAILED", e);
-            setFeedbackData({
-                message: "QR Payment Failed! - ".concat(
-                    e.error_message ? e.error_message : ""
-                ),
-                code: e.http_code ? e.http_code : 500,
+            swal.fireError({
+                title: `Error`,
+                text: e.error_message ? e.error_message : "Invalid request, please try again.",
             });
         }
-
-        setModalOpen(true);
     };
 
     const findUserByQR = async (value) => {
@@ -78,13 +77,10 @@ export default function OrderCreate() {
             setScannedUser(qr);
         } catch (e) {
             console.log("findUserByQR Error", e);
-            setFeedbackData({
-                message: "Invalid QR! - ".concat(
-                    e.error_message ? e.error_message : ""
-                ),
-                code: e.http_code ? e.http_code : 500,
+            swal.fireError({
+                title: `Error`,
+                text: e.error_message ? e.error_message : "Invalid QR, please try again.",
             });
-            setModalOpen(true);
         }
     };
 
@@ -104,7 +100,9 @@ export default function OrderCreate() {
                         }}
                     >
                         <div onClick={() => history.push("/orders")}>
-                            <Iconify icon={"material-symbols:arrow-back"}></Iconify>
+                            <Iconify
+                                icon={"material-symbols:arrow-back"}
+                            ></Iconify>
                         </div>
                         <div style={{ flex: 1 }}>&nbsp;Proses Order</div>
                         <AntButton
@@ -294,13 +292,6 @@ export default function OrderCreate() {
                         </div>
                     </Col>
                 </Row>
-                <OrderFeedbackModal
-                    isOpen={modalOpen}
-                    feedback={feedbackData}
-                    handleClose={() => {
-                        setModalOpen(false);
-                    }}
-                />
             </Container>
         </>
     );

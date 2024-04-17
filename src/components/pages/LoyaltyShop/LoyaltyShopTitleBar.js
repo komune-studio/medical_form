@@ -9,7 +9,7 @@ export default function LoyaltyShopTitleBar() {
         <>
             <Row className={'mb-4'}>
                 <Col className='mb-3' md={12}>
-                    <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Top Up</div>
+                    <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Loyalty Shop</div>
                 </Col>
                 <Col md={12}>
                     <ButtonGroup aria-label="Basic example">

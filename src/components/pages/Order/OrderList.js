@@ -72,7 +72,6 @@ export default function OrderList() {
         }
     ]
 
-
     const initializeData = async () => {
         setLoading(true)
         try {
@@ -108,6 +107,7 @@ export default function OrderList() {
             key: '3',
         },
     ];
+
     return (
         <>
             <Container fluid>
