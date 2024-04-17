@@ -1,6 +1,7 @@
 import { Button, Card, CardBody, Container } from "reactstrap";
 import { Col, Form, Row } from "react-bootstrap";
 import Palette from "../../../utils/Palette";
+import Helper from "utils/Helper";
 import TopUpTitleBar from "../TopUp/TopUpTitleBar";
 import { Dropdown } from "react-bootstrap";
 import Iconify from "../../reusable/Iconify";
@@ -26,6 +27,7 @@ export default function OrderCreate() {
     let [quantity, setQuantity] = useState([0, 0, 0]);
     let [scanTextInput, setScanTextInput] = useState("");
     let [scannedUser, setScannedUser] = useState(null);
+    const [orderItems, setOrderItems] = useState([]);
 
     const editValue = (value) => {
         setScanTextInput(value);
@@ -55,15 +57,17 @@ export default function OrderCreate() {
             console.log("QR PAYMENT SUCCESS", result);
             swal.fire({
                 title: `Success`,
-                icon: 'success',
+                icon: "success",
                 text: "QR payment success!",
             });
-            history.push("/orders")
+            history.push("/orders");
         } catch (e) {
             console.log("QR PAYMENT FAILED", e);
             swal.fireError({
                 title: `Error`,
-                text: e.error_message ? e.error_message : "Invalid request, please try again.",
+                text: e.error_message
+                    ? e.error_message
+                    : "Invalid request, please try again.",
             });
         }
     };
@@ -79,12 +83,27 @@ export default function OrderCreate() {
             console.log("findUserByQR Error", e);
             swal.fireError({
                 title: `Error`,
-                text: e.error_message ? e.error_message : "Invalid QR, please try again.",
+                text: e.error_message
+                    ? e.error_message
+                    : "Invalid QR, please try again.",
             });
         }
     };
 
-    useEffect(() => {}, []);
+    const getOrderItems = async () => {
+        try {
+            // Modelnya masih salah, belum ada kayaknya (?)
+            let result = await OrderModel.getAll();
+            setOrderItems(result);
+            console.log("ORDER ITEMS", result);
+        } catch (e) {
+            swal.fireError({ text: e.error_message ? e.error_message : "" });
+        }
+    };
+
+    useEffect(() => {
+        getOrderItems();
+    }, []);
 
     return (
         <>
@@ -217,7 +236,7 @@ export default function OrderCreate() {
                                         <Iconify
                                             icon={"fluent-emoji-flat:coin"}
                                         ></Iconify>
-                                        30.000
+                                        300.000
                                     </div>
                                 </Col>
                                 {/* <Col md={12} style={{marginTop : 10}}>
@@ -252,6 +271,17 @@ export default function OrderCreate() {
                                         }}
                                     >
                                         {scannedUser.email}
+                                    </div>
+                                    <div
+                                        style={{
+                                            color: "#C2C2C2",
+                                            fontSize: "0.85em",
+                                        }}
+                                    >
+                                        <Iconify
+                                            icon={"fluent-emoji-flat:coin"}
+                                        ></Iconify>
+                                        {Helper.formatNumber(scannedUser.balance.COIN)}
                                     </div>
                                 </div>
                             ) : (
