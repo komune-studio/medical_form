@@ -11,12 +11,13 @@ import React, { useEffect, useState } from "react";
 import { Space, Button as AntButton } from "antd";
 import OrderModel from "models/OrderModel";
 import UserModel from "models/UserModel";
+import OrderCreateModel from "models/OrderCreateModel";
 import { useHistory } from "react-router-dom";
 
 const ITEMS = [
-    { id: 1, name: "Beginner Ticket", price: "30.000" },
-    { id: 2, name: "Advanced Ticket", price: "40.000" },
-    { id: 3, name: "Pro Ticket", price: "50.000" },
+    { id: 1, name: "Beginner Ticket", price: "30000" },
+    { id: 2, name: "Advanced Ticket", price: "40000" },
+    { id: 3, name: "Pro Ticket", price: "50000" },
 ];
 
 let contentTimer;
@@ -28,6 +29,7 @@ export default function OrderCreate() {
     let [scanTextInput, setScanTextInput] = useState("");
     let [scannedUser, setScannedUser] = useState(null);
     const [orderItems, setOrderItems] = useState([]);
+    const [total, setTotal] = useState(0)
 
     const editValue = (value) => {
         setScanTextInput(value);
@@ -40,6 +42,11 @@ export default function OrderCreate() {
             }
         }, 300);
     };
+
+    const resetValue = () => {
+        setScanTextInput("");
+        setQuantity([0, 0, 0]);
+    }
 
     const onSubmit = async () => {
         try {
@@ -87,15 +94,14 @@ export default function OrderCreate() {
                     ? e.error_message
                     : "Invalid QR, please try again.",
             });
+            resetValue();
         }
     };
 
     const getOrderItems = async () => {
         try {
-            // Modelnya masih salah, belum ada kayaknya (?)
-            let result = await OrderModel.getAll();
+            let result = await OrderCreateModel.getAll();
             setOrderItems(result);
-            console.log("ORDER ITEMS", result);
         } catch (e) {
             swal.fireError({ text: e.error_message ? e.error_message : "" });
         }
@@ -104,6 +110,18 @@ export default function OrderCreate() {
     useEffect(() => {
         getOrderItems();
     }, []);
+
+    useEffect(() => {
+        let sum = 0;
+        
+        if (orderItems.length > 0) {
+            quantity.forEach((num, index) => {
+                sum += orderItems[index].price * num
+            })
+        }
+
+        setTotal(sum);
+    }, [quantity, orderItems])
 
     return (
         <>
@@ -124,6 +142,19 @@ export default function OrderCreate() {
                             ></Iconify>
                         </div>
                         <div style={{ flex: 1 }}>&nbsp;Proses Order</div>
+                        <AntButton
+                            onClick={() => {
+                                resetValue();
+                            }}
+                            style={{
+                                backgroundColor: 'transparent',
+                                borderColor: Palette.BARCODE_ORANGE,
+                                color: "white",
+                                marginRight: 12,
+                            }}
+                        >
+                            Reset
+                        </AntButton>
                         <AntButton
                             onClick={() => {
                                 onSubmit();
@@ -158,7 +189,7 @@ export default function OrderCreate() {
                                         }}
                                     ></div>
                                 </Col>
-                                {ITEMS.map((item, index) => {
+                                {orderItems.map((item, index) => {
                                     return (
                                         <>
                                             <Col
@@ -236,7 +267,7 @@ export default function OrderCreate() {
                                         <Iconify
                                             icon={"fluent-emoji-flat:coin"}
                                         ></Iconify>
-                                        300.000
+                                        {Helper.formatNumber(total)}
                                     </div>
                                 </Col>
                                 {/* <Col md={12} style={{marginTop : 10}}>
