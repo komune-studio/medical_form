@@ -14,12 +14,6 @@ import UserModel from "models/UserModel";
 import OrderCreateModel from "models/OrderCreateModel";
 import { useHistory } from "react-router-dom";
 
-const ITEMS = [
-    { id: 1, name: "Beginner Ticket", price: "30000" },
-    { id: 2, name: "Advanced Ticket", price: "40000" },
-    { id: 3, name: "Pro Ticket", price: "50000" },
-];
-
 let contentTimer;
 
 export default function OrderCreate() {
@@ -54,7 +48,7 @@ export default function OrderCreate() {
             for (let qIndex in quantity) {
                 let q = quantity[qIndex];
                 if (q > 0) {
-                    details.push({ id: ITEMS[qIndex].id, quantity: q });
+                    details.push({ id: orderItems[qIndex].id, quantity: q });
                 }
             }
             let result = await OrderModel.create({

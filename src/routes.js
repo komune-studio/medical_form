@@ -27,6 +27,8 @@ import PromotionList from "./components/pages/Promotion/PromotionList";
 import LoyaltyShopList from "./components/pages/LoyaltyShop/LoyaltyShopList.";
 import OrderList from "./components/pages/Order/OrderList";
 import OrderCreate from "components/pages/Order/OrderCreate";
+import LoyaltyHistory from "components/pages/LoyaltyShop/LoyaltyHistory";
+import LoyaltyHistoryCreate from "components/pages/LoyaltyShop/LoyaltyHistoryCreate";
 
 var routes = [
     {
@@ -61,7 +63,7 @@ var routes = [
     },
     {
         path: "/orders/create",
-        name: "Order",
+        name: "Order Create",
         component: OrderCreate,
         layout: "/admin",
     },
@@ -81,6 +83,18 @@ var routes = [
         path: "/loyalty-shop-catalog",
         name: "Loyalty Shop",
         component: LoyaltyShopList,
+        layout: "/admin",
+    },
+    {
+        path: "/loyalty-history/create",
+        name: "Loyalty History Create",
+        component: LoyaltyHistoryCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/loyalty-history",
+        name: "Loyalty History",
+        component: LoyaltyHistory,
         layout: "/admin",
     },
     {

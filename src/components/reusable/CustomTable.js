@@ -185,7 +185,7 @@ const CustomTable = ({
         }
 
 
-        <TableContainer sx={{minWidth: 800}}>
+        <TableContainer sx={{minWidth: 0}}>
             <Table>
                 <TableHead>
                     <TableRow>

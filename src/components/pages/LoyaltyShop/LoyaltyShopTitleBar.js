@@ -15,8 +15,8 @@ export default function LoyaltyShopTitleBar() {
                     <ButtonGroup aria-label="Basic example">
                         <Link
                             // style={{background: '#121212'}}
-                            className={`btn ${location.pathname === '/loyalty-shop-history' ? 'btn-primary-tab' : 'btn-default-tab'}`}
-                            to={'/loyalty-shop-history'}>
+                            className={`btn ${location.pathname === '/loyalty-history' ? 'btn-primary-tab' : 'btn-default-tab'}`}
+                            to={'/loyalty-history'}>
                             Histori Tukar Poin
                         </Link>
                         <Link
