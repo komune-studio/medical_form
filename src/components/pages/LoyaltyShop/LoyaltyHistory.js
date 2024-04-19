@@ -43,11 +43,6 @@ export default function LoyaltyHistory() {
                 return <>{`${Helper.formatNumber(row.total_coins)}`}</>;
             },
         },
-        {
-            id: "active",
-            label: "Status",
-            filter: true,
-        },
     ];
 
     // Getting all loyalty usage history

@@ -272,16 +272,17 @@ const CustomTable = ({
                                 <Paper
                                     sx={{
                                         textAlign: 'center',
+                                        backgroundColor: 'transparent',
                                     }}
                                 >
                                     <Typography variant="h6" paragraph>
-                                        Not found
+                                        Data Tidak Ditemukan
                                     </Typography>
 
                                     <Typography variant="body2">
-                                        No results found for &nbsp;
+                                        Tidak ada data ditemukan untuk &nbsp;
                                         <strong>&quot;{filterName}&quot;</strong>.
-                                        <br/> Try checking for typos or using complete words.
+                                        <br/> Periksa nama barang atau coba dengan kata kunci lain
                                     </Typography>
                                 </Paper>
                             </TableCell>

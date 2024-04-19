@@ -22,7 +22,7 @@ export default function LoyaltyHistoryCreate() {
 
     const columns = [
         {
-            id: "item",
+            id: "name",
             label: "Item",
             filter: true,
             render: (row) => {
