@@ -47,27 +47,42 @@ const getPastWeekDates = () => {
     return result;
 };
 
-// DEV
-
+// NOTE --> ini function buat create tournament, numpang taruh di file ini
 const createTournament = async () => {
-
     try {
         const result = await TournamentModel.create({
-            name: 'Pitstop Grand Finale',
-            location: 'Mall of Indonesia',
-            model: 'SODI SX9',
+            name: "Pitstop Grand Finale",
+            location: "Mall of Indonesia",
+            model: "SODI SX9",
             start_date: moment().toISOString(),
             end_date: moment().toISOString(),
-            detail: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sapien sapien, elementum et lacinia placerat, lobortis non justo. Maecenas consequat vel ante non mollis.',
-            type: 'classic',
-        })
-        console.log(result)
-        swal.fire({text: "Data berhasil dibuat", icon: "success"})
-    } catch(e) {
+            detail: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sapien sapien, elementum et lacinia placerat, lobortis non justo. Maecenas consequat vel ante non mollis.",
+            type: "classic",
+        });
+        console.log(result);
+        swal.fire({ text: "Data berhasil dibuat", icon: "success" });
+    } catch (e) {
         swal.fireError(e);
     }
-}
+};
 
+// NOTE --> ini function buat create tournament detail, numpang taruh di file ini
+const createTournamentDetail = async (tournamentId) => {
+    try {
+        const result = await TournamentModel.createDetail({
+            body: {
+                username: "michael",
+                time_in_millisecond: 1200,
+                laps: 20,
+            },
+            id: tournamentId,
+        });
+        console.log(result);
+        swal.fire({ text: "Data detail berhasil dibuat", icon: "success" });
+    } catch (e) {
+        swal.fireError(e);
+    }
+};
 
 export default function Schedule() {
     return (
@@ -129,10 +144,11 @@ export default function Schedule() {
             {/* Schedule table */}
             <div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
                 {/* Table y-axis header */}
-                <div className="d-flex flex-column">       
-                    
-                    <div style={{ height: DATE_HEADER_HEIGHT, marginBottom: 8 }}></div>
-                    
+                <div className="d-flex flex-column">
+                    <div
+                        style={{ height: DATE_HEADER_HEIGHT, marginBottom: 8 }}
+                    ></div>
+
                     {/* Loop for getting the y-axis of the table (every hour in a day) */}
                     {OPERATIONAL_HOURS.map((text, index) => (
                         <div
