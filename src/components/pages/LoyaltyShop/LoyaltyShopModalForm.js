@@ -24,7 +24,7 @@ export default function LoyaltyModalForm({isOpen, close, isNewRecord, selectedDa
     const [description, setDescription] = useState(null)
     const [price, setPrice] = useState(null)
     const [active, setActive] = useState(false)
-    const [loadingUpload, setLoadingUpload] = useState(true)
+    const [loadingUpload, setLoadingUpload] = useState(false)
 
     const onSubmit = async () => {
         if (!name) {
