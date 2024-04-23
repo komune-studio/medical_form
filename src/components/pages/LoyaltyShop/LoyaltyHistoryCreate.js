@@ -92,6 +92,19 @@ export default function LoyaltyHistoryCreate() {
         }
     };
 
+    const findUserByUsername = async (value) => {
+        try {
+            let result = await UserModel.processUserQR({username: value});
+            setScannedUser(result);
+        } catch(e) {
+            swal.fireError({
+                text: e.error_message
+                    ? e.error_message
+                    : "Invalid username, please try again.",
+            });
+        }
+    }
+
     const getLoyaltyItems = async () => {
         try {
             let result = await LoyaltyShopModel.getAll();
@@ -108,6 +121,7 @@ export default function LoyaltyHistoryCreate() {
         }
     };
 
+    // TODO: bedain antara input token dengan username
     const handleScanTextInputChange = (value) => {
         setScanTextInput(value);
 
@@ -325,7 +339,7 @@ export default function LoyaltyHistoryCreate() {
                                 <div style={{ paddingLeft: 10 }}>
                                     <AntButton
                                         onClick={() => {
-                                            findUserByQR();
+                                            findUserByUsername(scanTextInput);
                                         }}
                                         style={{
                                             backgroundColor: "black",
