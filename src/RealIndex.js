@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 /*!
 
 =========================================================
@@ -50,7 +51,7 @@ export default function (props) {
                 },
             }}
         >
-            <BrowserRouter>
+            <BrowserRouter basename="/">
                 <Switch>
                     {
                         kicked ?
@@ -62,8 +63,7 @@ export default function (props) {
                             </>
                             :
                             <>
-                                <Route path="/" render={(props) => <AdminLayout {...props} />}/>
-                                <Redirect from="/" to="/schedule" />
+                                <Route path="/" render={(props) => <AdminLayout {...props} />} />
                                 {/*<Route path={"*"} component={Dashboard}/>*/}
                                 {/*<Route from="*" to="/admin/admin"/>*/}
                             </>
