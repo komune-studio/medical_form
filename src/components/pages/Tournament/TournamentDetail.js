@@ -18,6 +18,7 @@ import TournamentModel from 'models/TournamentModel';
 import Palette from 'utils/Palette';
 import Helper from 'utils/Helper';
 import CustomTable from 'components/reusable/CustomTable';
+import Avatar from 'assets/img/brand/avatar.png';
 
 export default function TournamentDetail() {
 	const [detail, setDetail] = useState({});
@@ -77,9 +78,10 @@ export default function TournamentDetail() {
 			render: (row) => (
 				<Flex align={'center'} gap={12}>
 					<img
-						src={row?.user_avatar_url}
+						src={row?.user_avatar_url || Avatar}
 						alt="driver-avatar"
 						style={{ height: 32, width: 32 }}
+						className="rounded-circle"
 					/>
 					<div>{row?.username}</div>
 				</Flex>
