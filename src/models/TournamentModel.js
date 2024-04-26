@@ -10,10 +10,14 @@ export default class TournamentModel {
     };
 
     static getAll = async () => {
-        return await ApiRequest.set('v1/tournaments', 'GET');
+        return await ApiRequest.set('v1/tournaments/all', 'GET');
     }
 
     static getById = async (id) => {
         return await ApiRequest.set(`v1/tournament/${id}`, 'GET');
+    }
+
+    static edit = async (params) => {
+        return await ApiRequest.set(`v1/tournament/${params.id}`, 'PUT', params.body);
     }
 }

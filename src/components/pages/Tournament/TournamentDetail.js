@@ -123,6 +123,10 @@ export default function TournamentDetail() {
 									value={detail?.tournament?.name || ''}
 								/>
 								<TournamentDetailItem
+									title={'Status'}
+									value={detail?.tournament?.active ? 'Aktif' : 'Tidak Aktif'}
+								/>
+								<TournamentDetailItem
 									title={'Lokasi'}
 									value={detail?.tournament?.location || ''}
 								/>

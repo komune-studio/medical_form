@@ -214,7 +214,7 @@ const LoyaltyShopList = () => {
 
     const onDelete = (record) => {
         Modal.confirm({
-            title: "Apakah Anda yakin ingin nonaktifkan paket ini?",
+            title: "Apakah Anda yakin ingin menonaktifkan paket ini?",
             okText: "Yes",
             okButtonProps: {
                 danger: false,

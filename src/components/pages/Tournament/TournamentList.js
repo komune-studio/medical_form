@@ -3,7 +3,14 @@ import { useHistory } from 'react-router-dom';
 import { Container } from 'reactstrap';
 import { ButtonGroup, Form } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
-import { Flex, Spin, Button as AntButton, Tooltip } from 'antd';
+import {
+	Flex,
+	Spin,
+	Button as AntButton,
+	Tooltip,
+	Switch,
+	Modal as AntModal,
+} from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import TournamentModel from 'models/TournamentModel';
@@ -17,7 +24,7 @@ export default function TournamentList() {
 	const [tournaments, setTournaments] = useState({});
 	const [category, setCategory] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [modal, setModal] = useState({});
+	const [modal, setModal] = useState({ show: false });
 	const history = useHistory();
 
 	const tournamentsDataFormatter = (data) => {
@@ -95,6 +102,21 @@ export default function TournamentList() {
 			render: (row) => <>{Helper.toTitleCase(row?.type || '')}</>,
 		},
 		{
+			id: 'active',
+			label: 'STATUS',
+			filter: false,
+			link: false,
+			render: (row) => (
+				<Switch
+					defaultChecked={row.active}
+					checked={row.active}
+					onChange={() => {
+						handleActiveStatusChange(row);
+					}}
+				/>
+			),
+		},
+		{
 			id: '',
 			label: '',
 			filter: false,
@@ -136,6 +158,46 @@ export default function TournamentList() {
 			},
 		},
 	];
+
+	const handleActiveStatusChange = (rowData) => {
+		AntModal.confirm({
+			title: rowData.active
+				? 'Apakah anda yakin ingin menonaktifkan tournamen ini?'
+				: 'Apakah anda yakin ingin mengaktifkan turnamen ini?',
+			okText: 'Ya',
+			okButtonProps: {
+				danger: false,
+				type: 'primary',
+			},
+			cancelButtonProps: {
+				danger: false,
+				type: 'link',
+				style: { color: '#FFF' },
+			},
+			okType: 'danger',
+			onOk: () => {
+				changeActiveStatus(rowData);
+			},
+		});
+	};
+
+	const changeActiveStatus = async (rowData) => {
+		try {
+			await TournamentModel.edit({
+				id: rowData.id,
+				body: { ...rowData, active: !rowData.active },
+			});
+			swal.fire({
+				text: 'Berhasil mengubah status turnamen!',
+				icon: 'success',
+			});
+			getTournamentsData();
+		} catch (e) {
+			swal.fireError({
+				text: e?.error_message || 'Gagal mengubah status turnamen!',
+			});
+		}
+	};
 
 	useEffect(() => {
 		getTournamentsData();
@@ -283,8 +345,23 @@ function TournamentListModal(props) {
 		}
 
 		try {
-			let result = await TournamentModel.create(formData);
-			swal.fire({ text: 'Turnamen berhasil dibuat!', icon: 'success' });
+			if (props.formType === 'create') {
+				await TournamentModel.create(formData);
+				swal.fire({
+					text: 'Turnamen berhasil dibuat!',
+					icon: 'success',
+				});
+			} else {
+				await TournamentModel.edit({
+					id: props?.tournamentData?.id,
+					body: formData,
+				});
+				swal.fire({
+					text: 'Turnamen berhasil diubah!',
+					icon: 'success',
+				});
+			}
+
 			props.updateTournamentsData();
 			handleClose();
 		} catch (e) {
@@ -295,6 +372,8 @@ function TournamentListModal(props) {
 	};
 
 	useEffect(() => {
+		console.log(props.tournamentData);
+
 		if (props.formType === 'edit') {
 			preFillForm(props.tournamentData);
 		} else {
