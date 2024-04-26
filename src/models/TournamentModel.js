@@ -24,4 +24,8 @@ export default class TournamentModel {
     static editDetail = async (params) => {
         return await ApiRequest.set(`v1/tournament/detail/${params.id}`, 'PUT', params.body);
     }
+
+    static hardDeleteDetail = async (id) => {
+        return await ApiRequest.set(`v1/tournament/detail/${id}`, 'DELETE')
+    }
 }

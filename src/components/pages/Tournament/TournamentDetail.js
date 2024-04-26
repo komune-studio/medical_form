@@ -4,7 +4,13 @@ import { Container } from 'reactstrap';
 import { Form } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import { CloseOutlined } from '@ant-design/icons';
-import { Flex, Button as AntButton, Spin, Tooltip } from 'antd';
+import {
+	Flex,
+	Button as AntButton,
+	Spin,
+	Tooltip,
+	Modal as AntModal,
+} from 'antd';
 import moment from 'moment';
 import Iconify from 'components/reusable/Iconify';
 import swal from 'components/reusable/CustomSweetAlert';
@@ -30,6 +36,37 @@ export default function TournamentDetail() {
 		} catch (e) {
 			setLoading(false);
 			console.log(e);
+		}
+	};
+
+	const handleDelete = (id) => {
+		AntModal.confirm({
+			title: 'Apakah anda yakin ingin menghapus hasil ini?',
+			okText: 'Ya',
+			okButtonProps: {
+				danger: false,
+				type: 'primary',
+			},
+			cancelButtonProps: {
+				danger: false,
+				type: 'link',
+				style: { color: '#FFF' },
+			},
+			okType: 'danger',
+			onOk: () => {
+				deleteData(id);
+			},
+		});
+	};
+
+	const deleteData = async (id) => {
+		try {
+			await TournamentModel.hardDeleteDetail(id);
+			getTournamentDetail();
+			swal.fire({text: 'Berhasil menghapus hasil!', icon: 'success'});
+		} catch(e) {
+			getTournamentDetail();
+			swal.fireError({text: 'Gagal menghapus hasil!'});
 		}
 	};
 
@@ -81,6 +118,21 @@ export default function TournamentDetail() {
 											formType: 'edit',
 											initialData: row,
 										});
+									}}
+								/>
+							</Tooltip>
+							<Tooltip title="Hapus">
+								<AntButton
+									type={'link'}
+									shape={'circle'}
+									icon={
+										<Iconify
+											icon={'material-symbols:delete'}
+										/>
+									}
+									style={{ color: Palette.MAIN_THEME }}
+									onClick={() => {
+										handleDelete(row.id);
 									}}
 								/>
 							</Tooltip>
@@ -279,18 +331,21 @@ function TournamentDetailModalForm({
 					id: tournamentData?.tournament?.id,
 					body: formData,
 				});
-				swal.fire({ text: 'Hasil berhasil ditambahkan!', icon: 'success' });
+				swal.fire({
+					text: 'Hasil berhasil ditambahkan!',
+					icon: 'success',
+				});
 			} else {
 				await TournamentModel.editDetail({
 					id: initialData?.id,
 					body: {
 						...initialData,
-						...formData
-					}
+						...formData,
+					},
 				});
-				swal.fire({text: 'Hasil berhasil diubah!', icon: 'success'});
+				swal.fire({ text: 'Hasil berhasil diubah!', icon: 'success' });
 			}
-			
+
 			updateDetailData();
 			resetForm();
 			if (formType === 'edit') handleClose();
@@ -308,7 +363,7 @@ function TournamentDetailModalForm({
 				tournament_id: tournamentData?.tournament?.id,
 				username: initialData?.username || '',
 				laps: initialData?.laps || '',
-				time_in_millisecond: initialData?.time_in_millisecond || ''
+				time_in_millisecond: initialData?.time_in_millisecond || '',
 			});
 	}, [formType, initialData]);
 
