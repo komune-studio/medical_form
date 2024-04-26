@@ -4,7 +4,7 @@ import { Container } from 'reactstrap';
 import { Form } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import { CloseOutlined } from '@ant-design/icons';
-import { Flex, Button as AntButton, Spin } from 'antd';
+import { Flex, Button as AntButton, Spin, Tooltip } from 'antd';
 import moment from 'moment';
 import Iconify from 'components/reusable/Iconify';
 import swal from 'components/reusable/CustomSweetAlert';
@@ -16,7 +16,7 @@ import CustomTable from 'components/reusable/CustomTable';
 export default function TournamentDetail() {
 	const [detail, setDetail] = useState({});
 	const [loading, setLoading] = useState(false);
-	const [showModal, setShowModal] = useState(false);
+	const [modal, setModal] = useState({ show: false });
 	const history = useHistory();
 	const { id } = useParams();
 
@@ -27,7 +27,6 @@ export default function TournamentDetail() {
 			let result = await TournamentModel.getById(id);
 			setDetail(result);
 			setLoading(false);
-			console.log(result);
 		} catch (e) {
 			setLoading(false);
 			console.log(e);
@@ -57,6 +56,38 @@ export default function TournamentDetail() {
 			id: 'time_in_millisecond',
 			label: 'WAKTU',
 			render: (row) => <>{`${row.time_in_millisecond} ms`}</>,
+		},
+		{
+			id: '',
+			label: '',
+			filter: false,
+			render: (row) => {
+				return (
+					<>
+						<Flex align={'center'} justify={'start'}>
+							<Tooltip title="Edit">
+								<AntButton
+									type={'link'}
+									shape={'circle'}
+									icon={
+										<Iconify
+											icon={'material-symbols:edit'}
+										/>
+									}
+									style={{ color: Palette.MAIN_THEME }}
+									onClick={() => {
+										setModal({
+											show: true,
+											formType: 'edit',
+											initialData: row,
+										});
+									}}
+								/>
+							</Tooltip>
+						</Flex>
+					</>
+				);
+			},
 		},
 	];
 
@@ -100,7 +131,9 @@ export default function TournamentDetail() {
 						<AntButton
 							size={'middle'}
 							type={'primary'}
-							onClick={() => setShowModal(true)}
+							onClick={() =>
+								setModal({ show: true, formType: 'create' })
+							}
 						>
 							Tambah Driver
 						</AntButton>
@@ -124,7 +157,11 @@ export default function TournamentDetail() {
 								/>
 								<TournamentDetailItem
 									title={'Status'}
-									value={detail?.tournament?.active ? 'Aktif' : 'Tidak Aktif'}
+									value={
+										detail?.tournament?.active
+											? 'Aktif'
+											: 'Tidak Aktif'
+									}
 								/>
 								<TournamentDetailItem
 									title={'Lokasi'}
@@ -180,10 +217,12 @@ export default function TournamentDetail() {
 					)}
 				</div>
 			</Container>
-			<CreateTournamentDetailModalForm
-				isOpen={showModal}
-				closeModal={() => setShowModal(false)}
+			<TournamentDetailModalForm
+				isOpen={modal?.show}
+				formType={modal?.formType}
+				closeModal={() => setModal({ show: false })}
 				tournamentData={detail ? detail : {}}
+				initialData={modal?.initialData}
 				updateDetailData={() => getTournamentDetail()}
 			/>
 		</>
@@ -199,18 +238,15 @@ function TournamentDetailItem({ title, value }) {
 	);
 }
 
-function CreateTournamentDetailModalForm({
+function TournamentDetailModalForm({
 	isOpen,
+	formType,
 	closeModal,
 	tournamentData,
+	initialData,
 	updateDetailData,
 }) {
-	const [formData, setFormData] = useState({
-		tournament_id: tournamentData?.tournament?.id,
-		username: '',
-		laps: 0,
-		time_in_millisecond: 0,
-	});
+	const [formData, setFormData] = useState({});
 
 	const updateFormData = (name, value) => {
 		setFormData({ ...formData, [name]: value });
@@ -238,13 +274,26 @@ function CreateTournamentDetailModalForm({
 		}
 
 		try {
-			let result = await TournamentModel.createDetail({
-				id: tournamentData?.tournament?.id,
-				body: formData,
-			});
-			swal.fire({ text: 'Hasil berhasil ditambahkan!', icon: 'success' });
+			if (formType === 'create') {
+				await TournamentModel.createDetail({
+					id: tournamentData?.tournament?.id,
+					body: formData,
+				});
+				swal.fire({ text: 'Hasil berhasil ditambahkan!', icon: 'success' });
+			} else {
+				await TournamentModel.editDetail({
+					id: initialData?.id,
+					body: {
+						...initialData,
+						...formData
+					}
+				});
+				swal.fire({text: 'Hasil berhasil diubah!', icon: 'success'});
+			}
+			
 			updateDetailData();
 			resetForm();
+			if (formType === 'edit') handleClose();
 		} catch (e) {
 			swal.fireError({
 				text: e?.error_message || 'Gagal membuat turnamen',
@@ -252,11 +301,26 @@ function CreateTournamentDetailModalForm({
 		}
 	};
 
+	useEffect(() => {
+		if (formType === 'create') resetForm();
+		else
+			setFormData({
+				tournament_id: tournamentData?.tournament?.id,
+				username: initialData?.username || '',
+				laps: initialData?.laps || '',
+				time_in_millisecond: initialData?.time_in_millisecond || ''
+			});
+	}, [formType, initialData]);
+
 	return (
 		<Modal size={'lg'} show={isOpen} backdrop="static" keyboard={false}>
 			<Modal.Header>
 				<Flex justify="space-between" align="center" className="w-100">
-					<Modal.Title>Buat Turnamen</Modal.Title>
+					<Modal.Title>
+						{formType === 'create'
+							? 'Tambah Driver'
+							: 'Edit Driver'}
+					</Modal.Title>
 					<div onClick={handleClose} style={{ cursor: 'pointer' }}>
 						<CloseOutlined style={{ color: '#FFF' }} />
 					</div>

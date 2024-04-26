@@ -20,4 +20,8 @@ export default class TournamentModel {
     static edit = async (params) => {
         return await ApiRequest.set(`v1/tournament/${params.id}`, 'PUT', params.body);
     }
+
+    static editDetail = async (params) => {
+        return await ApiRequest.set(`v1/tournament/detail/${params.id}`, 'PUT', params.body);
+    }
 }
