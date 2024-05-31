@@ -5,12 +5,9 @@ import Palette from '../../../utils/Palette';
 import Helper from 'utils/Helper';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button as AntButton, Checkbox, Spin } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
-import OrderModel from 'models/OrderModel';
 import UserModel from 'models/UserModel';
-import OrderCreateModel from 'models/OrderCreateModel';
 import { useHistory } from 'react-router-dom';
 
 let contentTimer;
@@ -20,10 +17,8 @@ const ORDER_NOMINALS = [50000, 100000, 150000, 200000, 250000, 300000];
 export default function OrderCreateV2() {
 	const history = useHistory();
 
-	let [quantity, setQuantity] = useState([0, 0, 0]);
 	const [scanValue, setScanValue] = useState('');
 	const [scannedUser, setScannedUser] = useState(null);
-	const [orderItems, setOrderItems] = useState([]);
 	const [total, setTotal] = useState(0);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [currentModalContent, setCurrentModalContent] = useState(0);
@@ -64,55 +59,9 @@ export default function OrderCreateV2() {
 			});
 		}
 
-		resetValue();
-		setTimeout(() => setLoading(false), 3000);
-	};
-
-	const resetValue = () => {
 		setScanValue('');
+		setLoading(false);
 	};
-
-	const onSubmit = async () => {
-		try {
-			let details = [];
-			for (let qIndex in quantity) {
-				let q = quantity[qIndex];
-				if (q > 0) {
-					details.push({ id: orderItems[qIndex].id, quantity: q });
-				}
-			}
-			let result = await OrderModel.create({
-				user_id: scannedUser.id,
-				details,
-			});
-			swal.fire({
-				title: `Success`,
-				icon: 'success',
-				text: 'QR payment success!',
-			});
-			history.push('/orders');
-		} catch (e) {
-			console.log('QR PAYMENT FAILED', e);
-			swal.fireError({
-				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Invalid request, please try again.',
-			});
-		}
-	};
-
-	useEffect(() => {
-		let sum = 0;
-
-		if (orderItems.length > 0) {
-			quantity.forEach((num, index) => {
-				sum += orderItems[index].price * num;
-			});
-		}
-
-		setTotal(sum);
-	}, [quantity, orderItems]);
 
 	return (
 		<>
@@ -249,7 +198,9 @@ export default function OrderCreateV2() {
 									<AntButton
 										type={'primary'}
 										style={{ width: '100%' }}
-										onClick={() => setIsModalOpen(true)}
+										onClick={() => {
+											setIsModalOpen(true);
+										}}
 									>
 										ScanQR
 									</AntButton>
@@ -431,10 +382,10 @@ function CreateOrderModal(props) {
 							}}
 						>
 							<Iconify
-								icon={'mdi:check'}
+								icon={'mdi:check-bold'}
 								height={28}
 								width={28}
-								color={'#FFF'}
+								style={{ color: Palette.BACKGROUND_BLACK }}
 							/>
 						</div>
 					)}
@@ -455,7 +406,7 @@ function CreateOrderModal(props) {
 							style={{
 								fontSize: 12,
 								color: Palette.INACTIVE_GRAY,
-								marginTop: 4,
+								marginTop: 6,
 							}}
 						>
 							Barcoins sebesar {Helper.formatNumber(total)}{' '}
