@@ -1,13 +1,13 @@
 import Modal from 'react-bootstrap/Modal';
 import { Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
-import { CloseOutlined } from '@ant-design/icons';
 import Palette from '../../../utils/Palette';
 import Helper from 'utils/Helper';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import React, { useEffect, useState } from 'react';
-import { Button as AntButton, Checkbox } from 'antd';
+import { Button as AntButton, Checkbox, Spin } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 import OrderModel from 'models/OrderModel';
 import UserModel from 'models/UserModel';
 import OrderCreateModel from 'models/OrderCreateModel';
@@ -26,6 +26,8 @@ export default function OrderCreateV2() {
 	const [orderItems, setOrderItems] = useState([]);
 	const [total, setTotal] = useState(0);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [currentModalContent, setCurrentModalContent] = useState(0);
+	const [loading, setLoading] = useState(false);
 
 	const handleNominalClick = (value) => {
 		setTotal(value);
@@ -44,14 +46,16 @@ export default function OrderCreateV2() {
 	};
 
 	const findUserByQR = async (value) => {
+		setLoading(true);
+		setCurrentModalContent(2);
+
 		try {
 			let qr = await UserModel.processUserQR({
 				token: value,
 			});
-			console.log(qr);
 			setScannedUser(qr);
-			setIsModalOpen(false);
 		} catch (e) {
+			setCurrentModalContent(1);
 			swal.fireError({
 				title: `Error`,
 				text: e.error_message
@@ -61,6 +65,7 @@ export default function OrderCreateV2() {
 		}
 
 		resetValue();
+		setTimeout(() => setLoading(false), 3000);
 	};
 
 	const resetValue = () => {
@@ -140,7 +145,9 @@ export default function OrderCreateV2() {
 							{scannedUser && (
 								<div>
 									<div>
-										<div>Username / Email Pembayar</div>
+										<div style={{ fontSize: 14 }}>
+											Username / Email Pembayar
+										</div>
 										<div
 											className="d-flex justify-content-between align-items-center"
 											style={{ gap: 8, marginTop: 8 }}
@@ -257,6 +264,11 @@ export default function OrderCreateV2() {
 				handleClose={() => setIsModalOpen(false)}
 				scanValue={scanValue}
 				updateScanValue={(value) => updateScanValue(value)}
+				currentModalContent={currentModalContent}
+				setCurrentModalContent={setCurrentModalContent}
+				loading={loading}
+				total={total}
+				scannedUser={scannedUser}
 			/>
 		</>
 	);
@@ -284,9 +296,19 @@ function OrderNominalContainer({ value, onClick }) {
 }
 
 function CreateOrderModal(props) {
-	const { isOpen, handleClose, scanValue, updateScanValue } = props;
 	const [checkboxValue, setCheckboxValue] = useState(false);
-	const [currentContent, setCurrentContent] = useState(0);
+
+	const {
+		isOpen,
+		handleClose,
+		scanValue,
+		updateScanValue,
+		currentModalContent,
+		setCurrentModalContent,
+		loading,
+		total,
+		scannedUser,
+	} = props;
 
 	const FirstContent = () => (
 		<>
@@ -312,7 +334,9 @@ function CreateOrderModal(props) {
 				</div>
 				<AntButton
 					type={'primary'}
-					onClick={() => setCurrentContent(currentContent + 1)}
+					onClick={() =>
+						setCurrentModalContent(currentModalContent + 1)
+					}
 				>
 					Oke
 				</AntButton>
@@ -369,13 +393,92 @@ function CreateOrderModal(props) {
 				<div
 					onClick={() => {
 						handleClose();
-						setCurrentContent(0);
+						setCurrentModalContent(0);
 					}}
 				>
 					Batal
 				</div>
 			</div>
 		</>
+	);
+
+	const ThirdContent = () => (
+		<div>
+			<div
+				className="d-flex flex-column align-items-center justify-content-center"
+				style={{ gap: 8 }}
+			>
+				<div
+					style={{
+						padding: 20,
+						color: '#FFFFFF14',
+						backgroundColor: '#FFFFFF14',
+						borderRadius: 16,
+						width: 'fit-content',
+					}}
+				>
+					{loading ? (
+						<Spin size={'large'} />
+					) : (
+						<div
+							className="d-flex justify-content-center align-items-center"
+							style={{
+								backgroundColor: Palette.BARCODE_ORANGE,
+								borderRadius: 999,
+								padding: 4,
+								height: 44,
+								width: 44,
+							}}
+						>
+							<Iconify
+								icon={'mdi:check'}
+								height={28}
+								width={28}
+								color={'#FFF'}
+							/>
+						</div>
+					)}
+				</div>
+			</div>
+			<div
+				className="d-flex flex-column justify-content-center align-items-center"
+				style={{ fontWeight: 600, marginTop: 16 }}
+			>
+				{loading ? (
+					'Memproses Kode QR...'
+				) : (
+					<>
+						<div style={{ fontWeight: 600 }}>
+							Penarikan koin berhasil
+						</div>
+						<div
+							style={{
+								fontSize: 12,
+								color: Palette.INACTIVE_GRAY,
+								marginTop: 4,
+							}}
+						>
+							Barcoins sebesar {Helper.formatNumber(total)}{' '}
+							ditarik dari {scannedUser.username}
+						</div>
+					</>
+				)}
+			</div>
+			<div
+				className="text-right"
+				style={{ marginTop: 32, cursor: 'pointer' }}
+			>
+				<div
+					style={{ fontSize: 12 }}
+					onClick={() => {
+						handleClose();
+						setCurrentModalContent(0);
+					}}
+				>
+					Tutup
+				</div>
+			</div>
+		</div>
 	);
 
 	return (
@@ -387,8 +490,9 @@ function CreateOrderModal(props) {
 			style={{ color: '#FFF', fontSize: 14 }}
 		>
 			<Modal.Body>
-				{currentContent === 0 && <FirstContent />}
-				{currentContent === 1 && <SecondContent />}
+				{currentModalContent === 0 && <FirstContent />}
+				{currentModalContent === 1 && <SecondContent />}
+				{currentModalContent === 2 && <ThirdContent />}
 			</Modal.Body>
 		</Modal>
 	);
