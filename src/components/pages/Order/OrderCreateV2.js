@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Button as AntButton, Checkbox, Spin } from 'antd';
 import Modal from 'react-bootstrap/Modal';
 import { Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
@@ -5,10 +8,8 @@ import Palette from '../../../utils/Palette';
 import Helper from 'utils/Helper';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
-import React, { useState } from 'react';
-import { Button as AntButton, Checkbox, Spin } from 'antd';
 import UserModel from 'models/UserModel';
-import { useHistory } from 'react-router-dom';
+
 
 let contentTimer;
 
