@@ -21,7 +21,6 @@
 import {Container, Row, Col, Nav, NavItem, NavLink} from "reactstrap";
 import Palette from "../../utils/Palette";
 import Iconify from "../reusable/Iconify";
-import icon from "../../assets/img/brand/elib.png"
 
 const Footer = () => {
     return (

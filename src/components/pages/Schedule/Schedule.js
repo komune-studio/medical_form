@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { Button as AntButton, Flex, Spin } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { Form } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
+import Datetime from 'react-datetime';
 import Palette from 'utils/Palette';
 import Iconify from 'components/reusable/Iconify';
 import swal from 'components/reusable/CustomSweetAlert';
 import UserModel from 'models/UserModel';
 import TournamentModel from 'models/TournamentModel';
+import ScheduleModel from 'models/ScheduleModel';
 
 // Data-data sementara (tunggu API)
 const SCHEDULES = [
@@ -40,13 +42,26 @@ const OPERATIONAL_HOURS = [
 
 const DATE_HEADER_HEIGHT = 25;
 
-const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO'];
+const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO', 'MAINTENANCE'];
 
 export default function Schedule() {
 	const [modalSetting, setModalSetting] = useState({
 		isOpen: false,
 		isCreateMode: true,
 	});
+
+	const getThisWeekSchedule = async () => {
+		try {
+			let result = await ScheduleModel.getAllThisWeek();
+			console.log('DEBUG SCHEDULE', result);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	useEffect(() => {
+		getThisWeekSchedule();
+	}, []);
 
 	return (
 		<>
@@ -163,7 +178,7 @@ export default function Schedule() {
 									marginBottom: 8,
 								}}
 							>
-								{moment(date).format('LL')}
+								{moment(date).format('dddd, DD MMMM YYYY')}
 							</div>
 							{/* Loop for getting schedule data from each hour in current date  */}
 							{OPERATIONAL_HOURS.map((text, index) => (
@@ -230,39 +245,43 @@ function ScheduleItem(props) {
 	);
 }
 
-function ScheduleActionModal({
-	isOpen,
-	isCreateMode,
-	handleClose,
-	handleSubmit,
-}) {
+function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 	const [createFormData, setCreateFormData] = useState({
-		startTime: '',
-		duration: '',
-		skillLevel: '',
+		start_time: new Date(),
+		duration_minutes: 0,
+		skill_level: '',
 	});
-	const [registerInputValue, setRegisterInputValue] = useState('');
-	const [registeredDrivers, setRegisteredDrivers] = useState([]);
+	const [registerFormData, setRegisterFormData] = useState('');
+	const [registeredDriversList, setRegisteredDriversList] = useState([]);
 	const [driverSearchResult, setDriverSearchResult] = useState(null);
 
-	const resetForms = () => {
+	const resetAllForms = () => {
 		setCreateFormData({
-			startTime: '',
-			duration: '',
-			skillLevel: '',
+			start_time: new Date(),
+			duration_minutes: 0,
+			skill_level: '',
 		});
+		setDriverSearchResult(null);
+		setRegisterFormData('');
+		setRegisteredDriversList([]);
+	};
 
-		setRegisteredDrivers([]);
+	const resetCreateForm = () => {
+		setCreateFormData({
+			start_time: new Date(),
+			duration_minutes: 0,
+			skill_level: '',
+		});
 	};
 
 	const resetRegisterForm = () => {
-		setRegisterInputValue('');
+		setRegisterFormData('');
 		setDriverSearchResult(null);
 	};
 
-	const handleDriverRegistrationInputChange = async (value) => {
+	const handleRegisterFormInputChange = async (value) => {
 		try {
-			setRegisterInputValue(value);
+			setRegisterFormData(value);
 
 			let getUserData;
 			clearTimeout(getUserData);
@@ -272,8 +291,11 @@ function ScheduleActionModal({
 					let result = await UserModel.processUserQR({
 						token: value,
 					});
-					setRegisteredDrivers([...registeredDrivers, result]);
-					setTimeout(() => setRegisterInputValue(''), 300)
+					setRegisteredDriversList([
+						...registeredDriversList,
+						result,
+					]);
+					setTimeout(() => setRegisterFormData(''), 300);
 				}
 			}, 300);
 		} catch (e) {
@@ -288,7 +310,7 @@ function ScheduleActionModal({
 
 	const handleDriverSearch = async () => {
 		try {
-			let result = await UserModel.getByUsername(registerInputValue);
+			let result = await UserModel.getByUsername(registerFormData);
 			if (!result || result.length < 1) {
 			}
 
@@ -304,6 +326,26 @@ function ScheduleActionModal({
 		}
 	};
 
+	const handleSubmit = async () => {
+		if (isCreateMode) {
+			handleCreateFormSubmit();
+		} else {
+			return;
+		}
+	};
+
+	const handleCreateFormSubmit = async () => {
+		try {
+			let result = await ScheduleModel.create({
+				...createFormData,
+				duration_minutes: parseInt(createFormData.duration_minutes),
+			});
+			console.log(result);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
 	return (
 		<Modal size={'lg'} show={isOpen} backdrop="static" keyboard={false}>
 			<Modal.Header>
@@ -313,7 +355,7 @@ function ScheduleActionModal({
 					</Modal.Title>
 					<AntButton
 						onClick={() => {
-							resetForms();
+							resetAllForms();
 							handleClose();
 						}}
 						style={{
@@ -331,31 +373,30 @@ function ScheduleActionModal({
 			<Modal.Body>
 				<Flex vertical gap={12}>
 					{isCreateMode ? (
+						// Create new race schedule form
 						<>
 							<Flex vertical gap={8}>
 								<Form.Label>Waktu Mulai</Form.Label>
-								<Form.Control
-									placeholder={'...'}
-									type="date"
-									value={createFormData.startTime}
-									onChange={(e) =>
+								<Datetime
+									value={createFormData.start_time}
+									onChange={(value) =>
 										setCreateFormData({
 											...createFormData,
-											startTime: e.target.value,
+											start_time: value.toDate(),
 										})
 									}
 								/>
 							</Flex>
 							<Flex vertical gap={8}>
 								<Form.Label>Durasi (menit)</Form.Label>
-								<Form.Control
+								<input
 									placeholder={0}
 									type="number"
-									value={createFormData.duration}
+									value={createFormData.duration_minutes}
 									onChange={(e) =>
 										setCreateFormData({
 											...createFormData,
-											duration: e.target.value,
+											duration_minutes: e.target.value,
 										})
 									}
 								/>
@@ -364,11 +405,11 @@ function ScheduleActionModal({
 								<Form.Label>Level Skill</Form.Label>
 								<Form.Select
 									className="form-control"
-									value={createFormData.skillLevel}
+									value={createFormData.skill_level}
 									onChange={(e) =>
 										setCreateFormData({
 											...createFormData,
-											skillLevel: e.target.value,
+											skill_level: e.target.value,
 										})
 									}
 								>
@@ -381,6 +422,7 @@ function ScheduleActionModal({
 							</Flex>
 						</>
 					) : (
+						// Register Driver in Race Session Form
 						<>
 							{/* Driver Regisration Form - Action Buttons */}
 							<Flex vertical gap={8}>
@@ -389,12 +431,12 @@ function ScheduleActionModal({
 								</Form.Label>
 								<Flex gap={8}>
 									<Form.Control
-										value={registerInputValue}
+										value={registerFormData}
 										placeholder={
 											'Scan QR atau masukkan username user'
 										}
 										onChange={(e) =>
-											handleDriverRegistrationInputChange(
+											handleRegisterFormInputChange(
 												e.target.value
 											)
 										}
@@ -416,8 +458,8 @@ function ScheduleActionModal({
 												});
 											}
 
-											setRegisteredDrivers([
-												...registeredDrivers,
+											setRegisteredDriversList([
+												...registeredDriversList,
 												driverSearchResult,
 											]);
 											resetRegisterForm();
@@ -477,7 +519,7 @@ function ScheduleActionModal({
 							) : null}
 
 							{/* Registered Drivers List */}
-							{registeredDrivers.length > 0 ? (
+							{registeredDriversList.length > 0 ? (
 								<Flex vertical gap={8}>
 									<div
 										style={{
@@ -486,26 +528,29 @@ function ScheduleActionModal({
 											marginTop: 24,
 										}}
 									>
-										REGISTERED DRIVER
+										REGISTERED DRIVERS
 									</div>
-									{registeredDrivers.map((driver, index) => (
-										<RegisteredDriversListItem
-											key={driver.id}
-											driver={driver}
-											registeredDrivers={
-												registeredDrivers
-											}
-											setRegisteredDrivers={
-												setRegisteredDrivers
-											}
-										/>
-									))}
+									{registeredDriversList.map(
+										(driver, index) => (
+											<RegisteredDriversListItem
+												key={driver.id}
+												driver={driver}
+												registeredDrivers={
+													registeredDriversList
+												}
+												setRegisteredDrivers={
+													setRegisteredDriversList
+												}
+											/>
+										)
+									)}
 								</Flex>
 							) : null}
 						</>
 					)}
 				</Flex>
 
+				{/* Discard & Submit Buttons */}
 				<Flex className="mt-5" justify={'end'}>
 					<AntButton
 						className={'text-white'}
@@ -513,7 +558,7 @@ function ScheduleActionModal({
 						size="sm"
 						variant="outline-danger"
 						onClick={() => {
-							resetForms();
+							resetAllForms();
 							handleClose();
 						}}
 						style={{ marginRight: '5px' }}
