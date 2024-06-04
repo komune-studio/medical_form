@@ -340,7 +340,8 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 				...createFormData,
 				duration_minutes: parseInt(createFormData.duration_minutes),
 			});
-			console.log(result);
+			swal.fire({ text: 'Sesi Balapan berhasil dibuat!', icon: 'success' });
+			resetCreateForm();
 		} catch (e) {
 			console.log(e);
 		}
@@ -389,7 +390,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 							</Flex>
 							<Flex vertical gap={8}>
 								<Form.Label>Durasi (menit)</Form.Label>
-								<input
+								<Form.Control
 									placeholder={0}
 									type="number"
 									value={createFormData.duration_minutes}
