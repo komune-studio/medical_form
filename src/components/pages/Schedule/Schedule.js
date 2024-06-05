@@ -10,9 +10,9 @@ import Palette from 'utils/Palette';
 import Iconify from 'components/reusable/Iconify';
 import swal from 'components/reusable/CustomSweetAlert';
 import UserModel from 'models/UserModel';
-import TournamentModel from 'models/TournamentModel';
 import ScheduleModel from 'models/ScheduleModel';
 import Avatar from 'assets/img/brand/avatar.png';
+import ScheduleTable from './ScheduleTable';
 
 // Data-data sementara (tunggu API)
 const SCHEDULES = [
@@ -63,11 +63,10 @@ export default function Schedule() {
 			// Group each of the object properties by hour
 			Object.keys(groupedResult).forEach((key) => {
 				groupedResult[key] = _.groupBy(groupedResult[key], (item) =>
-					moment(item.start_time).format('HH:00')
+					moment(item.start_time).format('HH.00')
 				);
 			});
 
-			console.log('GROUPED RESULT', groupedResult);
 			setDisplayedSchedule(groupedResult);
 		} catch (e) {
 			console.log(e);
@@ -81,7 +80,7 @@ export default function Schedule() {
 	return (
 		<>
 			<div
-				className="container-fluid"
+				className="container-fluid d-flex flex-column h-100"
 				style={{ color: '#FFF', fontFamily: 'Helixa', flex: 1 }}
 			>
 				{/* Schedule title & pagination */}
@@ -146,91 +145,10 @@ export default function Schedule() {
 						</div>
 					</div>
 				</div>
+
 				{/* Schedule table */}
 				<div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
-					{/* Table y-axis header */}
-					<div className="d-flex flex-column">
-						<div
-							style={{
-								height: DATE_HEADER_HEIGHT,
-								marginBottom: 8,
-							}}
-						></div>
-						{/* Loop for getting the y-axis of the table (every hour in a day) */}
-						{OPERATIONAL_HOURS.map((text, index) => (
-							<div
-								className="d-flex justify-content-center align-items-start font-weight-bold"
-								style={{
-									flex: 1,
-									padding: '2px 4px',
-									marginRight: 12,
-									fontSize: 12,
-									fontWeight: 700,
-								}}
-								key={index}
-							>
-								{text}
-							</div>
-						))}
-					</div>
-					{/* Table x-axis header */}
-					{/* Loop through all dates in current section */}
-					{getPastWeekDates().map((date, index) => {
-						const formattedDateForKey = moment(date)
-							.format('DD/MM/YYYY')
-							.toString();
-
-						return (
-							<div
-								className="d-flex flex-column"
-								style={{
-									flex: 1,
-								}}
-								key={index}
-							>
-								{/* Table x-axis header || current date */}
-								<div
-									className="d-flex align-items-center justify-content-center"
-									style={{
-										fontSize: 14,
-										fontWeight: 700,
-										color: Palette.INACTIVE_GRAY,
-										height: DATE_HEADER_HEIGHT,
-										marginBottom: 8,
-									}}
-								>
-									{moment(date).format('dddd, DD MMMM YYYY')}
-								</div>
-								{/* Loop for getting schedule data from each hour in current date  */}
-								{OPERATIONAL_HOURS.map(
-									(operationalHour, index) => (
-										<div
-											className="d-flex flex-column"
-											style={{
-												gap: 8,
-												padding: '4px 4px',
-												border: '1px solid #404040',
-												flex: 1,
-											}}
-											key={index}
-										>
-											{/* Loop for getting schedule data in current hour */}
-											{/* {SCHEDULES.map((item, index) => (
-													<ScheduleItem
-														key={index}
-														backgroundColor={
-															item.backgroundColor
-														}
-														color={item.color}
-														setModalSetting={setModalSetting}
-													/>
-											))} */}
-										</div>
-									)
-								)}
-							</div>
-						);
-					})}
+					<ScheduleTable schedule={displayedSchedule} />
 				</div>
 			</div>
 			<ScheduleActionModal
@@ -242,32 +160,6 @@ export default function Schedule() {
 				}
 			/>
 		</>
-	);
-}
-
-function ScheduleItem(props) {
-	return (
-		<div
-			className="d-flex justify-content-between align-items-center"
-			style={{
-				padding: '4px 8px',
-				backgroundColor: props.backgroundColor,
-				color: props.color,
-				borderRadius: 24,
-				fontSize: 10,
-				cursor: 'pointer',
-			}}
-			onClick={() =>
-				props.setModalSetting({
-					isOpen: true,
-					isCreateMode: false,
-					scheduleId: 1,
-				})
-			}
-		>
-			<div className="font-weight-bold">Beginner</div>
-			<div>4 slot(s) available</div>
-		</div>
 	);
 }
 
@@ -706,52 +598,3 @@ function RegisteredDriversListItem({
 		</Flex>
 	);
 }
-
-function getPastWeekDates() {
-	const result = [];
-
-	for (let i = 0; i < 7; i++) {
-		let date = new Date();
-		date.setDate(date.getDate() - i);
-		result.push(date);
-	}
-
-	return result;
-}
-
-// NOTE --> ini function buat create tournament, numpang taruh di file ini
-const createTournament = async () => {
-	try {
-		const result = await TournamentModel.create({
-			name: 'Pitstop Grand Finale',
-			location: 'Mall of Indonesia',
-			model: 'SODI SX9',
-			start_date: moment().toISOString(),
-			end_date: moment().toISOString(),
-			detail: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sapien sapien, elementum et lacinia placerat, lobortis non justo. Maecenas consequat vel ante non mollis.',
-			type: 'classic',
-		});
-		console.log(result);
-		swal.fire({ text: 'Data berhasil dibuat', icon: 'success' });
-	} catch (e) {
-		swal.fireError(e);
-	}
-};
-
-// NOTE --> ini function buat create tournament detail, numpang taruh di file ini
-const createTournamentDetail = async (tournamentId) => {
-	try {
-		const result = await TournamentModel.createDetail({
-			body: {
-				username: 'michael',
-				time_in_millisecond: 1200,
-				laps: 20,
-			},
-			id: tournamentId,
-		});
-		console.log(result);
-		swal.fire({ text: 'Data detail berhasil dibuat', icon: 'success' });
-	} catch (e) {
-		swal.fireError(e);
-	}
-};
