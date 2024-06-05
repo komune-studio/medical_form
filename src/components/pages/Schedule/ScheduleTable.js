@@ -19,7 +19,7 @@ const OPERATIONAL_HOURS = [
 
 const X_AXIS_HEADER_HEIGHT = 25;
 
-const Y_AXIS_HEADER_HEIGHT = 172;
+const Y_AXIS_HEADER_HEIGHT = 220;
 
 export default function ScheduleTable({ schedule }) {
 	const getPastWeekDates = () => {
@@ -34,7 +34,10 @@ export default function ScheduleTable({ schedule }) {
 	};
 
 	return (
-		<div className="d-flex" style={{ width: '100%', height: '100%', flex: 1 }}>
+		<div
+			className="d-flex"
+			style={{ width: '100%', height: '100%', flex: 1 }}
+		>
 			<ScheduleTableYAxis />
 			<ScheduleTableXAxis
 				dates={getPastWeekDates()}
@@ -58,10 +61,9 @@ function ScheduleTableYAxis() {
 				<div
 					className="d-flex justify-content-center align-items-start font-weight-bold"
 					style={{
-                        height: Y_AXIS_HEADER_HEIGHT,
-						padding: '2px 4px',
-						marginRight: 12,
-						fontSize: 12,
+						height: Y_AXIS_HEADER_HEIGHT,
+						padding: '8px 4px',
+						fontSize: 14,
 						fontWeight: 700,
 					}}
 					key={index}
@@ -99,6 +101,7 @@ function ScheduleTableXAxis({ dates, schedule }) {
 								color: Palette.INACTIVE_GRAY,
 								height: X_AXIS_HEADER_HEIGHT,
 								marginBottom: 8,
+								textAlign: 'center',
 							}}
 						>
 							{currentDateMoment.format('dddd, DD MMMM YYYY')}
@@ -106,7 +109,6 @@ function ScheduleTableXAxis({ dates, schedule }) {
 
 						{/* Table contents */}
 						<ScheduleTableContent
-							currentDate={currentDate}
 							schedule={schedule[currentDate] || null}
 						/>
 					</div>
@@ -116,7 +118,7 @@ function ScheduleTableXAxis({ dates, schedule }) {
 	);
 }
 
-function ScheduleTableContent({ currentDate, schedule }) {
+function ScheduleTableContent({ schedule }) {
 	return (
 		<>
 			{/* Loop for getting schedule data from each hour in current date  */}
@@ -134,7 +136,7 @@ function ScheduleTableContent({ currentDate, schedule }) {
 					>
 						{/* Loop for getting schedule data in current hour */}
 						{schedule && (
-							<ScheduleTableContentPerHour
+							<ScheduleTableContentPerOperationalHour
 								schedule={schedule[currentHour] || null}
 							/>
 						)}
@@ -145,16 +147,15 @@ function ScheduleTableContent({ currentDate, schedule }) {
 	);
 }
 
-function ScheduleTableContentPerHour({ schedule }) {
+function ScheduleTableContentPerOperationalHour({ schedule }) {
 	if (!schedule) return null;
 
 	return (
-		<div>
+		<div className="d-flex flex-column" style={{ gap: 8, padding: 4 }}>
 			{schedule.map((item, index) => (
 				<ScheduleItem
 					key={index}
-					backgroundColor={'#D1E7DD'}
-					color={'#0F5132'}
+					data={item}
 					// setModalSetting={setModalSetting}
 				/>
 			))}
@@ -163,13 +164,36 @@ function ScheduleTableContentPerHour({ schedule }) {
 }
 
 function ScheduleItem(props) {
+	const { data } = props;
+
+    let backgroundColor;
+    let color;
+
+    switch(data.skill_level) {
+        case 'BEGINNER':
+            backgroundColor = '#D1E7DD';
+            color = '#0F5132';
+            break;
+        case 'ADVANCED':
+            backgroundColor = '#FFF3CD';
+            color = '#664D03';
+            break;
+        case 'PRO':
+            backgroundColor = '#F8D7DA';
+            color = '#842029';
+            break;
+        default:
+            backgroundColor = Palette.LIGHT_GRAY;
+            color = Palette.WHITE_GRAY;
+    }
+
 	return (
 		<div
 			className="d-flex justify-content-between align-items-center"
 			style={{
 				padding: '4px 8px',
-				backgroundColor: props.backgroundColor,
-				color: props.color,
+				backgroundColor: backgroundColor,
+				color: color,
 				borderRadius: 24,
 				fontSize: 10,
 				cursor: 'pointer',
@@ -182,7 +206,7 @@ function ScheduleItem(props) {
 				})
 			}
 		>
-			<div className="font-weight-bold">Beginner</div>
+			<div className="font-weight-bold">{data.skill_level}</div>
 			<div>4 slot(s) available</div>
 		</div>
 	);
