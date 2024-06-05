@@ -11,6 +11,7 @@ import swal from 'components/reusable/CustomSweetAlert';
 import UserModel from 'models/UserModel';
 import TournamentModel from 'models/TournamentModel';
 import ScheduleModel from 'models/ScheduleModel';
+import Avatar from 'assets/img/brand/avatar.png';
 
 // Data-data sementara (tunggu API)
 const SCHEDULES = [
@@ -42,7 +43,7 @@ const OPERATIONAL_HOURS = [
 
 const DATE_HEADER_HEIGHT = 25;
 
-const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO', 'MAINTENANCE'];
+const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO', 'MAINTENANCE', 'EVENT'];
 
 export default function Schedule() {
 	const [modalSetting, setModalSetting] = useState({
@@ -53,7 +54,6 @@ export default function Schedule() {
 	const getThisWeekSchedule = async () => {
 		try {
 			let result = await ScheduleModel.getAllThisWeek();
-			console.log('DEBUG SCHEDULE', result);
 		} catch (e) {
 			console.log(e);
 		}
@@ -72,7 +72,7 @@ export default function Schedule() {
 				{/* Schedule title & pagination */}
 				<div className="d-flex justify-content-between align-items-center">
 					{/* Schedule title */}
-					<div className="font-weight-bold" style={{ fontSize: 20 }}>
+					<div style={{ fontSize: 20, fontWeight: 'bold' }}>
 						Schedule
 					</div>
 					{/* Schedule pagination & create button */}
@@ -212,6 +212,7 @@ export default function Schedule() {
 			<ScheduleActionModal
 				isOpen={modalSetting.isOpen}
 				isCreateMode={modalSetting.isCreateMode}
+				scheduleId={modalSetting?.scheduleId || null}
 				handleClose={() =>
 					setModalSetting({ ...modalSetting, isOpen: false })
 				}
@@ -236,6 +237,7 @@ function ScheduleItem(props) {
 				props.setModalSetting({
 					isOpen: true,
 					isCreateMode: false,
+					scheduleId: 1,
 				})
 			}
 		>
@@ -245,10 +247,15 @@ function ScheduleItem(props) {
 	);
 }
 
-function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
+function ScheduleActionModal({
+	isOpen,
+	isCreateMode,
+	scheduleId,
+	handleClose,
+}) {
 	const [createFormData, setCreateFormData] = useState({
 		start_time: new Date(),
-		duration_minutes: 0,
+		duration_minutes: 10,
 		skill_level: '',
 	});
 	const [registerFormData, setRegisterFormData] = useState('');
@@ -258,7 +265,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 	const resetAllForms = () => {
 		setCreateFormData({
 			start_time: new Date(),
-			duration_minutes: 0,
+			duration_minutes: 10,
 			skill_level: '',
 		});
 		setDriverSearchResult(null);
@@ -269,7 +276,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 	const resetCreateForm = () => {
 		setCreateFormData({
 			start_time: new Date(),
-			duration_minutes: 0,
+			duration_minutes: 10,
 			skill_level: '',
 		});
 	};
@@ -311,11 +318,13 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 	const handleDriverSearch = async () => {
 		try {
 			let result = await UserModel.getByUsername(registerFormData);
-			if (!result || result.length < 1) {
-			}
-
 			setDriverSearchResult(result);
 		} catch (e) {
+			if (e?.code === 'USER_NOT_FOUND') {
+				setDriverSearchResult({ apex_nickname: registerFormData });
+				return;
+			}
+
 			console.log(e);
 			swal.fireError({
 				title: 'Error',
@@ -326,12 +335,13 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 		}
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = () => {
 		if (isCreateMode) {
 			handleCreateFormSubmit();
-		} else {
 			return;
 		}
+
+		handleRegisterFormSubmit();
 	};
 
 	const handleCreateFormSubmit = async () => {
@@ -340,7 +350,10 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 				...createFormData,
 				duration_minutes: parseInt(createFormData.duration_minutes),
 			});
-			swal.fire({ text: 'Sesi Balapan berhasil dibuat!', icon: 'success' });
+			swal.fire({
+				text: 'Sesi Balapan berhasil dibuat!',
+				icon: 'success',
+			});
 			resetCreateForm();
 		} catch (e) {
 			console.log(e);
@@ -351,6 +364,27 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 					: 'Failed to create new session, please try again.',
 			});
 		}
+	};
+
+	const handleRegisterFormSubmit = async () => {
+		registeredDriversList.forEach(async (driver) => {
+			try {
+				let result = await ScheduleModel.registerDriver({
+					schedule_slot_id: scheduleId,
+					apex_nickname: driver.apex_nickname,
+					user_id: driver?.id || null,
+				});
+			} catch (e) {
+				console.log(e);
+			}
+		});
+
+		swal.fire({
+			text: 'Driver berhasil ditambahkan!',
+			icon: 'success',
+		});
+		setRegisteredDriversList([]);
+		resetRegisterForm();
 	};
 
 	return (
@@ -397,7 +431,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 							<Flex vertical gap={8}>
 								<Form.Label>Durasi (menit)</Form.Label>
 								<Form.Control
-									placeholder={0}
+									placeholder={10}
 									type="number"
 									value={createFormData.duration_minutes}
 									onChange={(e) =>
@@ -420,6 +454,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 										})
 									}
 								>
+									<option selected hidden></option>
 									{SKILL_LEVEL.map((skill) => (
 										<option key={skill} value={skill}>
 											{skill}
@@ -497,29 +532,36 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 										<div>
 											<img
 												src={
-													driverSearchResult.avatar_url
+													driverSearchResult?.avatar_url ||
+													Avatar
 												}
-												height={48}
-												width={48}
+												style={{
+													borderRadius: 99,
+													height: 48,
+													width: 48,
+												}}
 											/>
 										</div>
 										<Flex vertical>
 											<div style={{ fontWeight: 700 }}>
-												{driverSearchResult.username}
+												{
+													driverSearchResult.apex_nickname
+												}
 											</div>
 											<div
 												style={{
-													font: 10,
+													fontSize: 12,
 													color: Palette.INACTIVE_GRAY,
 												}}
 											>
-												{driverSearchResult.email}
+												{driverSearchResult?.email ||
+													'E-mail tidak tersedia'}
 											</div>
 										</Flex>
 									</Flex>
 									<Flex>
 										<div style={{ fontWeight: 700 }}>
-											PRO
+											// TODO
 										</div>
 									</Flex>
 								</Flex>
@@ -580,7 +622,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, handleClose }) {
 							handleSubmit();
 						}}
 					>
-						{isCreateMode ? 'Simpan' : 'Ubah'}
+						{isCreateMode ? 'Buat Sesi' : 'Daftarkan Driver'}
 					</AntButton>
 				</Flex>
 			</Modal.Body>
@@ -607,12 +649,17 @@ function RegisteredDriversListItem({
 		>
 			<Flex gap={8} justify="center" align="center">
 				<div>
-					<img src={driver.avatar_url} height={48} width={48} />
+					<img
+						src={driver?.avatar_url || Avatar}
+						style={{ borderRadius: 99, height: 48, width: 48 }}
+					/>
 				</div>
 				<Flex vertical>
-					<div style={{ fontWeight: 700 }}>{driver.username}</div>
+					<div style={{ fontWeight: 700 }}>
+						{driver.apex_nickname}
+					</div>
 					<div style={{ font: 10, color: Palette.INACTIVE_GRAY }}>
-						{driver.email}
+						{driver?.email || 'E-mail tidak tersedia'}
 					</div>
 				</Flex>
 			</Flex>

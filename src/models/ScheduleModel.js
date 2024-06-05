@@ -5,6 +5,10 @@ export default class Schedule {
         return await ApiRequest.set('v1/schedules', 'POST', body)
     }
 
+    static registerDriver = async (body) => {
+        return await ApiRequest.set('v1/schedule', 'POST', body)
+    }
+
     static getAllThisWeek = async () => {
         return await ApiRequest.set('v1/schedules/this-week', 'GET');
     }
