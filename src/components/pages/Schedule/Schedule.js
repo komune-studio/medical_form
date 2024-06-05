@@ -5,6 +5,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { Form } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Datetime from 'react-datetime';
+import _ from 'lodash';
 import Palette from 'utils/Palette';
 import Iconify from 'components/reusable/Iconify';
 import swal from 'components/reusable/CustomSweetAlert';
@@ -24,8 +25,6 @@ const SCHEDULES = [
 ];
 
 const OPERATIONAL_HOURS = [
-	'08:00',
-	'09.00',
 	'10.00',
 	'11.00',
 	'12.00',
@@ -46,6 +45,7 @@ const DATE_HEADER_HEIGHT = 25;
 const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO', 'MAINTENANCE', 'EVENT'];
 
 export default function Schedule() {
+	const [displayedSchedule, setDisplayedSchedule] = useState([]);
 	const [modalSetting, setModalSetting] = useState({
 		isOpen: false,
 		isCreateMode: true,
@@ -54,6 +54,21 @@ export default function Schedule() {
 	const getThisWeekSchedule = async () => {
 		try {
 			let result = await ScheduleModel.getAllThisWeek();
+
+			// Group data by date
+			let groupedResult = _.groupBy(result, (schedule) =>
+				moment(schedule.start_time).format('DD/MM/YYYY')
+			);
+
+			// Group each of the object properties by hour
+			Object.keys(groupedResult).forEach((key) => {
+				groupedResult[key] = _.groupBy(groupedResult[key], (item) =>
+					moment(item.start_time).format('HH:00')
+				);
+			});
+
+			console.log('GROUPED RESULT', groupedResult);
+			setDisplayedSchedule(groupedResult);
 		} catch (e) {
 			console.log(e);
 		}
@@ -158,55 +173,64 @@ export default function Schedule() {
 							</div>
 						))}
 					</div>
+					{/* Table x-axis header */}
 					{/* Loop through all dates in current section */}
-					{getPastWeekDates().map((date, index) => (
-						<div
-							className="d-flex flex-column"
-							style={{
-								flex: 1,
-							}}
-							key={index}
-						>
-							{/* Table x-axis header || current date */}
+					{getPastWeekDates().map((date, index) => {
+						const formattedDateForKey = moment(date)
+							.format('DD/MM/YYYY')
+							.toString();
+
+						return (
 							<div
-								className="d-flex align-items-center justify-content-center"
+								className="d-flex flex-column"
 								style={{
-									fontSize: 14,
-									fontWeight: 700,
-									color: Palette.INACTIVE_GRAY,
-									height: DATE_HEADER_HEIGHT,
-									marginBottom: 8,
+									flex: 1,
 								}}
+								key={index}
 							>
-								{moment(date).format('dddd, DD MMMM YYYY')}
-							</div>
-							{/* Loop for getting schedule data from each hour in current date  */}
-							{OPERATIONAL_HOURS.map((text, index) => (
+								{/* Table x-axis header || current date */}
 								<div
-									className="d-flex flex-column"
+									className="d-flex align-items-center justify-content-center"
 									style={{
-										gap: 8,
-										padding: '4px 4px',
-										border: '1px solid #404040',
-										flex: 1,
+										fontSize: 14,
+										fontWeight: 700,
+										color: Palette.INACTIVE_GRAY,
+										height: DATE_HEADER_HEIGHT,
+										marginBottom: 8,
 									}}
-									key={index}
 								>
-									{/* Loop for getting schedule data in current hour */}
-									{SCHEDULES.map((item, index) => (
-										<ScheduleItem
-											key={index}
-											backgroundColor={
-												item.backgroundColor
-											}
-											color={item.color}
-											setModalSetting={setModalSetting}
-										/>
-									))}
+									{moment(date).format('dddd, DD MMMM YYYY')}
 								</div>
-							))}
-						</div>
-					))}
+								{/* Loop for getting schedule data from each hour in current date  */}
+								{OPERATIONAL_HOURS.map(
+									(operationalHour, index) => (
+										<div
+											className="d-flex flex-column"
+											style={{
+												gap: 8,
+												padding: '4px 4px',
+												border: '1px solid #404040',
+												flex: 1,
+											}}
+											key={index}
+										>
+											{/* Loop for getting schedule data in current hour */}
+											{/* {SCHEDULES.map((item, index) => (
+													<ScheduleItem
+														key={index}
+														backgroundColor={
+															item.backgroundColor
+														}
+														color={item.color}
+														setModalSetting={setModalSetting}
+													/>
+											))} */}
+										</div>
+									)
+								)}
+							</div>
+						);
+					})}
 				</div>
 			</div>
 			<ScheduleActionModal
