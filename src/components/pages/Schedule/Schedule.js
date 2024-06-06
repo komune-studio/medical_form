@@ -137,7 +137,7 @@ function ScheduleActionModal({
 	isCreateMode,
 	scheduleId,
 	handleClose,
-	refreshData
+	refreshData,
 }) {
 	const [createFormData, setCreateFormData] = useState({
 		start_time: new Date(),
@@ -219,6 +219,35 @@ function ScheduleActionModal({
 					: 'Unable to process search request!',
 			});
 		}
+	};
+
+	const handleAppendDriversList = () => {
+		if (!driverSearchResult) {
+			swal.fireError({
+				title: 'Error',
+				text: 'Search value is empty!',
+			});
+			return;
+		}
+
+		const checkForDuplicate = registeredDriversList.findIndex(
+			(driver) =>
+				driver.apex_nickname === driverSearchResult.apex_nickname
+		);
+
+		if (checkForDuplicate >= 0) {
+			swal.fireError({
+				title: 'Error',
+				text: 'Driver has been added to the list!',
+			});
+			return;
+		}
+
+		setRegisteredDriversList([
+			...registeredDriversList,
+			driverSearchResult,
+		]);
+		resetRegisterForm();
 	};
 
 	const handleSubmit = () => {
@@ -380,20 +409,7 @@ function ScheduleActionModal({
 									<AntButton
 										type={'primary'}
 										disabled={!driverSearchResult}
-										onClick={() => {
-											if (!driverSearchResult) {
-												swal.fireError({
-													title: 'Error',
-													text: 'Search value is empty!',
-												});
-											}
-
-											setRegisteredDriversList([
-												...registeredDriversList,
-												driverSearchResult,
-											]);
-											resetRegisterForm();
-										}}
+										onClick={handleAppendDriversList}
 									>
 										Tambah Driver
 									</AntButton>
