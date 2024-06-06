@@ -21,7 +21,7 @@ const X_AXIS_HEADER_HEIGHT = 25;
 
 const Y_AXIS_HEADER_HEIGHT = 220;
 
-export default function ScheduleTable({ schedule }) {
+export default function ScheduleTable({ schedule, setModalSetting }) {
 	const getPastWeekDates = () => {
 		const result = [];
 		for (let i = 0; i < 7; i++) {
@@ -38,47 +38,32 @@ export default function ScheduleTable({ schedule }) {
 			className="d-flex"
 			style={{ width: '100%', height: '100%', flex: 1 }}
 		>
-			<ScheduleTableYAxis />
-			<ScheduleTableXAxis
-				dates={getPastWeekDates()}
-				schedule={schedule}
-			/>
-		</div>
-	);
-}
-
-function ScheduleTableYAxis() {
-	return (
-		<div className="d-flex flex-column">
-			<div
-				style={{
-					height: X_AXIS_HEADER_HEIGHT,
-					marginBottom: 8,
-				}}
-			></div>
-			{/* Loop for getting the y-axis of the table (every hour in a day) */}
-			{OPERATIONAL_HOURS.map((text, index) => (
+			{/* Table y-axis header */}
+			<div className="d-flex flex-column">
 				<div
-					className="d-flex justify-content-center align-items-start font-weight-bold"
 					style={{
-						height: Y_AXIS_HEADER_HEIGHT,
-						padding: '8px 4px',
-						fontSize: 14,
-						fontWeight: 700,
+						height: X_AXIS_HEADER_HEIGHT,
+						marginBottom: 8,
 					}}
-					key={index}
-				>
-					{text}
-				</div>
-			))}
-		</div>
-	);
-}
+				></div>
+				{/* Loop for getting the y-axis of the table */}
+				{OPERATIONAL_HOURS.map((text, index) => (
+					<div
+						className="d-flex justify-content-center align-items-center font-weight-bold"
+						style={{
+							height: Y_AXIS_HEADER_HEIGHT,
+							padding: '8px',
+							fontSize: 14,
+							fontWeight: 700,
+						}}
+						key={index}
+					>
+						{text}
+					</div>
+				))}
+			</div>
 
-function ScheduleTableXAxis({ dates, schedule }) {
-	return (
-		<>
-			{dates.map((date, index) => {
+			{getPastWeekDates().map((date, index) => {
 				const currentDateMoment = moment(date);
 				const currentDate = currentDateMoment
 					.format('DD/MM/YYYY')
@@ -108,84 +93,90 @@ function ScheduleTableXAxis({ dates, schedule }) {
 						</div>
 
 						{/* Table contents */}
-						<ScheduleTableContent
-							schedule={schedule[currentDate] || null}
-						/>
+						{/* Loop for getting schedule data in each operational hour in current date  */}
+						{OPERATIONAL_HOURS.map((currentHour, index) => {
+							return (
+								<div
+									className="d-flex flex-column"
+									style={{
+										gap: 8,
+										padding: '4px 4px',
+										border: '1px solid #404040',
+										flex: 1,
+									}}
+									key={index}
+								>
+									{/* Loop for getting schedule data in current hour */}
+									{schedule[currentDate] && (
+										<SchedulePerOperationalHour
+											schedule={
+												schedule[currentDate][
+													currentHour
+												] || null
+											}
+											setModalSetting={setModalSetting}
+										/>
+									)}
+								</div>
+							);
+						})}
 					</div>
 				);
 			})}
-		</>
+		</div>
 	);
 }
 
-function ScheduleTableContent({ schedule }) {
-	return (
-		<>
-			{/* Loop for getting schedule data from each hour in current date  */}
-			{OPERATIONAL_HOURS.map((currentHour, index) => {
-				return (
-					<div
-						className="d-flex flex-column"
-						style={{
-							gap: 8,
-							padding: '4px 4px',
-							border: '1px solid #404040',
-							flex: 1,
-						}}
-						key={index}
-					>
-						{/* Loop for getting schedule data in current hour */}
-						{schedule && (
-							<ScheduleTableContentPerOperationalHour
-								schedule={schedule[currentHour] || null}
-							/>
-						)}
-					</div>
-				);
-			})}
-		</>
-	);
-}
-
-function ScheduleTableContentPerOperationalHour({ schedule }) {
+function SchedulePerOperationalHour({ schedule, setModalSetting }) {
 	if (!schedule) return null;
 
 	return (
 		<div className="d-flex flex-column" style={{ gap: 8, padding: 4 }}>
-			{schedule.map((item, index) => (
+			{schedule.map((item) => (
 				<ScheduleItem
-					key={index}
+					key={item.id}
 					data={item}
-					// setModalSetting={setModalSetting}
+					setModalSetting={setModalSetting}
 				/>
 			))}
 		</div>
 	);
 }
 
-function ScheduleItem(props) {
-	const { data } = props;
+function ScheduleItem({ data, setModalSetting }) {
+	const handleClick = () => {
+		if (
+			data.skill_level !== 'EVENT' &&
+			data.skill_level !== 'MAINTENANCE'
+		) {
+			setModalSetting({
+				isOpen: true,
+				isCreateMode: false,
+				scheduleId: data.id,
+			});
+		}
+	};
 
-    let backgroundColor;
-    let color;
+	let backgroundColor;
+	let color;
 
-    switch(data.skill_level) {
-        case 'BEGINNER':
-            backgroundColor = '#D1E7DD';
-            color = '#0F5132';
-            break;
-        case 'ADVANCED':
-            backgroundColor = '#FFF3CD';
-            color = '#664D03';
-            break;
-        case 'PRO':
-            backgroundColor = '#F8D7DA';
-            color = '#842029';
-            break;
-        default:
-            backgroundColor = Palette.LIGHT_GRAY;
-            color = Palette.WHITE_GRAY;
-    }
+	switch (data.skill_level) {
+		case 'BEGINNER':
+			backgroundColor = '#D1E7DD';
+			color = '#0F5132';
+			break;
+		case 'ADVANCED':
+			backgroundColor = '#FFF3CD';
+			color = '#664D03';
+			break;
+		case 'PRO':
+			backgroundColor = '#F8D7DA';
+			color = '#842029';
+			break;
+		default:
+			backgroundColor = Palette.LIGHT_GRAY;
+			color = Palette.WHITE_GRAY;
+	}
 
 	return (
 		<div
@@ -198,13 +189,7 @@ function ScheduleItem(props) {
 				fontSize: 10,
 				cursor: 'pointer',
 			}}
-			onClick={() =>
-				props.setModalSetting({
-					isOpen: true,
-					isCreateMode: false,
-					scheduleId: 1,
-				})
-			}
+			onClick={handleClick}
 		>
 			<div className="font-weight-bold">{data.skill_level}</div>
 			<div>4 slot(s) available</div>

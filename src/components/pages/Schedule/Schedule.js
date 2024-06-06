@@ -14,34 +14,6 @@ import ScheduleModel from 'models/ScheduleModel';
 import Avatar from 'assets/img/brand/avatar.png';
 import ScheduleTable from './ScheduleTable';
 
-// Data-data sementara (tunggu API)
-const SCHEDULES = [
-	{ backgroundColor: '#D1E7DD', color: '#0F5132' },
-	{ backgroundColor: Palette.LIGHT_GRAY, color: Palette.WHITE_GRAY },
-	{ backgroundColor: '#FFF3CD', color: '#664D03' },
-	{ backgroundColor: '#F8D7DA', color: '#842029' },
-	{ backgroundColor: '#D1E7DD', color: '#0F5132' },
-	{ backgroundColor: Palette.LIGHT_GRAY, color: Palette.WHITE_GRAY },
-];
-
-const OPERATIONAL_HOURS = [
-	'10.00',
-	'11.00',
-	'12.00',
-	'13.00',
-	'14.00',
-	'15.00',
-	'16.00',
-	'17.00',
-	'18.00',
-	'19.00',
-	'20.00',
-	'21.00',
-	'22.00',
-];
-
-const DATE_HEADER_HEIGHT = 25;
-
 const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO', 'MAINTENANCE', 'EVENT'];
 
 export default function Schedule() {
@@ -148,7 +120,7 @@ export default function Schedule() {
 
 				{/* Schedule table */}
 				<div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
-					<ScheduleTable schedule={displayedSchedule} />
+					<ScheduleTable schedule={displayedSchedule} setModalSetting={setModalSetting} />
 				</div>
 			</div>
 			<ScheduleActionModal
