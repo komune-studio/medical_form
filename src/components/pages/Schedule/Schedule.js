@@ -229,42 +229,6 @@ function ScheduleActionModal({
 		}
 	};
 
-	const handleAppendDriver = () => {
-		if (!driverSearchResult) {
-			swal.fireError({
-				title: 'Error',
-				text: 'Search value is empty!',
-			});
-			return;
-		}
-
-		const checkForDuplicate = newDriversList.findIndex(
-			(driver) =>
-				driver.apex_nickname === driverSearchResult.apex_nickname
-		);
-
-		const checkForDuplicate2 = registeredDriversList.findIndex(
-			(driver) => driver.apex_nickname === driverSearchResult.apex_nickname
-		);
-
-		if (checkForDuplicate >= 0 || checkForDuplicate2 >= 0) {
-			swal.fireError({
-				title: 'Error',
-				text: 'Driver has been added to the list!',
-			});
-			return;
-		}
-
-		setNewDriversList([...newDriversList, driverSearchResult]);
-		resetRegisterForm();
-	};
-
-	const handleRemoveDriver = (driverId) => {
-		setNewDriversList(
-			newDriversList.filter((driver) => driver.id !== driverId)
-		);
-	};
-
 	const handleUnregisterDriver = async (driverId) => {
 		try {
 			await ScheduleModel.unregisterDriver(driverId)
@@ -318,13 +282,19 @@ function ScheduleActionModal({
 	};
 
 	const handleRegisterFormSubmit = async () => {
-		newDriversList.forEach(async (driver) => {
 			try {
 				await ScheduleModel.registerDriver({
 					schedule_slot_id: scheduleData.id,
-					apex_nickname: driver.apex_nickname,
-					user_id: driver?.id || null,
+					apex_nickname: driverSearchResult.apex_nickname,
+					user_id: driverSearchResult?.id || null,
 				});
+
+				swal.fire({
+					text: 'Driver berhasil ditambahkan!',
+					icon: 'success',
+				});
+				getRegisteredDriversList();
+				resetRegisterForm();
 			} catch (e) {
 				console.log(e);
 				swal.fireError({
@@ -334,15 +304,6 @@ function ScheduleActionModal({
 						: 'Failed to register drivers, please try again.',
 				});
 			}
-		});
-
-		swal.fire({
-			text: 'Driver berhasil ditambahkan!',
-			icon: 'success',
-		});
-		setNewDriversList([]);
-		getRegisteredDriversList();
-		resetRegisterForm();
 	};
 
 	useEffect(() => {
@@ -462,9 +423,9 @@ function ScheduleActionModal({
 									<AntButton
 										type={'primary'}
 										disabled={!driverSearchResult}
-										onClick={handleAppendDriver}
+										onClick={handleSubmit}
 									>
-										Tambah Driver
+										Daftarkan Driver
 									</AntButton>
 								</Flex>
 							</Flex>
@@ -524,15 +485,6 @@ function ScheduleActionModal({
 								</Flex>
 							) : null}
 
-							{/* New Drivers (to-be-registered) List */}
-							{newDriversList.length > 0 ? (
-								<DriversListComponent
-									title={'DRIVER AKAN DITAMBAHKAN'}
-									data={newDriversList}
-									handleDelete={handleRemoveDriver}
-								/>
-							) : null}
-
 							{/* Registered Drivers List */}
 							{registeredDriversList.length > 0 ? (
 								<DriversListComponent
@@ -545,7 +497,7 @@ function ScheduleActionModal({
 					)}
 				</Flex>
 
-				{/* Discard & Submit Buttons */}
+				{/* Close modal button */}
 				<Flex className="mt-5" justify={'end'}>
 					<AntButton
 						className={'text-white'}
@@ -558,17 +510,7 @@ function ScheduleActionModal({
 						}}
 						style={{ marginRight: '5px' }}
 					>
-						Batal
-					</AntButton>
-					<AntButton
-						type={'primary'}
-						size="sm"
-						variant="primary"
-						onClick={() => {
-							handleSubmit();
-						}}
-					>
-						{isCreateMode ? 'Buat Sesi' : 'Daftarkan Driver'}
+						Tutup
 					</AntButton>
 				</Flex>
 			</Modal.Body>
