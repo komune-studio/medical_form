@@ -17,9 +17,26 @@ const OPERATIONAL_HOURS = [
 	'22.00',
 ];
 
+const TOTAL_OPERATION_HOURS = 12;
+
+const SESSION_DURATION_MINUTES = 10;
+
+const SCHEDULE_ITEM_PROPERTIES = {
+	heightPerMinute: 2.2,
+	paddingVertical: 4,
+	paddingHorizontal: 8,
+};
+
+const SCHEDULE_ITEMS_GAP = 8;
+
+const MAX_SESSIONS_PER_DAY =
+	(TOTAL_OPERATION_HOURS * 60) / SESSION_DURATION_MINUTES;
+
+const MAX_SESSIONS_PER_HOUR = 60 / SESSION_DURATION_MINUTES;
+
 const X_AXIS_HEADER_HEIGHT = 25;
 
-const Y_AXIS_HEADER_HEIGHT = 220;
+const Y_AXIS_HEADER_HEIGHT = SCHEDULE_ITEM_PROPERTIES.heightPerMinute * 60;
 
 export default function ScheduleTable({ schedule, setModalSetting }) {
 	const getPastWeekDates = () => {
@@ -40,6 +57,7 @@ export default function ScheduleTable({ schedule, setModalSetting }) {
 		>
 			{/* Table y-axis header */}
 			<div className="d-flex flex-column">
+				{/* Empty space for adjusting y-axis to x-axis */}
 				<div
 					style={{
 						height: X_AXIS_HEADER_HEIGHT,
@@ -49,10 +67,10 @@ export default function ScheduleTable({ schedule, setModalSetting }) {
 				{/* Loop for getting the y-axis of the table */}
 				{OPERATIONAL_HOURS.map((text, index) => (
 					<div
-						className="d-flex justify-content-center align-items-center font-weight-bold"
+						className="d-flex justify-content-center align-items-start font-weight-bold"
 						style={{
 							height: Y_AXIS_HEADER_HEIGHT,
-							padding: '8px',
+							padding: '0px 8px',
 							fontSize: 14,
 							fontWeight: 700,
 						}}
@@ -89,37 +107,33 @@ export default function ScheduleTable({ schedule, setModalSetting }) {
 								textAlign: 'center',
 							}}
 						>
-							{currentDateMoment.format('dddd, DD MMMM YYYY')}
+							{currentDateMoment.format('ddd, DD MMMM YYYY')}
 						</div>
 
 						{/* Table contents */}
-						{/* Loop for getting schedule data in each operational hour in current date  */}
-						{OPERATIONAL_HOURS.map((currentHour, index) => {
-							return (
-								<div
-									className="d-flex flex-column"
-									style={{
-										gap: 8,
-										padding: '4px 4px',
-										border: '1px solid #404040',
-										flex: 1,
-									}}
-									key={index}
-								>
-									{/* Loop for getting schedule data in current hour */}
-									{schedule[currentDate] && (
-										<SchedulePerOperationalHour
-											schedule={
-												schedule[currentDate][
-													currentHour
-												] || null
-											}
-											setModalSetting={setModalSetting}
-										/>
-									)}
-								</div>
-							);
-						})}
+						<div
+							className="d-flex flex-column justify-content-center align-items-center"
+							style={{
+								padding: '0px 4px',
+								border: '2px solid #404040',
+								flex: 1,
+								position: 'relative',
+							}}
+							key={index}
+						>
+							{/* Loop for getting schedule data in current hour */}
+							{schedule[currentDate] &&
+								schedule[currentDate].map((item) => (
+									<ScheduleItem
+										key={item.id}
+										data={item}
+										currentDateMoment={currentDateMoment.set(
+											{ hour: 10, minute: 0 }
+										)}
+										setModalSetting={setModalSetting}
+									/>
+								))}
+						</div>
 					</div>
 				);
 			})}
@@ -127,23 +141,7 @@ export default function ScheduleTable({ schedule, setModalSetting }) {
 	);
 }
 
-function SchedulePerOperationalHour({ schedule, setModalSetting }) {
-	if (!schedule) return null;
-
-	return (
-		<div className="d-flex flex-column" style={{ gap: 8, padding: 4 }}>
-			{schedule.map((item) => (
-				<ScheduleItem
-					key={item.id}
-					data={item}
-					setModalSetting={setModalSetting}
-				/>
-			))}
-		</div>
-	);
-}
-
-function ScheduleItem({ data, setModalSetting }) {
+function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 	const handleClick = () => {
 		if (
 			data.skill_level !== 'EVENT' &&
@@ -157,42 +155,70 @@ function ScheduleItem({ data, setModalSetting }) {
 		}
 	};
 
+	const startTime = moment(data.start_time);
+	console.log(startTime.diff(currentDateMoment, 'minutes'));
+
 	let backgroundColor;
 	let color;
 
 	switch (data.skill_level) {
 		case 'BEGINNER':
-			backgroundColor = '#D1E7DD';
+			backgroundColor = '#caffbf';
 			color = '#0F5132';
 			break;
 		case 'ADVANCED':
-			backgroundColor = '#FFF3CD';
+			backgroundColor = '#fdffb6';
 			color = '#664D03';
 			break;
 		case 'PRO':
-			backgroundColor = '#F8D7DA';
-			color = '#842029';
+			backgroundColor = '#9bf6ff';
+			color = '#056676';
+			break;
+		case 'EVENT':
+			backgroundColor = '#D68869';
+			color = '#813314';
 			break;
 		default:
-			backgroundColor = Palette.LIGHT_GRAY;
+			backgroundColor = '#121212';
 			color = Palette.WHITE_GRAY;
 	}
 
 	return (
 		<div
-			className="d-flex justify-content-between align-items-center"
+			className="d-flex justify-content-start align-items-center w-100"
 			style={{
 				padding: '4px 8px',
 				backgroundColor: backgroundColor,
 				color: color,
-				borderRadius: 24,
-				fontSize: 10,
+				borderRadius: 2,
+				fontSize: 12,
 				cursor: 'pointer',
+				height:
+					SCHEDULE_ITEM_PROPERTIES.heightPerMinute *
+					data.duration_minutes,
+				position: 'absolute',
+				top: startTime.diff(currentDateMoment, 'minutes') * 2.2,
+				left: 0,
 			}}
 			onClick={handleClick}
 		>
-			<div className="font-weight-bold">{data.skill_level}</div>
-			<div>4 slot(s) available</div>
+			<div
+				className="d-flex justify-content-start align-items-center w-100"
+				style={{ margin: '0px 4px' }}
+			>
+				<div className="font-weight-bold text-left" style={{ flex: 1 }}>
+					{data.skill_level}
+				</div>
+				<div className="text-center" style={{ flex: 1 }}>
+					{startTime.format('HH:mm')}
+				</div>
+				<div
+					className="font-weight-bold text-right"
+					style={{ flex: 1 }}
+				>
+					{data.duration_minutes}&nbsp;minutes
+				</div>
+			</div>
 		</div>
 	);
 }

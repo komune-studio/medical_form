@@ -34,10 +34,17 @@ export default function Schedule() {
 
 			// Group each of the object properties by hour
 			Object.keys(groupedResult).forEach((key) => {
-				groupedResult[key] = _.groupBy(groupedResult[key], (item) =>
-					moment(item.start_time).format('HH.00')
-				);
+				groupedResult[key].sort((scheduleA, scheduleB) => {
+					let dateA = moment(scheduleA.start_time);
+					let dateB = moment(scheduleB.start_time);
+
+					if (dateA.isBefore(dateB)) return -1 
+					else if (dateA.isAfter(dateB)) return 1
+					else return 0;
+				});
 			});
+
+			console.log('SORT RESULT', groupedResult);
 
 			setDisplayedSchedule(groupedResult);
 		} catch (e) {
@@ -120,7 +127,10 @@ export default function Schedule() {
 
 				{/* Schedule table */}
 				<div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
-					<ScheduleTable schedule={displayedSchedule} setModalSetting={setModalSetting} />
+					<ScheduleTable
+						schedule={displayedSchedule}
+						setModalSetting={setModalSetting}
+					/>
 				</div>
 			</div>
 			<ScheduleActionModal
