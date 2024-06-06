@@ -32,18 +32,6 @@ export default function Schedule() {
 				moment(schedule.start_time).format('DD/MM/YYYY')
 			);
 
-			// Group each of the object properties by hour
-			Object.keys(groupedResult).forEach((key) => {
-				groupedResult[key].sort((scheduleA, scheduleB) => {
-					let dateA = moment(scheduleA.start_time);
-					let dateB = moment(scheduleB.start_time);
-
-					if (dateA.isBefore(dateB)) return -1 
-					else if (dateA.isAfter(dateB)) return 1
-					else return 0;
-				});
-			});
-
 			setDisplayedSchedule(groupedResult);
 		} catch (e) {
 			console.log(e);
