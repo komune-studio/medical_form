@@ -186,7 +186,7 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 				padding: '4px 8px',
 				backgroundColor: backgroundColor,
 				color: color,
-				borderRadius: 2,
+				borderRadius: 0,
 				fontSize: 10,
 				cursor: 'pointer',
 				height:
