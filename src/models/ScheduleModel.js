@@ -9,6 +9,10 @@ export default class Schedule {
         return await ApiRequest.set(`v1/schedule/${body.schedule_slot_id}`, 'POST', body)
     }
 
+    static unregisterDriver = async(scheduleSlotUserId) => {
+        return await ApiRequest.set(`v1/schedule/user/${scheduleSlotUserId}`, 'DELETE')
+    }
+
     static getAllThisWeek = async () => {
         return await ApiRequest.set('v1/schedules/this-week', 'GET');
     }

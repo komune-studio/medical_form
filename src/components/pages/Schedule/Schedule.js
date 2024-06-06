@@ -146,6 +146,7 @@ function ScheduleActionModal({
 		skill_level: '',
 	});
 	const [registerFormData, setRegisterFormData] = useState('');
+	const [newDriversList, setNewDriversList] = useState([]);
 	const [registeredDriversList, setRegisteredDriversList] = useState([]);
 	const [driverSearchResult, setDriverSearchResult] = useState(null);
 
@@ -154,9 +155,9 @@ function ScheduleActionModal({
 			let drivers = await ScheduleModel.getById(scheduleData.id);
 			setRegisteredDriversList(drivers.schedule_slot_user);
 		} catch (e) {
-			console.log(e)
+			console.log(e);
 		}
-	}
+	};
 
 	const resetAllForms = () => {
 		setCreateFormData({
@@ -166,7 +167,7 @@ function ScheduleActionModal({
 		});
 		setDriverSearchResult(null);
 		setRegisterFormData('');
-		setRegisteredDriversList([]);
+		setNewDriversList([]);
 	};
 
 	const resetCreateForm = () => {
@@ -194,10 +195,7 @@ function ScheduleActionModal({
 					let result = await UserModel.processUserQR({
 						token: value,
 					});
-					setRegisteredDriversList([
-						...registeredDriversList,
-						result,
-					]);
+					setNewDriversList([...newDriversList, result]);
 					setTimeout(() => setRegisterFormData(''), 300);
 				}
 			}, 300);
@@ -231,7 +229,7 @@ function ScheduleActionModal({
 		}
 	};
 
-	const handleAppendDriversList = () => {
+	const handleAppendDriver = () => {
 		if (!driverSearchResult) {
 			swal.fireError({
 				title: 'Error',
@@ -240,12 +238,16 @@ function ScheduleActionModal({
 			return;
 		}
 
-		const checkForDuplicate = registeredDriversList.findIndex(
+		const checkForDuplicate = newDriversList.findIndex(
 			(driver) =>
 				driver.apex_nickname === driverSearchResult.apex_nickname
 		);
 
-		if (checkForDuplicate >= 0) {
+		const checkForDuplicate2 = registeredDriversList.findIndex(
+			(driver) => driver.apex_nickname === driverSearchResult.apex_nickname
+		);
+
+		if (checkForDuplicate >= 0 || checkForDuplicate2 >= 0) {
 			swal.fireError({
 				title: 'Error',
 				text: 'Driver has been added to the list!',
@@ -253,11 +255,33 @@ function ScheduleActionModal({
 			return;
 		}
 
-		setRegisteredDriversList([
-			...registeredDriversList,
-			driverSearchResult,
-		]);
+		setNewDriversList([...newDriversList, driverSearchResult]);
 		resetRegisterForm();
+	};
+
+	const handleRemoveDriver = (driverId) => {
+		setNewDriversList(
+			newDriversList.filter((driver) => driver.id !== driverId)
+		);
+	};
+
+	const handleUnregisterDriver = async (driverId) => {
+		try {
+			await ScheduleModel.unregisterDriver(driverId)
+			getRegisteredDriversList();
+			swal.fire({
+				text: 'Driver berhasil di un-daftarkan!',
+				icon: 'success',
+			});
+		} catch (e) {
+			console.log(e);
+			swal.fireError({
+				title: `Error`,
+				text: e.error_message
+					? e.error_message
+					: 'Failed to unregister driver, please try again.',
+			});
+		}
 	};
 
 	const handleSubmit = () => {
@@ -294,15 +318,21 @@ function ScheduleActionModal({
 	};
 
 	const handleRegisterFormSubmit = async () => {
-		registeredDriversList.forEach(async (driver) => {
+		newDriversList.forEach(async (driver) => {
 			try {
-				let result = await ScheduleModel.registerDriver({
+				await ScheduleModel.registerDriver({
 					schedule_slot_id: scheduleData.id,
 					apex_nickname: driver.apex_nickname,
 					user_id: driver?.id || null,
 				});
 			} catch (e) {
 				console.log(e);
+				swal.fireError({
+					title: `Error`,
+					text: e.error_message
+						? e.error_message
+						: 'Failed to register drivers, please try again.',
+				});
 			}
 		});
 
@@ -310,6 +340,7 @@ function ScheduleActionModal({
 			text: 'Driver berhasil ditambahkan!',
 			icon: 'success',
 		});
+		setNewDriversList([]);
 		getRegisteredDriversList();
 		resetRegisterForm();
 	};
@@ -431,7 +462,7 @@ function ScheduleActionModal({
 									<AntButton
 										type={'primary'}
 										disabled={!driverSearchResult}
-										onClick={handleAppendDriversList}
+										onClick={handleAppendDriver}
 									>
 										Tambah Driver
 									</AntButton>
@@ -493,33 +524,22 @@ function ScheduleActionModal({
 								</Flex>
 							) : null}
 
+							{/* New Drivers (to-be-registered) List */}
+							{newDriversList.length > 0 ? (
+								<DriversListComponent
+									title={'DRIVER AKAN DITAMBAHKAN'}
+									data={newDriversList}
+									handleDelete={handleRemoveDriver}
+								/>
+							) : null}
+
 							{/* Registered Drivers List */}
 							{registeredDriversList.length > 0 ? (
-								<Flex vertical gap={8}>
-									<div
-										style={{
-											color: '#FFF',
-											fontWeight: 700,
-											marginTop: 24,
-										}}
-									>
-										REGISTERED DRIVERS
-									</div>
-									{registeredDriversList.map(
-										(driver, index) => (
-											<RegisteredDriversListItem
-												key={driver.id}
-												driver={driver}
-												registeredDrivers={
-													registeredDriversList
-												}
-												setRegisteredDrivers={
-													setRegisteredDriversList
-												}
-											/>
-										)
-									)}
-								</Flex>
+								<DriversListComponent
+									title={'DRIVER TELAH TERDAFTAR'}
+									data={registeredDriversList}
+									handleDelete={handleUnregisterDriver}
+								/>
 							) : null}
 						</>
 					)}
@@ -556,11 +576,30 @@ function ScheduleActionModal({
 	);
 }
 
-function RegisteredDriversListItem({
-	driver,
-	registeredDrivers,
-	setRegisteredDrivers,
-}) {
+function DriversListComponent({ title, data, handleDelete }) {
+	return (
+		<Flex vertical gap={8}>
+			<div
+				style={{
+					color: '#FFF',
+					fontWeight: 700,
+					marginTop: 24,
+				}}
+			>
+				{title}
+			</div>
+			{data.map((driver, index) => (
+				<DriversListItemComponent
+					key={driver.id}
+					driver={driver}
+					handleDelete={handleDelete}
+				/>
+			))}
+		</Flex>
+	);
+}
+
+function DriversListItemComponent({ driver, handleDelete }) {
 	return (
 		<Flex
 			style={{
@@ -595,13 +634,7 @@ function RegisteredDriversListItem({
 					fontSize: 12,
 					cursor: 'pointer',
 				}}
-				onClick={() => {
-					setRegisteredDrivers(
-						registeredDrivers.filter(
-							(item) => item.id !== driver.id
-						)
-					);
-				}}
+				onClick={() => handleDelete(driver.id)}
 			>
 				Hapus
 			</div>
