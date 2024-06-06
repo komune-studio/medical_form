@@ -146,7 +146,6 @@ function ScheduleActionModal({
 		skill_level: '',
 	});
 	const [registerFormData, setRegisterFormData] = useState('');
-	const [newDriversList, setNewDriversList] = useState([]);
 	const [registeredDriversList, setRegisteredDriversList] = useState([]);
 	const [driverSearchResult, setDriverSearchResult] = useState(null);
 
@@ -167,7 +166,6 @@ function ScheduleActionModal({
 		});
 		setDriverSearchResult(null);
 		setRegisterFormData('');
-		setNewDriversList([]);
 	};
 
 	const resetCreateForm = () => {
@@ -194,8 +192,8 @@ function ScheduleActionModal({
 				if (value.length > 100) {
 					let result = await UserModel.processUserQR({
 						token: value,
-					});
-					setNewDriversList([...newDriversList, result]);
+					});					
+					handleRegisterFormSubmit(result);
 					setTimeout(() => setRegisterFormData(''), 300);
 				}
 			}, 300);
@@ -209,29 +207,9 @@ function ScheduleActionModal({
 		}
 	};
 
-	const handleDriverSearch = async () => {
-		try {
-			let result = await UserModel.getByUsername(registerFormData);
-			setDriverSearchResult(result);
-		} catch (e) {
-			if (e?.code === 'USER_NOT_FOUND') {
-				setDriverSearchResult({ apex_nickname: registerFormData });
-				return;
-			}
-
-			console.log(e);
-			swal.fireError({
-				title: 'Error',
-				text: e.error_message
-					? e.error_message
-					: 'Unable to process search request!',
-			});
-		}
-	};
-
 	const handleUnregisterDriver = async (driverId) => {
 		try {
-			await ScheduleModel.unregisterDriver(driverId)
+			await ScheduleModel.unregisterDriver(driverId);
 			getRegisteredDriversList();
 			swal.fire({
 				text: 'Driver berhasil di un-daftarkan!',
@@ -281,29 +259,30 @@ function ScheduleActionModal({
 		}
 	};
 
-	const handleRegisterFormSubmit = async () => {
-			try {
-				await ScheduleModel.registerDriver({
-					schedule_slot_id: scheduleData.id,
-					apex_nickname: driverSearchResult.apex_nickname,
-					user_id: driverSearchResult?.id || null,
-				});
+	const handleRegisterFormSubmit = async (userData) => {
+		try {
+			await ScheduleModel.registerDriver({
+				schedule_slot_id: scheduleData.id,
+				apex_nickname:
+					userData?.apex_data?.nickname || registerFormData,
+				user_id: userData?.id || null,
+			});
 
-				swal.fire({
-					text: 'Driver berhasil ditambahkan!',
-					icon: 'success',
-				});
-				getRegisteredDriversList();
-				resetRegisterForm();
-			} catch (e) {
-				console.log(e);
-				swal.fireError({
-					title: `Error`,
-					text: e.error_message
-						? e.error_message
-						: 'Failed to register drivers, please try again.',
-				});
-			}
+			swal.fire({
+				text: 'Driver berhasil ditambahkan!',
+				icon: 'success',
+			});
+			getRegisteredDriversList();
+			resetRegisterForm();
+		} catch (e) {
+			console.log(e);
+			swal.fireError({
+				title: `Error`,
+				text: e.error_message
+					? e.error_message
+					: 'Failed to register drivers, please try again.',
+			});
+		}
 	};
 
 	useEffect(() => {
@@ -406,7 +385,7 @@ function ScheduleActionModal({
 									<Form.Control
 										value={registerFormData}
 										placeholder={
-											'Scan QR atau masukkan username user'
+											'Scan QR atau masukkan nickname user'
 										}
 										onChange={(e) =>
 											handleRegisterFormInputChange(
@@ -416,13 +395,7 @@ function ScheduleActionModal({
 									/>
 									<AntButton
 										type={'primary'}
-										onClick={handleDriverSearch}
-									>
-										Cari Driver
-									</AntButton>
-									<AntButton
-										type={'primary'}
-										disabled={!driverSearchResult}
+										disabled={!registerFormData}
 										onClick={handleSubmit}
 									>
 										Daftarkan Driver
@@ -499,19 +472,20 @@ function ScheduleActionModal({
 
 				{/* Close modal button */}
 				<Flex className="mt-5" justify={'end'}>
-					<AntButton
+					<div
 						className={'text-white'}
-						type={'link'}
-						size="sm"
-						variant="outline-danger"
 						onClick={() => {
 							resetAllForms();
 							handleClose();
 						}}
-						style={{ marginRight: '5px' }}
+						style={{
+							marginRight: '5px',
+							fontSize: 14,
+							cursor: 'pointer',
+						}}
 					>
 						Tutup
-					</AntButton>
+					</div>
 				</Flex>
 			</Modal.Body>
 		</Modal>
@@ -565,9 +539,9 @@ function DriversListItemComponent({ driver, handleDelete }) {
 					<div style={{ fontWeight: 700 }}>
 						{driver.apex_nickname}
 					</div>
-					<div style={{ font: 10, color: Palette.INACTIVE_GRAY }}>
+					{/* <div style={{ font: 10, color: Palette.INACTIVE_GRAY }}>
 						{driver?.email || 'E-mail tidak tersedia'}
-					</div>
+					</div> */}
 				</Flex>
 			</Flex>
 			<div
