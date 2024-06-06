@@ -27,6 +27,8 @@ const X_AXIS_HEADER_HEIGHT = 25;
 
 const Y_AXIS_HEADER_HEIGHT = SCHEDULE_ITEM_PROPERTIES.heightPerMinute * 60;
 
+const MAXIMUM_DRIVERS_PER_SESSION = 10;
+
 export default function ScheduleTable({ schedule, setModalSetting }) {
 	const getPastWeekDates = () => {
 		const result = [];
@@ -131,10 +133,43 @@ export default function ScheduleTable({ schedule, setModalSetting }) {
 }
 
 function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
+	const startTime = moment(data.start_time);
+	const slotAvailable =
+		MAXIMUM_DRIVERS_PER_SESSION - data._count.schedule_slot_user;
+	let backgroundColor;
+	let color;
+
+	switch (true) {
+		case slotAvailable <= 0:
+			backgroundColor = Palette.INACTIVE_GRAY;
+			color = Palette.WHITE_GRAY;
+			break;
+		case data.skill_level === 'BEGINNER':
+			backgroundColor = '#caffbf';
+			color = '#0F5132';
+			break;
+		case data.skill_level === 'ADVANCED':
+			backgroundColor = '#fdffb6';
+			color = '#664D03';
+			break;
+		case data.skill_level === 'PRO':
+			backgroundColor = '#9bf6ff';
+			color = '#056676';
+			break;
+		case data.skill_level === 'EVENT':
+			backgroundColor = '#D68869';
+			color = '#813314';
+			break;
+		default:
+			backgroundColor = '#121212';
+			color = Palette.WHITE_GRAY;
+	}
+
 	const handleClick = () => {
 		if (
 			data.skill_level !== 'EVENT' &&
-			data.skill_level !== 'MAINTENANCE'
+			data.skill_level !== 'MAINTENANCE' &&
+			slotAvailable > 0
 		) {
 			setModalSetting({
 				isOpen: true,
@@ -144,34 +179,6 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 		}
 	};
 
-	const startTime = moment(data.start_time);
-	console.log(startTime.diff(currentDateMoment, 'minutes'));
-
-	let backgroundColor;
-	let color;
-
-	switch (data.skill_level) {
-		case 'BEGINNER':
-			backgroundColor = '#caffbf';
-			color = '#0F5132';
-			break;
-		case 'ADVANCED':
-			backgroundColor = '#fdffb6';
-			color = '#664D03';
-			break;
-		case 'PRO':
-			backgroundColor = '#9bf6ff';
-			color = '#056676';
-			break;
-		case 'EVENT':
-			backgroundColor = '#D68869';
-			color = '#813314';
-			break;
-		default:
-			backgroundColor = '#121212';
-			color = Palette.WHITE_GRAY;
-	}
-
 	return (
 		<div
 			className="d-flex justify-content-start align-items-center w-100"
@@ -180,7 +187,7 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 				backgroundColor: backgroundColor,
 				color: color,
 				borderRadius: 2,
-				fontSize: 12,
+				fontSize: 10,
 				cursor: 'pointer',
 				height:
 					SCHEDULE_ITEM_PROPERTIES.heightPerMinute *
@@ -198,15 +205,23 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 				<div className="font-weight-bold text-left" style={{ flex: 1 }}>
 					{data.skill_level}
 				</div>
-				<div className="text-center" style={{ flex: 1 }}>
-					{startTime.format('HH:mm')}
-				</div>
-				<div
-					className="font-weight-bold text-right"
-					style={{ flex: 1 }}
-				>
-					{data.duration_minutes}&nbsp;minutes
-				</div>
+				{data.skill_level !== 'EVENT' &&
+				data.skill_level !== 'MAINTENANCE' ? (
+					<div
+						className="font-weight-bold text-right"
+						style={{ flex: 1 }}
+					>
+						{MAXIMUM_DRIVERS_PER_SESSION -
+							data._count.schedule_slot_user}{' '}
+						slot(s) available
+					</div>
+				) : (
+					<div className="text-right" style={{ flex: 1 }}>
+						{`${startTime.format('HH:mm')} - ${startTime
+							.add(data.duration_minutes, 'minute')
+							.format('HH:mm')}`}
+					</div>
+				)}
 			</div>
 		</div>
 	);
