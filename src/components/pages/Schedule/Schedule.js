@@ -392,6 +392,11 @@ function ScheduleActionModal({
 												e.target.value
 											)
 										}
+										onKeyDown={(e) => {
+											if (e.key === 'Enter') {
+												handleSubmit();
+											}
+										}}
 									/>
 									<AntButton
 										type={'primary'}
