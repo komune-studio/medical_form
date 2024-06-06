@@ -149,6 +149,15 @@ function ScheduleActionModal({
 	const [registeredDriversList, setRegisteredDriversList] = useState([]);
 	const [driverSearchResult, setDriverSearchResult] = useState(null);
 
+	const getRegisteredDriversList = async () => {
+		try {
+			let drivers = await ScheduleModel.getById(scheduleData.id);
+			setRegisteredDriversList(drivers.schedule_slot_user);
+		} catch (e) {
+			console.log(e)
+		}
+	}
+
 	const resetAllForms = () => {
 		setCreateFormData({
 			start_time: new Date(),
@@ -301,9 +310,15 @@ function ScheduleActionModal({
 			text: 'Driver berhasil ditambahkan!',
 			icon: 'success',
 		});
-		setRegisteredDriversList([]);
+		getRegisteredDriversList();
 		resetRegisterForm();
 	};
+
+	useEffect(() => {
+		if (scheduleData) {
+			getRegisteredDriversList();
+		}
+	}, [scheduleData]);
 
 	return (
 		<Modal size={'lg'} show={isOpen} backdrop="static" keyboard={false}>
