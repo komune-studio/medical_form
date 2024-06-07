@@ -147,7 +147,6 @@ function ScheduleActionModal({
 	});
 	const [registerFormData, setRegisterFormData] = useState('');
 	const [registeredDriversList, setRegisteredDriversList] = useState([]);
-	const [driverSearchResult, setDriverSearchResult] = useState(null);
 
 	const getRegisteredDriversList = async () => {
 		try {
@@ -164,7 +163,6 @@ function ScheduleActionModal({
 			duration_minutes: 10,
 			skill_level: '',
 		});
-		setDriverSearchResult(null);
 		setRegisterFormData('');
 	};
 
@@ -178,7 +176,6 @@ function ScheduleActionModal({
 
 	const resetRegisterForm = () => {
 		setRegisterFormData('');
-		setDriverSearchResult(null);
 	};
 
 	const handleRegisterFormInputChange = async (value) => {
@@ -192,7 +189,7 @@ function ScheduleActionModal({
 				if (value.length > 100) {
 					let result = await UserModel.processUserQR({
 						token: value,
-					});					
+					});
 					handleRegisterFormSubmit(result);
 					setTimeout(() => setRegisterFormData(''), 300);
 				}
@@ -211,10 +208,6 @@ function ScheduleActionModal({
 		try {
 			await ScheduleModel.unregisterDriver(driverId);
 			getRegisteredDriversList();
-			swal.fire({
-				text: 'Driver berhasil di un-daftarkan!',
-				icon: 'success',
-			});
 		} catch (e) {
 			console.log(e);
 			swal.fireError({
@@ -259,7 +252,7 @@ function ScheduleActionModal({
 		}
 	};
 
-	const handleRegisterFormSubmit = async (userData) => {
+	const handleRegisterFormSubmit = async (userData = null) => {
 		try {
 			await ScheduleModel.registerDriver({
 				schedule_slot_id: scheduleData.id,
@@ -268,10 +261,6 @@ function ScheduleActionModal({
 				user_id: userData?.id || null,
 			});
 
-			swal.fire({
-				text: 'Driver berhasil ditambahkan!',
-				icon: 'success',
-			});
 			getRegisteredDriversList();
 			resetRegisterForm();
 		} catch (e) {
@@ -281,6 +270,7 @@ function ScheduleActionModal({
 				text: e.error_message
 					? e.error_message
 					: 'Failed to register drivers, please try again.',
+				focusConfirm: true,
 			});
 		}
 	};
@@ -394,79 +384,24 @@ function ScheduleActionModal({
 										}
 										onKeyDown={(e) => {
 											if (e.key === 'Enter') {
-												handleSubmit();
+												handleRegisterFormSubmit();
 											}
 										}}
 									/>
 									<AntButton
 										type={'primary'}
 										disabled={!registerFormData}
-										onClick={handleSubmit}
+										onClick={handleRegisterFormSubmit}
 									>
 										Daftarkan Driver
 									</AntButton>
 								</Flex>
 							</Flex>
 
-							{/* Search Driver Result */}
-							{driverSearchResult ? (
-								<Flex
-									style={{
-										color: '#FFF',
-										backgroundColor: '#FFFFFF14',
-										padding: '8px 12px',
-										borderRadius: 8,
-									}}
-									justify="space-between"
-									align="center"
-								>
-									<Flex
-										gap={8}
-										justify="center"
-										align="center"
-									>
-										<div>
-											<img
-												src={
-													driverSearchResult?.avatar_url ||
-													Avatar
-												}
-												style={{
-													borderRadius: 99,
-													height: 48,
-													width: 48,
-												}}
-											/>
-										</div>
-										<Flex vertical>
-											<div style={{ fontWeight: 700 }}>
-												{
-													driverSearchResult.apex_nickname
-												}
-											</div>
-											<div
-												style={{
-													fontSize: 12,
-													color: Palette.INACTIVE_GRAY,
-												}}
-											>
-												{driverSearchResult?.email ||
-													'E-mail tidak tersedia'}
-											</div>
-										</Flex>
-									</Flex>
-									<Flex>
-										<div style={{ fontWeight: 700 }}>
-											// TODO
-										</div>
-									</Flex>
-								</Flex>
-							) : null}
-
 							{/* Registered Drivers List */}
 							{registeredDriversList.length > 0 ? (
 								<DriversListComponent
-									title={'DRIVER TELAH TERDAFTAR'}
+									title={'DRIVER TERDAFTAR'}
 									data={registeredDriversList}
 									handleDelete={handleUnregisterDriver}
 								/>
@@ -476,7 +411,7 @@ function ScheduleActionModal({
 				</Flex>
 
 				{/* Close modal button */}
-				<Flex className="mt-5" justify={'end'}>
+				<Flex className="mt-5" justify={'end'} align={'center'} gap={8}>
 					<div
 						className={'text-white'}
 						onClick={() => {
@@ -491,6 +426,18 @@ function ScheduleActionModal({
 					>
 						Tutup
 					</div>
+					{isCreateMode ? (
+						<AntButton
+							type={'primary'}
+							size="sm"
+							variant="primary"
+							onClick={() => {
+								handleSubmit();
+							}}
+						>
+							Buat sesi
+						</AntButton>
+					) : null}
 				</Flex>
 			</Modal.Body>
 		</Modal>
