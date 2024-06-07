@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Button as AntButton, Flex, Spin } from 'antd';
+import { Button as AntButton, Flex } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { Form } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
@@ -325,6 +325,9 @@ function ScheduleActionModal({
 											start_time: value.toDate(),
 										})
 									}
+									timeConstraints={{
+										hours: { min: 10, max: 22 },
+									}}
 								/>
 							</Flex>
 							<Flex vertical gap={8}>
@@ -409,13 +412,17 @@ function ScheduleActionModal({
 									>
 										DRIVER TERDAFTAR
 									</div>
-									{registeredDriversList.map((driver, index) => (
-										<DriversListItemComponent
-											key={driver.id}
-											driver={driver}
-											handleDelete={handleUnregisterDriver}
-										/>
-									))}
+									{registeredDriversList.map(
+										(driver, index) => (
+											<DriversListItemComponent
+												key={driver.id}
+												driver={driver}
+												handleDelete={
+													handleUnregisterDriver
+												}
+											/>
+										)
+									)}
 								</Flex>
 							) : null}
 						</>
