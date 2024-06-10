@@ -16,15 +16,15 @@ label, p, h1, h2, h3, h4, h5, h6, small {
 
 
 textarea.form-control, select.form-control, select.form-select, input.form-control {
-    background: #FFFFFF14;
-    border-color: #161616;
-    color: #fff;
+    background: #FFFFFF14 !important;
+    border-color: #161616 !important;
+    color: #fff !important;
 }
 
 textarea.form-control:focus, select.form-control:focus, select.form-select:focus, input.form-control:focus {
-    background: #FFFFFF14;
-    border-color: #161616;
-    color: #fff;
+    background: #FFFFFF14 !important;
+    border-color: #161616 !important;
+    color: #fff !important;
 }
 
 .ant-picker, ant-picker-input {
@@ -62,6 +62,10 @@ textarea.form-control:focus, select.form-control:focus, select.form-select:focus
 
 .ant-btn-primary {
     background: #ef6024 !important;
+}
+
+.ant-btn-dangerous {
+    background: #B53235 !important;
 }
 
 .ant-switch-inner {

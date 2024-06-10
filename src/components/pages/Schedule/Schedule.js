@@ -583,6 +583,7 @@ function ScheduleActionModal({
 								handleScheduleDelete();
 								handleClose();
 							}}
+							danger
 						>
 							Hapus Jadwal
 						</AntButton>

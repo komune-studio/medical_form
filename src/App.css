@@ -2,6 +2,10 @@ label {
     margin: 0;
 }
 
+option {
+    background-color: #282828 !important;
+}
+
 .swal2-container {
     z-index: 20000 !important;
 }
