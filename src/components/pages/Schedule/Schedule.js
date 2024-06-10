@@ -17,20 +17,35 @@ import Helper from 'utils/Helper';
 
 const SKILL_LEVEL = ['BEGINNER', 'ADVANCED', 'PRO', 'MAINTENANCE', 'EVENT'];
 
+const SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT = 'DD/MM/YYYY';
+
 export default function Schedule() {
 	const [displayedSchedule, setDisplayedSchedule] = useState([]);
 	const [modalSetting, setModalSetting] = useState({
 		isOpen: false,
 		isCreateMode: true,
 	});
+	const [currentTimeRange, setCurrentTimeRange] = useState({
+		start_time: moment().subtract(7, 'days'),
+		end_time: moment(),
+	});
 
 	const getThisWeekSchedule = async () => {
 		try {
-			let result = await ScheduleModel.getAllThisWeek();
+			let result = await ScheduleModel.getAllInTimeRange({
+				start_time: currentTimeRange.start_time
+					.set({ hour: 0, minute: 0, second: 0 })
+					.toString(),
+				end_time: currentTimeRange.end_time
+					.set({ hour: 23, minute: 59, second: 59 })
+					.toString(),
+			});
 
 			// Group data by date
 			let groupedResult = _.groupBy(result, (schedule) =>
-				moment(schedule.start_time).format('DD/MM/YYYY')
+				moment(schedule.start_time).format(
+					SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT
+				)
 			);
 
 			setDisplayedSchedule(groupedResult);
@@ -39,9 +54,23 @@ export default function Schedule() {
 		}
 	};
 
+	const changeToNextWeek = () => {
+		setCurrentTimeRange({
+			start_time: currentTimeRange.start_time.add(7, 'days'),
+			end_time: currentTimeRange.end_time.add(7, 'days')
+		});
+	}
+
+	const changeToPreviousWeek = () => {
+		setCurrentTimeRange({
+			start_time: currentTimeRange.start_time.subtract(7, 'days'),
+			end_time: currentTimeRange.end_time.subtract(7, 'days')
+		});
+	}
+
 	useEffect(() => {
 		getThisWeekSchedule();
-	}, []);
+	}, [currentTimeRange]);
 
 	return (
 		<>
@@ -82,26 +111,26 @@ export default function Schedule() {
 								borderRadius: 4,
 							}}
 						>
-							<div>Jan 2024</div>
+							<div>{currentTimeRange.end_time.format('MMMM YY')}</div>
 							<div
 								className="border"
 								style={{ borderRadius: 4, padding: '2px 8px' }}
 							>
-								W5
+								W{currentTimeRange.end_time.weeks()}
 							</div>
 						</div>
 						<div
 							className="d-flex align-items-center justify-content-center"
 							style={{ gap: 12 }}
 						>
-							<button className="btn p-0">
+							<button className="btn p-0" onClick={changeToPreviousWeek}>
 								<Iconify
 									icon="mdi:chevron-left"
 									size={16}
 									color="#FFF"
 								/>
 							</button>
-							<button className="btn p-0">
+							<button className="btn p-0" onClick={changeToNextWeek}>
 								<Iconify
 									icon="mdi:chevron-right"
 									size={16}
@@ -116,6 +145,7 @@ export default function Schedule() {
 				<div className="d-flex" style={{ marginTop: 34, flex: 1 }}>
 					<ScheduleTable
 						schedule={displayedSchedule}
+						currentTimeRange={currentTimeRange}
 						setModalSetting={setModalSetting}
 					/>
 				</div>

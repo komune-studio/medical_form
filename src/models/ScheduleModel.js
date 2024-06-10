@@ -21,6 +21,10 @@ export default class Schedule {
         return await ApiRequest.set('v1/schedules/this-week', 'GET');
     }
 
+    static getAllInTimeRange = async (parameters) => {
+        return await ApiRequest.set(`v1/schedules/custom-range?start_time=${parameters.start_time}&end_time=${parameters.end_time}`, 'GET');
+    }
+
     static getById = async (id) => {
         return await ApiRequest.set(`v1/schedule/${id}`, 'GET');
     }

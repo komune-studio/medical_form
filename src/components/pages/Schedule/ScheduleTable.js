@@ -29,15 +29,15 @@ const Y_AXIS_HEADER_HEIGHT = SCHEDULE_ITEM_PROPERTIES.heightPerMinute * 60;
 
 const MAXIMUM_DRIVERS_PER_SESSION = 10;
 
-export default function ScheduleTable({ schedule, setModalSetting }) {
+const SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT = 'DD/MM/YYYY';
+
+export default function ScheduleTable({ schedule, setModalSetting, currentTimeRange }) {
 	const getPastWeekDates = () => {
 		const result = [];
-		for (let i = 0; i < 7; i++) {
-			let date = new Date();
-			date.setDate(date.getDate() - i);
-			result.push(date);
-		}
 
+		for (let i = 0; i < 7; i++) {
+			result.push(moment(currentTimeRange.start_time).add(i, 'days').toString());
+		}
 		return result;
 	};
 
@@ -75,7 +75,7 @@ export default function ScheduleTable({ schedule, setModalSetting }) {
 			{getPastWeekDates().map((date, index) => {
 				const currentDateMoment = moment(date);
 				const currentDate = currentDateMoment
-					.format('DD/MM/YYYY')
+					.format(SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT)
 					.toString();
 
 				return (
