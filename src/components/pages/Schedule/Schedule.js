@@ -141,12 +141,13 @@ function ScheduleActionModal({
 	refreshData,
 }) {
 	const [createFormData, setCreateFormData] = useState({
-		start_time: new Date(),
+		start_time: new Date().setHours(10, 0, 0),
 		duration_minutes: 10,
 		skill_level: '',
 	});
 	const [registerFormData, setRegisterFormData] = useState('');
 	const [registeredDriversList, setRegisteredDriversList] = useState([]);
+	const [updateFormData, setUpdateFormData] = useState({});
 
 	const getRegisteredDriversList = async () => {
 		try {
@@ -171,7 +172,7 @@ function ScheduleActionModal({
 
 	const resetAllForms = () => {
 		setCreateFormData({
-			start_time: new Date(),
+			start_time: new Date().setHours(10, 0, 0),
 			duration_minutes: 10,
 			skill_level: '',
 		});
@@ -181,7 +182,7 @@ function ScheduleActionModal({
 
 	const resetCreateForm = () => {
 		setCreateFormData({
-			start_time: new Date(),
+			start_time: new Date().setHours(10, 0, 0),
 			duration_minutes: 10,
 			skill_level: '',
 		});
@@ -280,8 +281,32 @@ function ScheduleActionModal({
 		}
 	};
 
+	const handleUpdateFormSubmit = async () => {
+		try {
+			await ScheduleModel.edit({
+				...updateFormData,
+				duration_minutes: parseInt(updateFormData.duration_minutes),
+				schedule_slot_id: parseInt(updateFormData.id)
+			});
+			swal.fire({
+				text: 'Sesi Balapan berhasil diubah!',
+				icon: 'success',
+			});
+			refreshData();
+		} catch(e) {
+			console.log(e);
+			swal.fireError({
+				title: `Error`,
+				text: e.error_message
+					? e.error_message
+					: 'Failed to update schedule, please try again.',
+			});
+		}
+	}
+
 	useEffect(() => {
 		if (scheduleData) {
+			setUpdateFormData(scheduleData);
 			getRegisteredDriversList();
 		}
 	}, [scheduleData]);
@@ -366,12 +391,75 @@ function ScheduleActionModal({
 							</Flex>
 						</>
 					) : (
-						// Register Driver in Race Session Form
+						// Driver Registration & Race Session Editing Form
 						<>
-							{/* Driver Regisration Form - Action Buttons */}
+							{/* Race Session Edit Form */}
 							<Flex vertical gap={8}>
-								<Form.Label style={{ fontWeight: 700 }}>
-									SEARCH
+								<Flex vertical gap={8}>
+									<Form.Label>Waktu Mulai</Form.Label>
+									<Datetime
+										value={moment(
+											updateFormData?.start_time
+										).toDate()}
+										onChange={(value) =>
+											setUpdateFormData({
+												...updateFormData,
+												start_time: value.toDate(),
+											})
+										}
+										timeConstraints={{
+											hours: { min: 10, max: 22 },
+										}}
+									/>
+								</Flex>
+								<Flex vertical gap={8}>
+									<Form.Label>Durasi (menit)</Form.Label>
+									<Form.Control
+										placeholder={10}
+										type="number"
+										value={updateFormData?.duration_minutes}
+										onChange={(e) =>
+											setUpdateFormData({
+												...updateFormData,
+												duration_minutes:
+													e.target.value,
+											})
+										}
+									/>
+								</Flex>
+								<Flex vertical gap={8}>
+									<Form.Label>Level Skill</Form.Label>
+									<Form.Select
+										className="form-control"
+										value={updateFormData?.skill_level}
+										onChange={(e) =>
+											setUpdateFormData({
+												...updateFormData,
+												skill_level: e.target.value,
+											})
+										}
+									>
+										{SKILL_LEVEL.map((skill) => (
+											<option key={skill} value={skill}>
+												{skill}
+											</option>
+										))}
+									</Form.Select>
+								</Flex>
+								<Flex justify='end' style={{marginTop: 18}}>
+									<AntButton
+										type={'primary'}
+										onClick={handleUpdateFormSubmit}
+									>
+										Ubah
+									</AntButton>
+								</Flex>
+							</Flex>
+
+							{/* Driver Regisration Form */}
+							<Flex vertical gap={8} style={{ marginTop: 24 }}>
+								<Form.Label style={{ fontWeight: 400 }}>
+									Daftarkan Driver
 								</Form.Label>
 								<Flex gap={8}>
 									<Form.Control
@@ -395,7 +483,7 @@ function ScheduleActionModal({
 										disabled={!registerFormData}
 										onClick={handleRegisterFormSubmit}
 									>
-										Daftarkan Driver
+										Daftarkan
 									</AntButton>
 								</Flex>
 							</Flex>
@@ -410,7 +498,7 @@ function ScheduleActionModal({
 											marginTop: 24,
 										}}
 									>
-										DRIVER TERDAFTAR
+										Driver Terdaftar
 									</div>
 									{registeredDriversList.map(
 										(driver, index) => (

@@ -5,6 +5,10 @@ export default class Schedule {
         return await ApiRequest.set('v1/schedules', 'POST', body)
     }
 
+    static edit = async (body) => {
+        return await ApiRequest.set(`v1/schedule/${body.schedule_slot_id}`, 'PUT', body)
+    }
+
     static registerDriver = async (body) => {
         return await ApiRequest.set(`v1/schedule/${body.schedule_slot_id}`, 'POST', body)
     }
