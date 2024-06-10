@@ -26,7 +26,7 @@ export default function Schedule() {
 		isCreateMode: true,
 	});
 	const [currentTimeRange, setCurrentTimeRange] = useState({
-		start_time: moment().subtract(7, 'days'),
+		start_time: moment().subtract(6, 'days'),
 		end_time: moment(),
 	});
 
@@ -116,7 +116,7 @@ export default function Schedule() {
 								className="border"
 								style={{ borderRadius: 4, padding: '2px 8px' }}
 							>
-								W{currentTimeRange.end_time.weeks()}
+								Week {currentTimeRange.end_time.weeks()} of {currentTimeRange.start_time.year()}
 							</div>
 						</div>
 						<div
