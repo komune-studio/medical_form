@@ -94,7 +94,7 @@ export default function OrderCreateV2() {
 				user_id: parseInt(scannedUser.id),
 				total_coins: parseInt(orderValue),
 			});
-			setCurrentModalContent(2);
+			setCurrentModalContent(3);
 		} catch (e) {
 			setCurrentModalContent(1);
 			console.log(e);
@@ -122,7 +122,10 @@ export default function OrderCreateV2() {
 							alignItems: 'center',
 						}}
 					>
-						<div onClick={() => history.push('/orders')}>
+						<div
+							onClick={() => history.push('/orders')}
+							style={{ cursor: 'pointer' }}
+						>
 							<Iconify
 								icon={'material-symbols:arrow-back'}
 							></Iconify>
@@ -231,23 +234,21 @@ function OrderNominalContainer({ value, onClick }) {
 	);
 }
 
-function CreateOrderModal(props) {
+function CreateOrderModal({
+	isOpen,
+	handleClose,
+	scanValue,
+	updateScanInputValue,
+	currentModalContent,
+	setCurrentModalContent,
+	loading,
+	orderValue,
+	setOrderValue,
+	scannedUser,
+	searchUserByUsernameOrEmail,
+	handleCreateOrder,
+}) {
 	const [checkboxValue, setCheckboxValue] = useState(false);
-
-	const {
-		isOpen,
-		handleClose,
-		scanValue,
-		updateScanInputValue,
-		currentModalContent,
-		setCurrentModalContent,
-		loading,
-		orderValue,
-		setOrderValue,
-		scannedUser,
-		searchUserByUsernameOrEmail,
-		handleCreateOrder,
-	} = props;
 
 	const FirstContent = () => (
 		<>
@@ -450,16 +451,18 @@ function CreateOrderModal(props) {
 				className="text-right"
 				style={{ marginTop: 32, cursor: 'pointer' }}
 			>
-				<div
+				<AntButton
+					type="primary"
 					style={{ fontSize: 12 }}
 					onClick={() => {
 						handleClose();
 						setCurrentModalContent(0);
 						setOrderValue(0);
 					}}
+					autoFocus
 				>
 					Tutup
-				</div>
+				</AntButton>
 			</div>
 		</div>
 	);
