@@ -4,6 +4,7 @@ import { Button as AntButton, Checkbox, Spin } from 'antd';
 import Modal from 'react-bootstrap/Modal';
 import { Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
+import Form from 'react-bootstrap/Form';
 import Palette from '../../../utils/Palette';
 import Helper from 'utils/Helper';
 import Iconify from '../../reusable/Iconify';
@@ -13,7 +14,11 @@ import OrderModel from 'models/OrderModel';
 
 let contentTimer;
 
-const ORDER_NOMINALS = [50000, 100000, 150000, 200000, 250000, 300000];
+const ORDER_BARCOINS_VALUE = [50000, 100000, 150000, 200000, 250000, 300000];
+
+const ORDER_RIDES_VALUE = [1, 2, 3, 4, 5, 6];
+
+const CURRENCIES = ['BARCOIN', 'BEGINNER RIDES', 'ADVANCED RIDES', 'PRO RIDES'];
 
 export default function OrderCreateV2() {
 	const history = useHistory();
@@ -21,12 +26,14 @@ export default function OrderCreateV2() {
 	const [scanInputValue, setScanInputValue] = useState('');
 	const [scannedUser, setScannedUser] = useState(null);
 	const [orderValue, setOrderValue] = useState(0);
+	const [orderCurrency, setOrderCurrency] = useState('BARCOIN');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [currentModalContent, setCurrentModalContent] = useState(0);
 	const [loading, setLoading] = useState(false);
 
-	const handleNominalClick = (value) => {
+	const handleValueClick = (value, currency) => {
 		setOrderValue(value);
+		setOrderCurrency(currency);
 	};
 
 	const updateScanInputValue = (value) => {
@@ -142,37 +149,51 @@ export default function OrderCreateV2() {
 							{/* Barcoin withdrawal form & action button */}
 							<div>
 								<div>
-									<div style={{ fontSize: 14 }}>
-										Nominal penarikan Barcoin
-									</div>
-									<input
-										className="order-input"
-										value={orderValue}
-										onChange={(e) =>
-											setOrderValue(e.target.value)
-										}
-										type="number"
-									/>
-								</div>
-								<div style={{ marginTop: 24 }}>
+									<div style={{ fontSize: 14 }}>Order</div>
 									<div
-										style={{
-											display: 'grid',
-											columnGap: 8,
-											rowGap: 12,
-											gridTemplateColumns: '1fr 1fr 1fr',
-										}}
+										className="d-flex justify-content-center align-items-center"
+										style={{ gap: 8 }}
 									>
-										{ORDER_NOMINALS.map((value, index) => (
-											<OrderNominalContainer
-												key={index}
-												value={value}
-												onClick={() =>
-													handleNominalClick(value)
-												}
-											/>
-										))}
+										<input
+											className="order-input"
+											value={orderValue}
+											onChange={(e) =>
+												setOrderValue(e.target.value)
+											}
+											style={{ flex: 3 }}
+											type="number"
+										/>
+										<Form.Select
+											className="form-control"
+											style={{ flex: 1 }}
+											value={orderCurrency}
+											onChange={(e) =>
+												setOrderCurrency(e.target.value)
+											}
+										>
+											{CURRENCIES.map((currency) => (
+												<option value={currency}>
+													{currency}
+												</option>
+											))}
+										</Form.Select>
 									</div>
+								</div>
+								<div
+									className="d-flex flex-column"
+									style={{ marginTop: 24, gap: 24 }}
+								>
+									{CURRENCIES.map((currency) => (
+										<OrderValueOptions
+											options={
+												currency === 'BARCOIN'
+													? ORDER_BARCOINS_VALUE
+													: ORDER_RIDES_VALUE
+											}
+											currency={currency}
+											handleValueClick={handleValueClick}
+										/>
+									))}
 								</div>
 								<div style={{ marginTop: 48 }}>
 									<AntButton
@@ -213,7 +234,31 @@ export default function OrderCreateV2() {
 	);
 }
 
-function OrderNominalContainer({ value, onClick }) {
+function OrderValueOptions({ options, currency, handleValueClick }) {
+	return (
+		<div style={{ gap: 8 }} className="d-flex flex-column">
+			<div>{Helper.toTitleCase(currency)}</div>
+			<div
+				style={{
+					display: 'grid',
+					columnGap: 8,
+					rowGap: 12,
+					gridTemplateColumns: '1fr 1fr 1fr',
+				}}
+			>
+				{options.map((value, index) => (
+					<OrderValueOptionsItem
+						key={index}
+						value={value}
+						onClick={() => handleValueClick(value, currency)}
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function OrderValueOptionsItem({ value, onClick }) {
 	return (
 		<AntButton
 			style={{
@@ -248,8 +293,6 @@ function CreateOrderModal({
 	searchUserByUsernameOrEmail,
 	handleCreateOrder,
 }) {
-	const [checkboxValue, setCheckboxValue] = useState(false);
-
 	const FirstContent = () => (
 		<>
 			<div style={{ fontWeight: 600 }}>
@@ -257,26 +300,15 @@ function CreateOrderModal({
 				Barcode
 			</div>
 			<div
-				className="d-flex w-100 justify-content-between align-items-center"
+				className="d-flex w-100 justify-content-end align-items-center"
 				style={{ marginTop: 24 }}
 			>
-				<div
-					className="d-flex align-items-center"
-					style={{ gap: 6, color: '#C2C2C2', fontSize: 12 }}
-				>
-					<div>
-						<Checkbox
-							checked={checkboxValue}
-							onChange={() => setCheckboxValue(!checkboxValue)}
-						/>
-					</div>
-					<div>Jangan tampilkan pesan ini lagi</div>
-				</div>
 				<AntButton
 					type={'primary'}
 					onClick={() =>
 						setCurrentModalContent(currentModalContent + 1)
 					}
+					autoFocus
 				>
 					Oke
 				</AntButton>
