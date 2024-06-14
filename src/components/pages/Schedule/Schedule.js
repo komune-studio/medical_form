@@ -27,25 +27,21 @@ export default function Schedule() {
 	});
 	const [currentTimeRange, setCurrentTimeRange] = useState({
 		start_time: moment().day(0 + 1),
-		end_time: moment().day(0 + 1).add(6, 'days'),
+		end_time: moment()
+			.day(0 + 1)
+			.add(6, 'days'),
 	});
 
 	const getThisWeekSchedule = async () => {
 		try {
 			let result = await ScheduleModel.getAllInTimeRange({
-				start_time: currentTimeRange.start_time
-					.set({ hour: 0, minute: 0, second: 0 })
-					.toString(),
-				end_time: currentTimeRange.end_time
-					.set({ hour: 23, minute: 59, second: 59 })
-					.toString(),
+				start_time: currentTimeRange.start_time.set({ hour: 0, minute: 0, second: 0 }).toString(),
+				end_time: currentTimeRange.end_time.set({ hour: 23, minute: 59, second: 59 }).toString(),
 			});
 
 			// Group data by date
 			let groupedResult = _.groupBy(result, (schedule) =>
-				moment(schedule.start_time).format(
-					SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT
-				)
+				moment(schedule.start_time).format(SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT)
 			);
 
 			setDisplayedSchedule(groupedResult);
@@ -57,16 +53,16 @@ export default function Schedule() {
 	const changeToNextWeek = () => {
 		setCurrentTimeRange({
 			start_time: currentTimeRange.start_time.add(7, 'days'),
-			end_time: currentTimeRange.end_time.add(7, 'days')
+			end_time: currentTimeRange.end_time.add(7, 'days'),
 		});
-	}
+	};
 
 	const changeToPreviousWeek = () => {
 		setCurrentTimeRange({
 			start_time: currentTimeRange.start_time.subtract(7, 'days'),
-			end_time: currentTimeRange.end_time.subtract(7, 'days')
+			end_time: currentTimeRange.end_time.subtract(7, 'days'),
 		});
-	}
+	};
 
 	useEffect(() => {
 		getThisWeekSchedule();
@@ -81,9 +77,7 @@ export default function Schedule() {
 				{/* Schedule title & pagination */}
 				<div className="d-flex justify-content-between align-items-center">
 					{/* Schedule title */}
-					<div style={{ fontSize: 20, fontWeight: 'bold' }}>
-						Schedule
-					</div>
+					<div style={{ fontSize: 20, fontWeight: 'bold' }}>Schedule</div>
 					{/* Schedule pagination & create button */}
 					<div
 						className="d-flex font-weight-bold align-items-center justify-content-center"
@@ -112,30 +106,16 @@ export default function Schedule() {
 							}}
 						>
 							<div>{currentTimeRange.end_time.format('MMMM YY')}</div>
-							<div
-								className="border"
-								style={{ borderRadius: 4, padding: '2px 8px' }}
-							>
+							<div className="border" style={{ borderRadius: 4, padding: '2px 8px' }}>
 								Week {currentTimeRange.end_time.weeks()} of {currentTimeRange.start_time.year()}
 							</div>
 						</div>
-						<div
-							className="d-flex align-items-center justify-content-center"
-							style={{ gap: 12 }}
-						>
+						<div className="d-flex align-items-center justify-content-center" style={{ gap: 12 }}>
 							<button className="btn p-0" onClick={changeToPreviousWeek}>
-								<Iconify
-									icon="mdi:chevron-left"
-									size={16}
-									color="#FFF"
-								/>
+								<Iconify icon="mdi:chevron-left" size={16} color="#FFF" />
 							</button>
 							<button className="btn p-0" onClick={changeToNextWeek}>
-								<Iconify
-									icon="mdi:chevron-right"
-									size={16}
-									color="#FFF"
-								/>
+								<Iconify icon="mdi:chevron-right" size={16} color="#FFF" />
 							</button>
 						</div>
 					</div>
@@ -154,26 +134,19 @@ export default function Schedule() {
 				isOpen={modalSetting.isOpen}
 				isCreateMode={modalSetting.isCreateMode}
 				scheduleData={modalSetting?.scheduleData || null}
-				handleClose={() =>
-					setModalSetting({ ...modalSetting, isOpen: false })
-				}
+				handleClose={() => setModalSetting({ ...modalSetting, isOpen: false })}
 				refreshData={getThisWeekSchedule}
 			/>
 		</>
 	);
 }
 
-function ScheduleActionModal({
-	isOpen,
-	isCreateMode,
-	scheduleData,
-	handleClose,
-	refreshData,
-}) {
+function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, refreshData }) {
 	const [createFormData, setCreateFormData] = useState({
 		start_time: new Date().setHours(10, 0, 0),
 		duration_minutes: 10,
 		skill_level: '',
+		available_slots: 10,
 	});
 	const [registerFormData, setRegisterFormData] = useState('');
 	const [registeredDriversList, setRegisteredDriversList] = useState([]);
@@ -193,9 +166,7 @@ function ScheduleActionModal({
 		const title = Helper.toTitleCase(scheduleData?.skill_level);
 		const scheduleDate = scheduleDataMoment.format('dddd, DD MMMM YYYY');
 		const scheduleStartTime = scheduleDataMoment.format('HH:mm');
-		const scheduleEndTime = scheduleDataMoment
-			.add(scheduleData?.duration_minutes, 'minute')
-			.format('HH:mm');
+		const scheduleEndTime = scheduleDataMoment.add(scheduleData?.duration_minutes, 'minute').format('HH:mm');
 
 		return `${title} Session (${scheduleDate} / ${scheduleStartTime} - ${scheduleEndTime})`;
 	};
@@ -205,6 +176,7 @@ function ScheduleActionModal({
 			start_time: new Date().setHours(10, 0, 0),
 			duration_minutes: 10,
 			skill_level: '',
+			available_slots: 10,
 		});
 		setRegisterFormData('');
 		setRegisteredDriversList([]);
@@ -215,6 +187,7 @@ function ScheduleActionModal({
 			start_time: new Date().setHours(10, 0, 0),
 			duration_minutes: 10,
 			skill_level: '',
+			available_slots: 10,
 		});
 	};
 
@@ -241,9 +214,7 @@ function ScheduleActionModal({
 		} catch (e) {
 			swal.fireError({
 				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Invalid credential, please try again.',
+				text: e.error_message ? e.error_message : 'Invalid credential, please try again.',
 			});
 		}
 	};
@@ -257,9 +228,7 @@ function ScheduleActionModal({
 			console.log(e);
 			swal.fireError({
 				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Failed to unregister driver, please try again.',
+				text: e.error_message ? e.error_message : 'Failed to unregister driver, please try again.',
 			});
 		}
 	};
@@ -269,6 +238,7 @@ function ScheduleActionModal({
 			await ScheduleModel.create({
 				...createFormData,
 				duration_minutes: parseInt(createFormData.duration_minutes),
+				available_slots: parseInt(createFormData.available_slots)
 			});
 			swal.fire({
 				text: 'Sesi Balapan berhasil dibuat!',
@@ -280,9 +250,7 @@ function ScheduleActionModal({
 			console.log(e);
 			swal.fireError({
 				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Failed to create new session, please try again.',
+				text: e.error_message ? e.error_message : 'Failed to create new session, please try again.',
 			});
 		}
 	};
@@ -291,8 +259,7 @@ function ScheduleActionModal({
 		try {
 			await ScheduleModel.registerDriver({
 				schedule_slot_id: scheduleData.id,
-				apex_nickname:
-					userData?.apex_data?.nickname || registerFormData,
+				apex_nickname: userData?.apex_data?.nickname || registerFormData,
 				user_id: userData?.id || null,
 			});
 
@@ -303,9 +270,7 @@ function ScheduleActionModal({
 			console.log(e);
 			swal.fireError({
 				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Failed to register drivers, please try again.',
+				text: e.error_message ? e.error_message : 'Failed to register drivers, please try again.',
 				focusConfirm: true,
 			});
 		}
@@ -317,6 +282,7 @@ function ScheduleActionModal({
 				...updateFormData,
 				duration_minutes: parseInt(updateFormData.duration_minutes),
 				schedule_slot_id: parseInt(updateFormData.id),
+				available_slots: parseInt(updateFormData.available_slots)
 			});
 			swal.fire({
 				text: 'Sesi Balapan berhasil diubah!',
@@ -327,14 +293,12 @@ function ScheduleActionModal({
 			console.log(e);
 			swal.fireError({
 				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Gagal untuk mengubah jadwal, silahkan coba lagi',
+				text: e.error_message ? e.error_message : 'Gagal untuk mengubah jadwal, silahkan coba lagi',
 			});
 		}
 	};
 
-	const handleScheduleDelete = async () => {
+	const handleDeleteSchedule = async () => {
 		try {
 			await ScheduleModel.hardDelete(scheduleData?.id);
 			swal.fire({
@@ -346,9 +310,7 @@ function ScheduleActionModal({
 			console.log(e);
 			swal.fireError({
 				title: `Error`,
-				text: e.error_message
-					? e.error_message
-					: 'Gagal untuk menghapus jadwal, silahkan coba lagi',
+				text: e.error_message ? e.error_message : 'Gagal untuk menghapus jadwal, silahkan coba lagi',
 			});
 		}
 	};
@@ -364,9 +326,7 @@ function ScheduleActionModal({
 		<Modal size={'lg'} show={isOpen} backdrop="static" keyboard={false}>
 			<Modal.Header>
 				<div className={'d-flex w-100 justify-content-between'}>
-					<Modal.Title>
-						{isCreateMode ? 'Buat Sesi' : getModalHeaderTitle()}
-					</Modal.Title>
+					<Modal.Title>{isCreateMode ? 'Buat Sesi' : getModalHeaderTitle()}</Modal.Title>
 					<AntButton
 						onClick={() => {
 							resetAllForms();
@@ -438,6 +398,20 @@ function ScheduleActionModal({
 									))}
 								</Form.Select>
 							</Flex>
+							<Flex vertical gap={8}>
+								<Form.Label>Slot Tersedia</Form.Label>
+								<Form.Control
+									placeholder={10}
+									type="number"
+									value={createFormData.available_slots}
+									onChange={(e) =>
+										setCreateFormData({
+											...createFormData,
+											available_slots: e.target.value,
+										})
+									}
+								/>
+							</Flex>
 						</>
 					) : (
 						// Driver Registration & Race Session Editing Form
@@ -447,9 +421,7 @@ function ScheduleActionModal({
 								<Flex vertical gap={8}>
 									<Form.Label>Waktu Mulai</Form.Label>
 									<Datetime
-										value={moment(
-											updateFormData?.start_time
-										).toDate()}
+										value={moment(updateFormData?.start_time).toDate()}
 										onChange={(value) =>
 											setUpdateFormData({
 												...updateFormData,
@@ -470,8 +442,7 @@ function ScheduleActionModal({
 										onChange={(e) =>
 											setUpdateFormData({
 												...updateFormData,
-												duration_minutes:
-													e.target.value,
+												duration_minutes: e.target.value,
 											})
 										}
 									/>
@@ -495,6 +466,20 @@ function ScheduleActionModal({
 										))}
 									</Form.Select>
 								</Flex>
+								<Flex vertical gap={8}>
+									<Form.Label>Slot Tersedia</Form.Label>
+									<Form.Control
+										placeholder={10}
+										type="number"
+										value={updateFormData?.available_slots}
+										onChange={(e) =>
+											setUpdateFormData({
+												...updateFormData,
+												available_slots: e.target.value,
+											})
+										}
+									/>
+								</Flex>
 								<Flex justify="end" style={{ marginTop: 18 }}>
 									<AntButton
 										type={'primary'}
@@ -509,28 +494,15 @@ function ScheduleActionModal({
 							</Flex>
 
 							{/* Driver Regisration Form */}
-							{scheduleData.skill_level !== 'EVENT' &&
-							scheduleData.skill_level !== 'MAINTENANCE' ? (
+							{scheduleData.skill_level !== 'EVENT' && scheduleData.skill_level !== 'MAINTENANCE' ? (
 								<>
-									<Flex
-										vertical
-										gap={8}
-										style={{ marginTop: 24 }}
-									>
-										<Form.Label style={{ fontWeight: 400 }}>
-											Daftarkan Driver
-										</Form.Label>
+									<Flex vertical gap={8} style={{ marginTop: 24 }}>
+										<Form.Label style={{ fontWeight: 400 }}>Daftarkan Driver</Form.Label>
 										<Flex gap={8}>
 											<Form.Control
 												value={registerFormData}
-												placeholder={
-													'Scan QR atau masukkan nickname user'
-												}
-												onChange={(e) =>
-													handleRegisterFormInputChange(
-														e.target.value
-													)
-												}
+												placeholder={'Scan QR atau masukkan nickname user'}
+												onChange={(e) => handleRegisterFormInputChange(e.target.value)}
 												onKeyDown={(e) => {
 													if (e.key === 'Enter') {
 														handleRegisterFormSubmit();
@@ -540,9 +512,7 @@ function ScheduleActionModal({
 											<AntButton
 												type={'primary'}
 												disabled={!registerFormData}
-												onClick={
-													handleRegisterFormSubmit
-												}
+												onClick={handleRegisterFormSubmit}
 											>
 												Daftarkan
 											</AntButton>
@@ -560,17 +530,13 @@ function ScheduleActionModal({
 											>
 												Driver Terdaftar
 											</div>
-											{registeredDriversList.map(
-												(driver, index) => (
-													<DriversListItemComponent
-														key={driver.id}
-														driver={driver}
-														handleDelete={
-															handleUnregisterDriver
-														}
-													/>
-												)
-											)}
+											{registeredDriversList.map((driver, index) => (
+												<DriversListItemComponent
+													key={driver.id}
+													driver={driver}
+													handleDelete={handleUnregisterDriver}
+												/>
+											))}
 										</Flex>
 									) : null}
 								</>
@@ -596,7 +562,7 @@ function ScheduleActionModal({
 						<AntButton
 							type={'primary'}
 							onClick={() => {
-								handleScheduleDelete();
+								handleDeleteSchedule();
 								handleClose();
 							}}
 							danger
@@ -625,15 +591,10 @@ function DriversListItemComponent({ driver, handleDelete }) {
 		>
 			<Flex gap={8} justify="center" align="center">
 				<div>
-					<img
-						src={driver?.avatar_url || Avatar}
-						style={{ borderRadius: 99, height: 48, width: 48 }}
-					/>
+					<img src={driver?.avatar_url || Avatar} style={{ borderRadius: 99, height: 48, width: 48 }} />
 				</div>
 				<Flex vertical>
-					<div style={{ fontWeight: 700 }}>
-						{driver.apex_nickname}
-					</div>
+					<div style={{ fontWeight: 700 }}>{driver.apex_nickname}</div>
 					{/* <div style={{ font: 10, color: Palette.INACTIVE_GRAY }}>
 						{driver?.email || 'E-mail tidak tersedia'}
 					</div> */}

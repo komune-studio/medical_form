@@ -27,8 +27,6 @@ const X_AXIS_HEADER_HEIGHT = 25;
 
 const Y_AXIS_HEADER_HEIGHT = SCHEDULE_ITEM_PROPERTIES.heightPerMinute * 60;
 
-const MAXIMUM_DRIVERS_PER_SESSION = 10;
-
 const SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT = 'DD/MM/YYYY';
 
 export default function ScheduleTable({ schedule, setModalSetting, currentTimeRange }) {
@@ -135,11 +133,19 @@ export default function ScheduleTable({ schedule, setModalSetting, currentTimeRa
 function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 	const startTime = moment(data.start_time);
 	const slotAvailable =
-		MAXIMUM_DRIVERS_PER_SESSION - data._count.schedule_slot_user;
+		data.available_slots - data._count.schedule_slot_user;
 	let backgroundColor;
 	let color;
 
 	switch (true) {
+		case data.skill_level === 'EVENT':
+			backgroundColor = '#D68869';
+			color = '#813314';
+			break;
+		case data.skill_level === 'MAINTENANCE':
+			backgroundColor = '#121212';
+			color = Palette.WHITE_GRAY;
+			break;
 		case slotAvailable <= 0:
 			backgroundColor = Palette.INACTIVE_GRAY;
 			color = Palette.WHITE_GRAY;
@@ -155,10 +161,6 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 		case data.skill_level === 'PRO':
 			backgroundColor = '#9bf6ff';
 			color = '#056676';
-			break;
-		case data.skill_level === 'EVENT':
-			backgroundColor = '#D68869';
-			color = '#813314';
 			break;
 		default:
 			backgroundColor = '#121212';
@@ -209,7 +211,7 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 						className="font-weight-bold text-right"
 						style={{ flex: 1 }}
 					>
-						{MAXIMUM_DRIVERS_PER_SESSION -
+						{data.available_slots -
 							data._count.schedule_slot_user}{' '}
 						slot(s) available
 					</div>
