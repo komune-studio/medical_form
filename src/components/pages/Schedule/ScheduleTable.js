@@ -40,10 +40,7 @@ export default function ScheduleTable({ schedule, setModalSetting, currentTimeRa
 	};
 
 	return (
-		<div
-			className="d-flex"
-			style={{ width: '100%', height: '100%', flex: 1 }}
-		>
+		<div className="d-flex" style={{ width: '100%', height: '100%', flex: 1 }}>
 			{/* Table y-axis header */}
 			<div className="d-flex flex-column">
 				{/* Empty space for adjusting y-axis to x-axis */}
@@ -72,9 +69,7 @@ export default function ScheduleTable({ schedule, setModalSetting, currentTimeRa
 
 			{getPastWeekDates().map((date, index) => {
 				const currentDateMoment = moment(date);
-				const currentDate = currentDateMoment
-					.format(SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT)
-					.toString();
+				const currentDate = currentDateMoment.format(SCHEDULES_GROUPING_BY_DATE_KEY_FORMAT).toString();
 
 				return (
 					<div
@@ -116,9 +111,7 @@ export default function ScheduleTable({ schedule, setModalSetting, currentTimeRa
 									<ScheduleItem
 										key={item.id}
 										data={item}
-										currentDateMoment={currentDateMoment.set(
-											{ hour: 10, minute: 0 }
-										)}
+										currentDateMoment={currentDateMoment.set({ hour: 10, minute: 0 })}
 										setModalSetting={setModalSetting}
 									/>
 								))}
@@ -132,8 +125,7 @@ export default function ScheduleTable({ schedule, setModalSetting, currentTimeRa
 
 function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 	const startTime = moment(data.start_time);
-	const slotAvailable =
-		data.available_slots - data._count.schedule_slot_user;
+	const slotAvailable = data.available_slots - data._count.schedule_slot_user;
 	let backgroundColor;
 	let color;
 
@@ -168,15 +160,11 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 	}
 
 	const handleClick = () => {
-		if (
-			slotAvailable > 0
-		) {
-			setModalSetting({
-				isOpen: true,
-				isCreateMode: false,
-				scheduleData: data,
-			});
-		}
+		setModalSetting({
+			isOpen: true,
+			isCreateMode: false,
+			scheduleData: data,
+		});
 	};
 
 	return (
@@ -189,31 +177,20 @@ function ScheduleItem({ data, currentDateMoment, setModalSetting }) {
 				borderRadius: 0,
 				fontSize: 10,
 				cursor: 'pointer',
-				height:
-					SCHEDULE_ITEM_PROPERTIES.heightPerMinute *
-					data.duration_minutes,
+				height: SCHEDULE_ITEM_PROPERTIES.heightPerMinute * data.duration_minutes,
 				position: 'absolute',
 				top: startTime.diff(currentDateMoment, 'minutes') * 2.2,
 				left: 0,
 			}}
 			onClick={handleClick}
 		>
-			<div
-				className="d-flex justify-content-start align-items-center w-100"
-				style={{ margin: '0px 4px' }}
-			>
+			<div className="d-flex justify-content-start align-items-center w-100" style={{ margin: '0px 4px' }}>
 				<div className="font-weight-bold text-left" style={{ flex: 1 }}>
 					{data.skill_level}
 				</div>
-				{data.skill_level !== 'EVENT' &&
-				data.skill_level !== 'MAINTENANCE' ? (
-					<div
-						className="font-weight-bold text-right"
-						style={{ flex: 1 }}
-					>
-						{data.available_slots -
-							data._count.schedule_slot_user}{' '}
-						slot(s) available
+				{data.skill_level !== 'EVENT' && data.skill_level !== 'MAINTENANCE' ? (
+					<div className="font-weight-bold text-right" style={{ flex: 1 }}>
+						{data.available_slots - data._count.schedule_slot_user} slot(s) available
 					</div>
 				) : (
 					<div className="text-right" style={{ flex: 1 }}>
