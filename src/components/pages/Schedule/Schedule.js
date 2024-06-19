@@ -11,7 +11,6 @@ import Iconify from 'components/reusable/Iconify';
 import swal from 'components/reusable/CustomSweetAlert';
 import UserModel from 'models/UserModel';
 import ScheduleModel from 'models/ScheduleModel';
-import Avatar from 'assets/img/brand/avatar.png';
 import ScheduleTable from './ScheduleTable';
 import Helper from 'utils/Helper';
 
@@ -243,7 +242,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 				}
 			} else {
 				registeredDriversList.forEach(async (driver, driverIndex) => {
-					if (driverIndex >= index) {
+					if (driverIndex >= index && driver) {
 						await handleUnregisterDriver(driver.id);
 					}
 				})
