@@ -227,29 +227,31 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 		}
 	};
 
-	const handleCheckboxInputChange = async (event, index) => {
+	const handleUpdateDriverCheckboxInputChange = async (value, index) => {
 		try {
-			if (!event.target.value) {
-				const latestScheduleData = await ScheduleModel.getById(scheduleData.id);
-				const registeredDriversCount = latestScheduleData._count.schedule_slot_user;
-
-				for (let i = registeredDriversCount; i <= index; i++) {
-					const result = await ScheduleModel.registerDriver({
-						schedule_slot_id: scheduleData.id,
-						apex_nickname: (i + 1).toString(),
-						user_id: null,
-					});
-				}
+			if (!value) {
+				setRegisteredDriversList(
+					registeredDriversList.map((driver, driverIndex) => {
+						if (driverIndex <= index && !driver) {
+							return {
+								schedule_slot_id: scheduleData.id,
+								apex_nickname: (driverIndex + 1).toString(),
+								user_id: null,
+							};
+						} else {
+							return driver;
+						}
+					})
+				);
 			} else {
-				registeredDriversList.forEach(async (driver, driverIndex) => {
-					if (driverIndex >= index && driver) {
-						await handleUnregisterDriver(driver.id);
+				setRegisteredDriversList(registeredDriversList.map((driver, driverIndex) => {
+					if (driverIndex >= index) {
+						return 0;
+					} else {
+						return driver;
 					}
-				})
+				}));
 			}
-
-			getRegisteredDriversList();
-			refreshData();
 		} catch (e) {
 			console.log(e);
 			swal.fireError({
@@ -257,6 +259,18 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 				text: e.error_message ? e.error_message : 'Failed to register driver(s), please try again.',
 			});
 		}
+	};
+
+	const handleUpdateDriverTextInputChange = (value) => {
+		setRegisteredDriversList(
+			registeredDriversList.map((driver) => {
+				if (driver.id === value.id) {
+					return value;
+				} else {
+					return driver;
+				}
+			})
+		);
 	};
 
 	const handleCreateFormSubmit = async () => {
@@ -340,18 +354,38 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 
 	const hanldeUpdateDriverFormSubmit = async () => {
 		try {
-			registeredDriversList.forEach(async (driver) => {
-				if (driver.id) {
-					await ScheduleModel.editRegisteredDriver(driver);
+			let lastSavedData = await ScheduleModel.getById(scheduleData.id);
+
+			for (let i = 0; i < registeredDriversList.length; i++) {
+				let currentDriver = registeredDriversList[i]
+				if (!currentDriver) {
+					continue;
 				}
-			});
+
+				if (!currentDriver.id) {
+					await ScheduleModel.registerDriver(currentDriver);
+				} else {
+					for (let j = 0; j < lastSavedData.schedule_slot_user.length; j++) {
+						if (currentDriver.id === lastSavedData.schedule_slot_user[j].id) {
+							await ScheduleModel.editRegisteredDriver(currentDriver);
+							lastSavedData.schedule_slot_user.splice(j, 1);
+							break;
+						}
+					}
+				}
+			}
+
+			for (let i = 0; i < lastSavedData.schedule_slot_user.length; i++) {
+				await handleUnregisterDriver(lastSavedData.schedule_slot_user[i].id);
+			}
+
+			getRegisteredDriversList();
+			refreshData();
 
 			swal.fire({
 				text: 'Informasi driver berhasil diubah!',
 				icon: 'success',
 			});
-			getRegisteredDriversList();
-			refreshData();
 		} catch (e) {
 			console.log(e);
 			swal.fireError({
@@ -413,7 +447,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 		if (isOpen) {
 			getRegisteredDriversList();
 		}
-	}, [isOpen])
+	}, [isOpen]);
 
 	useEffect(() => {
 		if (todaySchedule) {
@@ -633,18 +667,8 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 												<DriversListItemComponent
 													key={driver.id}
 													driver={registeredDriversList[index]}
-													handleCheckboxInputChange={handleCheckboxInputChange}
-													handleTextInputChange={(value) => {
-														setRegisteredDriversList(
-															registeredDriversList.map((driver) => {
-																if (driver.id === value.id) {
-																	return value;
-																} else {
-																	return driver;
-																}
-															})
-														);
-													}}
+													handleCheckboxInputChange={handleUpdateDriverCheckboxInputChange}
+													handleTextInputChange={handleUpdateDriverTextInputChange}
 													index={index}
 												/>
 											))}
@@ -693,7 +717,6 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 }
 
 function DriversListItemComponent({ driver, handleCheckboxInputChange, handleTextInputChange, index }) {
-	const [checkboxValue, setCheckboxValue] = useState(driver ? true : false);
 
 	return (
 		<Flex justify="center" align="center" gap={12}>
@@ -701,11 +724,10 @@ function DriversListItemComponent({ driver, handleCheckboxInputChange, handleTex
 				<div>
 					<input
 						type="checkbox"
-						checked={checkboxValue || driver}
-						value={driver?.id || ''}
+						checked={driver}
+						value={driver?.apex_nickname|| ''}
 						onChange={(e) => {
-							setCheckboxValue(!checkboxValue);
-							handleCheckboxInputChange(e, index, !checkboxValue);
+							handleCheckboxInputChange(e.target.value, index);
 						}}
 					/>
 				</div>
@@ -714,7 +736,7 @@ function DriversListItemComponent({ driver, handleCheckboxInputChange, handleTex
 			<Form.Control
 				value={driver?.apex_nickname || ''}
 				onChange={(e) => handleTextInputChange({ ...driver, apex_nickname: e.target.value })}
-				disabled={!checkboxValue}
+				disabled={!driver}
 			/>
 		</Flex>
 	);
