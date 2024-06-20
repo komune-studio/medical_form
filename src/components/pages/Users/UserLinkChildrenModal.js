@@ -1,20 +1,32 @@
 import Modal from 'react-bootstrap/Modal';
 import { Form } from 'react-bootstrap';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { message, Button as AntButton, Flex } from 'antd';
 import swal from '../../reusable/CustomSweetAlert';
 import User from '../../../models/UserModel';
+import ChildrenModel from '../../../models/ChildrenAccount';
 
 export default function UserLinkChildrenModal({ isOpen, handleClose, userData }) {
+	const [children, setChildren] = useState([]);
 	const [inputValue, setInputValue] = useState('');
+
+	const getChildren = async () => {
+		try {
+			let result = await ChildrenModel.getByUserId(userData.id);
+			console.log('CHILDREN', result);
+			setChildren(children);
+		} catch (e) {
+			console.log(e);
+		}
+	};
 
 	const handleInputValueChange = (value) => {
 		setInputValue(value);
 	};
 
-    const handleSubmit = () => {
-        return null;
-    }
+	const handleSubmit = () => {
+		return null;
+	};
 
 	// const onSubmit = async () => {
 	// 	if (!confirmPassword) {
@@ -49,6 +61,12 @@ export default function UserLinkChildrenModal({ isOpen, handleClose, userData })
 	// 		});
 	// 	}
 	// };
+
+	useEffect(() => {
+		if (isOpen) {
+			getChildren();
+		}
+	}, [isOpen]);
 
 	return (
 		<Modal show={isOpen} backdrop="static" keyboard={false}>
