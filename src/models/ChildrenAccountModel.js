@@ -8,4 +8,8 @@ export default class Schedule {
 	static getByUserId = async (userId) => {
 		return await ApiRequest.set(`v1/children-accounts/parent/${userId}`, 'GET');
 	};
+
+	static hardDelete = async (id) => {
+		return await ApiRequest.set(`v1/children-account/${id}`, 'DELETE');
+	}
 }

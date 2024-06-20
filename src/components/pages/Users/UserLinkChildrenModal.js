@@ -62,6 +62,10 @@ export default function UserLinkChildrenModal({ isOpen, handleClose, userData })
 		}
 	}, [isOpen]);
 
+	if (!userData) {
+		return <div>No user data!</div>
+	}
+
 	return (
 		<Modal show={isOpen} backdrop="static" keyboard={false}>
 			<Modal.Header>
@@ -91,7 +95,7 @@ export default function UserLinkChildrenModal({ isOpen, handleClose, userData })
 						<div style={{ color: '#FFF' }}>Akun Terhubung</div>
 						<Flex vertical gap={12}>
 							{userChildren.map((child) => (
-								<ChildrenListItem data={child} key={child.id} />
+								<ChildrenListItem key={child.id} data={child} refreshData={getChildren} />
 							))}
 						</Flex>
 					</Flex>
@@ -104,20 +108,45 @@ export default function UserLinkChildrenModal({ isOpen, handleClose, userData })
 	);
 }
 
-function ChildrenListItem({ data }) {
+function ChildrenListItem({ data, refreshData }) {
+	const handleDelete = async () => {
+		try {
+			await ChildrenModel.hardDelete(data.id);
+			refreshData();
+			message.success('Berhasil menghapus hubungan!');
+		} catch (e) {
+			console.log(e);
+			swal.fireError({
+				title: `Error`,
+				text: e.error_message ? e.error_message : 'Gagal untuk menghapus hubungan, silahkan coba lagi!',
+				focusConfirm: true,
+			});
+		}
+	};
+
 	return (
-		<Flex gap={8} align={'center'} style={{ padding: '8px 12px', backgroundColor: '#FFFFFF14', borderRadius: 4 }}>
-			<div>
-				<img
-					src={data?.apex_data?.avatar_url || Avatar}
-					alt="child-avatar"
-					style={{ height: 48, width: 48, borderRadius: 999 }}
-				/>
-			</div>
-			<Flex vertical style={{ color: '#FFF' }}>
-				<div style={{ fontWeight: 700 }}>{data.child_apex_nickname}</div>
-				<div style={{ fontSize: 12 }}>{data.apex_data.skill}</div>
+		<Flex
+			align={'center'}
+			justify={'between'}
+			gap={8}
+			style={{ padding: '8px 12px', backgroundColor: '#FFFFFF14', borderRadius: 4 }}
+		>
+			<Flex gap={8} align={'center'} flex={1}>
+				<div>
+					<img
+						src={data?.apex_data?.avatar_url || Avatar}
+						alt="child-avatar"
+						style={{ height: 48, width: 48, borderRadius: 999 }}
+					/>
+				</div>
+				<Flex vertical style={{ color: '#FFF' }}>
+					<div style={{ fontWeight: 700 }}>{data.child_apex_nickname}</div>
+					<div style={{ fontSize: 12 }}>{data.apex_data.skill}</div>
+				</Flex>
 			</Flex>
+			<div onClick={handleDelete} style={{ color: Palette.THEME_RED, fontSize: 12, cursor: 'pointer' }}>
+				Hapus
+			</div>
 		</Flex>
 	);
 }
