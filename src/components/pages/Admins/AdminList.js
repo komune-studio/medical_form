@@ -133,7 +133,6 @@ const AdminList = () => {
                                     onClick={() => {
                                         onDelete(value.id)
                                     }}
-                                    danger
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
                                     icon={<Iconify icon={"material-symbols:delete-outline"}/>}>Hapus</AntButton>

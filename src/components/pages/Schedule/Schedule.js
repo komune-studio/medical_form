@@ -145,7 +145,7 @@ export default function Schedule() {
 
 function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, refreshData, todaySchedule }) {
 	const [createFormData, setCreateFormData] = useState({
-		start_time: new Date().setHours(10, 0, 0),
+		start_time: new Date().setHours(12, 0, 0),
 		duration_minutes: 10,
 		skill_level: '',
 		available_slots: 10,
@@ -316,21 +316,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 		}
 	};
 
-	const handleUnregisterDriver = async (driverId) => {
-		try {
-			await ScheduleModel.unregisterDriver(driverId);
-			getRegisteredDriversList();
-			refreshData();
-		} catch (e) {
-			console.log(e);
-			swal.fireError({
-				title: `Error`,
-				text: e.error_message ? e.error_message : 'Failed to unregister driver, please try again.',
-			});
-		}
-	};
-
-	const handleUpdateFormSubmit = async () => {
+	const handleUpdateScheduleFormSubmit = async () => {
 		try {
 			await ScheduleModel.edit({
 				...updateFormData,
@@ -395,6 +381,20 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 		}
 	};
 
+	const handleUnregisterDriver = async (driverId) => {
+		try {
+			await ScheduleModel.unregisterDriver(driverId);
+			getRegisteredDriversList();
+			refreshData();
+		} catch (e) {
+			console.log(e);
+			swal.fireError({
+				title: `Error`,
+				text: e.error_message ? e.error_message : 'Failed to unregister driver, please try again.',
+			});
+		}
+	};
+
 	const handleDeleteSchedule = async () => {
 		try {
 			await ScheduleModel.hardDelete(scheduleData?.id);
@@ -412,30 +412,6 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 		}
 	};
 
-	const updateDefaultCreateFormData = () => {
-		for (let i = 1; i < todaySchedule.length - 1; i++) {
-			const currentStartTime = moment(todaySchedule[i].start_time);
-			const currentEndTime = moment(todaySchedule[i].start_time).add(
-				todaySchedule[i].duration_minutes,
-				'minutes'
-			);
-
-			const previousStartTime = moment(todaySchedule[i - 1].start_time);
-			const previousEndTime = moment(todaySchedule[i - 1].start_time).add(
-				todaySchedule[i - 1].duration_minutes,
-				'minutes'
-			);
-
-			if (!currentStartTime.isSame(previousEndTime, 'minute')) {
-				setCreateFormData({
-					...createFormData,
-					start_time: previousEndTime.add(1, 'minutes'),
-				});
-				break;
-			}
-		}
-	};
-
 	useEffect(() => {
 		if (scheduleData) {
 			setUpdateFormData(scheduleData);
@@ -448,12 +424,6 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 			getRegisteredDriversList();
 		}
 	}, [isOpen]);
-
-	useEffect(() => {
-		if (todaySchedule) {
-			updateDefaultCreateFormData();
-		}
-	}, []);
 
 	return (
 		<Modal size={'lg'} show={isOpen} backdrop="static" keyboard={false}>
@@ -617,7 +587,7 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 									<AntButton
 										type={'primary'}
 										onClick={() => {
-											handleUpdateFormSubmit();
+											handleUpdateScheduleFormSubmit();
 											handleClose();
 										}}
 									>
