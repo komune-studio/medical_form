@@ -261,10 +261,10 @@ function ScheduleActionModal({ isOpen, isCreateMode, scheduleData, handleClose, 
 		}
 	};
 
-	const handleUpdateDriverTextInputChange = (value) => {
+	const handleUpdateDriverTextInputChange = (value, index) => {
 		setRegisteredDriversList(
-			registeredDriversList.map((driver) => {
-				if (driver.id === value.id) {
+			registeredDriversList.map((driver, driverIndex) => {
+				if (driverIndex === index) {
 					return value;
 				} else {
 					return driver;
@@ -735,7 +735,7 @@ function DriversListItemComponent({ driver, handleCheckboxInputChange, handleTex
 			</Flex>
 			<Form.Control
 				value={driver?.apex_nickname || ''}
-				onChange={(e) => handleTextInputChange({ ...driver, apex_nickname: e.target.value })}
+				onChange={(e) => handleTextInputChange({ ...driver, apex_nickname: e.target.value }, index)}
 				disabled={!driver}
 			/>
 		</Flex>
