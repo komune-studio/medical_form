@@ -26,6 +26,7 @@ import PromotionList from "./components/pages/Promotion/PromotionList";
 import LoyaltyShopList from "./components/pages/LoyaltyShop/LoyaltyShopList.";
 import OrderList from "./components/pages/Order/OrderList";
 import OrderCreate from "components/pages/Order/OrderCreate";
+import Messaging from './components/pages/Messaging/Messaging'
 
 var routes = [
     {
@@ -68,6 +69,12 @@ var routes = [
         path: "/referral",
         name: "Referral",
         component: ReferralList,
+        layout: "/admin",
+    },
+    {
+        path: "/messaging",
+        name: "Messaging",
+        component: Messaging,
         layout: "/admin",
     },
     {

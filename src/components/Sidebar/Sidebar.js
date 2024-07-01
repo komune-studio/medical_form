@@ -129,6 +129,12 @@ const SIDEBAR = [
         icon: "material-symbols:partner-exchange-outline-rounded",
         color: Palette.BARCODE_ORANGE
     },
+    {
+        path: "/messaging",
+        name: "Messaging",
+        icon: "material-symbols:send",
+        color: Palette.BARCODE_ORANGE
+    },
     // {
     //     path: "/banners",
     //     name: "Banners",
