@@ -54,7 +54,7 @@ const columns = [
 ]
 
 export default function Notification() {
-    const [title, setTitle] = useState(null)
+    const [title, setTitle] = useState('')
     const [body, setBody] = useState('')
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
     const [dataSource, setDataSource] = useState([])
@@ -101,14 +101,14 @@ export default function Notification() {
                     <CustomTable showFilter={true} pagination={true} searchText={''} data={dataSource} columns={columns}/>
                 </CardBody>
             </Card>
-            <CustomModal isOpen={isCreateModalOpen} title={'Create new Notification'} onClose={() => {}} onSubmit={onSubmit}>
+            <CustomModal isOpen={isCreateModalOpen} title={'Buat Notifikasi Baru'} onClose={() => {}} onSubmit={onSubmit}>
                 <FormGroup>
-                    <Form.Label style={{ fontSize: '0.8em' }}>Title</Form.Label>
-                    <Form.Control value={title} autoComplete={"referralCode"} onChange={(e) => setTitle(e.target.value)} type="text" placeholder="Title"/>
+                    <Form.Label style={{ fontSize: '0.8em', marginBottom: 8 }}>Judul</Form.Label>
+                    <Form.Control value={title} autoComplete={"referralCode"} onChange={(e) => setTitle(e.target.value)} type="text" />
                 </FormGroup>
                 <FormGroup>
-                    <Form.Label style={{ fontSize: '0.8em' }}>Body</Form.Label>
-                    <Form.Control value={body} autoComplete={"referralCode"} onChange={(e) => setBody(e.target.value)} type="text" rows={4} as='textarea' placeholder="Body"/>
+                    <Form.Label style={{ fontSize: '0.8em', marginBottom: 8 }}>Pesan</Form.Label>
+                    <Form.Control value={body} autoComplete={"referralCode"} onChange={(e) => setBody(e.target.value)} type="text" rows={4} as='textarea' />
                 </FormGroup>
 
             </CustomModal>
