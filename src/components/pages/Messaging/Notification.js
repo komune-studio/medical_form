@@ -101,7 +101,7 @@ export default function Notification() {
                     <CustomTable showFilter={true} pagination={true} searchText={''} data={dataSource} columns={columns}/>
                 </CardBody>
             </Card>
-            <CustomModal isOpen={isCreateModalOpen} title={'Buat Notifikasi Baru'} onClose={() => {}} onSubmit={onSubmit}>
+            <CustomModal isOpen={isCreateModalOpen} title={'Buat Notifikasi Baru'} onClose={() => setIsCreateModalOpen(false)} onSubmit={onSubmit}>
                 <FormGroup>
                     <Form.Label style={{ fontSize: '0.8em', marginBottom: 8 }}>Judul</Form.Label>
                     <Form.Control value={title} autoComplete={"referralCode"} onChange={(e) => setTitle(e.target.value)} type="text" />
