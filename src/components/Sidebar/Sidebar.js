@@ -130,6 +130,12 @@ const SIDEBAR = [
         color: Palette.BARCODE_ORANGE
     },
     {
+        path: "/messaging",
+        name: "Notification",
+        icon: "material-symbols:send",
+        color: Palette.BARCODE_ORANGE
+    },
+    {
         path: "/tournament",
         name: "Tournament",
         icon: "mdi:tournament",

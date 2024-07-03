@@ -27,6 +27,7 @@ import PromotionList from "./components/pages/Promotion/PromotionList";
 import LoyaltyShopList from "./components/pages/LoyaltyShop/LoyaltyShopList.";
 import OrderList from "./components/pages/Order/OrderList";
 import OrderCreate from "components/pages/Order/OrderCreate";
+import Notification from './components/pages/Messaging/Notification'
 import OrderCreateV2 from "./components/pages/Order/OrderCreateV2";
 import LoyaltyHistory from "components/pages/LoyaltyShop/LoyaltyHistory";
 import LoyaltyHistoryCreate from "components/pages/LoyaltyShop/LoyaltyHistoryCreate";
@@ -80,6 +81,12 @@ var routes = [
         path: "/referral",
         name: "Referral",
         component: ReferralList,
+        layout: "/admin",
+    },
+    {
+        path: "/messaging",
+        name: "Notification",
+        component: Notification,
         layout: "/admin",
     },
     {
