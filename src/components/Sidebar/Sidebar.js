@@ -82,6 +82,12 @@ const SIDEBAR = [
         color : Palette.BARCODE_ORANGE
     }, */
     {
+        path: "/dashboard",
+        name: "Dashboard",
+        icon: "material-symbols:dashboard",
+        color: Palette.BARCODE_ORANGE
+    },
+    {
         path: "/admins",
         name: "Admin",
         icon: "material-symbols:person",

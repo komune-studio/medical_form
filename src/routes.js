@@ -33,8 +33,15 @@ import LoyaltyHistory from "components/pages/LoyaltyShop/LoyaltyHistory";
 import LoyaltyHistoryCreate from "components/pages/LoyaltyShop/LoyaltyHistoryCreate";
 import TournamentList from "components/pages/Tournament/TournamentList";
 import TournamentDetail from "components/pages/Tournament/TournamentDetail";
+import Dashboard from "components/pages/Dashboard/Dashboard";
 
 var routes = [
+    {
+        path: "/dashboard",
+        name: "Dashboard",
+        component: Dashboard,
+        layout: "/admin"
+    },
     {
         path: "/admins",
         name: "Admins",
