@@ -99,8 +99,10 @@ export default function UserLinkChildrenModal({ isOpen, handleClose, userData })
 							))}
 						</Flex>
 					</Flex>
-					<Flex justify="end" onClick={handleClose}>
-						<div style={{ cursor: 'pointer', color: '#FFF', fontSize: 12 }}>Tutup</div>
+					<Flex justify="end">
+						<div style={{ cursor: 'pointer', color: '#FFF', fontSize: 12 }} onClick={handleClose}>
+							Tutup
+						</div>
 					</Flex>
 				</Flex>
 			</Modal.Body>
