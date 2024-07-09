@@ -37,24 +37,23 @@ export default function ReferralUsageModal({ isOpen, close, referralData }) {
 	const [dataSource, setDataSource] = useState([])
 	const columns = [
 		{
+			id: "username",
+			label: "Username",
+			filter: true
+		},
+		{
 			id: "full_name",
 			label: "Full name",
 			filter: true
 		},
 		{
-			id: "type",
-			label: "Tipe hadiah",
-			filter: true
-		},
-		{
-			id: "price",
-			label: "Nilai hadiah",
+			id: "count",
+			label: "Referral Usage",
 			filter: true,
-			/* render: (row) => {
-				return row?.type === "percentage"
-					? row.value + "%"
-					: "Rp." + Helper.formatNumber(row.value)
-			} */
+			render: (row) => {
+				let noun = (row.count == 1? "time" : "times")
+				return row.count + " " + noun
+			}
 		}
 		/* {
             id: 'active', label: 'Status Paket', filter: false, width: '12%',
@@ -90,7 +89,7 @@ export default function ReferralUsageModal({ isOpen, close, referralData }) {
 	}
 
 	return (
-		<Modal show={isOpen} backdrop="static" keyboard={false}>
+		<Modal show={isOpen} backdrop="static" keyboard={false} onExit={handleClose} size="lg">
 			<Modal.Header>
 				<Modal.Title>Referral {referralData?.code}</Modal.Title>
 			</Modal.Header>
@@ -109,7 +108,7 @@ export default function ReferralUsageModal({ isOpen, close, referralData }) {
 						size="sm"
 						variant="outline-danger"
 						onClick={() => handleClose()}
-						style={{ marginRight: "5px" }}
+						//style={{ marginRight: "5px" }}
 					>
 						Close
 					</Button>
