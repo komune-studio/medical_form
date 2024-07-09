@@ -52,7 +52,7 @@ export default function Dashboard() {
 				</Flex>
 				<Row gutter={24}>
 					<Col span={4}>
-						<Flex gap={24} vertical>
+						<Flex gap={24} vertical style={{height: '100%'}}>
 							<DashboardNumericMetricWidget title={'Today Income'} />
 							<DashboardNumericMetricWidget title={'Today Transaction'} />
 						</Flex>
@@ -61,7 +61,7 @@ export default function Dashboard() {
 						<DashboardColumnChartWidget title={'Income Trends'} />
 					</Col>
 					<Col span={10}>
-						<DashboardNumericMetricWidget />
+						<DashboardColumnChartWidget title={'Transaction Trends'} />
 					</Col>
 				</Row>
 			</div>

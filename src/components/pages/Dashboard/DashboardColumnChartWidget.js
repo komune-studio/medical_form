@@ -26,8 +26,8 @@ export default function DashboardColumnChartWidget(props) {
 
 	useEffect(() => {
 		setChartSize({
-			height: containerRef.current.clientHeight - 40, // vertical padding = 20 * 2
-			width: containerRef.current.clientWidth - 40, // horizontal padding = 20 * 2
+			height: containerRef.current.clientHeight - 40,
+			width: containerRef.current.clientWidth - 40,
 		});
 	}, [containerRef]);
 

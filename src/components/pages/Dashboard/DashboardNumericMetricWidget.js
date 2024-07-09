@@ -6,7 +6,7 @@ import DashboardWidgetContainer from './DashboardWidgetContainer';
 export default function DashboardNumericMetricWidget(props) {
 	return (
 		<DashboardWidgetContainer title={props.title}>
-			<Flex gap={12} justify={'center'} vertical>
+			<Flex flex={1} gap={12} justify={'center'} vertical style={{height: '100%'}}>
 				<div style={{ fontSize: 20, fontWeight: 700 }}>IDR ##.###.###</div>
 				<Flex gap={8} align={'center'}>
 					<Flex

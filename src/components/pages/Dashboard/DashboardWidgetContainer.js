@@ -8,7 +8,7 @@ export default function DashboardWidgetContainer(props) {
 				padding: '20px',
 				backgroundColor: Palette.BACKGROUND_BLACK,
 				borderRadius: 12,
-				flex: 1
+				flex: 1,
 			}}
 		>
 			<Flex gap={12} vertical flex={1}>
