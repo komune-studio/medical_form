@@ -5,7 +5,7 @@ import Palette from "utils/Palette"
 import DashboardWidgetContainer from "./DashboardWidgetContainer"
 
 export default function DashboardStackedColumnChartWidget(props) {
-	const [chartSize, setChartSize] = useState({height: 325})
+	const [chartSize, setChartSize] = useState({})
 	const containerRef = useRef()
 
 	const chartData = {

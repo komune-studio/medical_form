@@ -11,7 +11,7 @@ export default function DashboardWidgetContainer(props) {
 				flex: 1,
 			}}
 		>
-			<Flex gap={12} vertical flex={1}>
+			<Flex gap={16} vertical flex={1}>
 				<div style={{ fontSize: 14, fontWeight: 700 }}>{props.title}</div>
 				<div style={{ flex: 1 }}>{props.children}</div>
 			</Flex>

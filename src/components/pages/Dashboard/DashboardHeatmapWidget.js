@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import { Flex } from "antd"
-import { Bar } from "react-chartjs-2"
 import Palette from "utils/Palette"
 import DashboardWidgetContainer from "./DashboardWidgetContainer"
 import { HeatMapGrid } from "react-grid-heatmap"
@@ -33,17 +32,18 @@ export default function DashboardHeatmapWidget(props) {
 					data={data}
 					xLabels={xLabels}
 					yLabels={yLabels}
-					// Render cell with tooltip
 					cellRender={(x, y, value) => (
 						<div title={`Pos(${x}, ${y}) = ${value}`}>&nbsp;</div>
 					)}
 					xLabelsStyle={(index) => ({
 						color: Palette.INACTIVE_GRAY,
-						fontSize: ".8rem"
+						fontSize: ".8rem",
+						paddingTop: '10px'
 					})}
 					yLabelsStyle={() => ({
 						fontSize: ".7rem",
-						color: Palette.INACTIVE_GRAY
+						color: Palette.INACTIVE_GRAY,
+						paddingRight: '10px'
 					})}
 					cellStyle={(_x, _y, ratio) => ({
 						background: `rgb(139, 15, 6, ${ratio})`,
@@ -57,7 +57,6 @@ export default function DashboardHeatmapWidget(props) {
 					xLabelsPos="bottom"
 					onClick={(x, y) => alert(`Clicked (${x}, ${y})`)}
 					yLabelsPos="left"
-					
 				/>
 			</Flex>
 		</DashboardWidgetContainer>
