@@ -13,10 +13,13 @@ const columns = [
     {id: 'id', label: 'ID', filter: true, width: '15%'},
     {id: 'title', label: 'Title', filter: true, width: '15%'},
     {id: 'body', label: 'Body', filter: true, width: '15%'},
-    {id: 'created_by', label: 'Created By', filter: true, width: '15%'},
+    {id: 'created_by', label: 'Created By', filter: true, width: '15%', render: ((row) => {
+        return row.created_by_admin?.username
+    })},
     {
         id: 'created_at', label: 'Tanggal Dibuat', filter: true, width: '15%',
         render: (row => {
+            console.log(row)
             return moment(row.created_at).format('DD MMM YYYY HH:mm')
         })
     },

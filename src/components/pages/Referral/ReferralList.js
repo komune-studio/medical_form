@@ -10,6 +10,8 @@ import Referral from "../../../models/ReferralModel";
 import Helper from "../../../utils/Helper";
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ReferralModalForm from "./ReferralModalForm";
+import User from 'models/UserModel';
+import ReferralUsageModal from './ReferralUsageModal';
 
 const ReferralList = () => {
 
@@ -19,6 +21,7 @@ const ReferralList = () => {
     const [openReferralModal, setOpenReferralModal] = useState(false)
     const [isNewRecord, setIsNewRecord] = useState(false)
     const [selectedReferral, setSelectedReferral] = useState(null)
+    const [selectedReferralUsage, setSelectedReferralUsage] = useState(null)
     const columns = [
 
         {
@@ -33,20 +36,36 @@ const ReferralList = () => {
                 return row?.type === "percentage" ? row.value + '%' : 'Rp.' + Helper.formatNumber(row.value)
             })
         },
-        {
+        /* {
             id: 'active', label: 'Status Paket', filter: false, width: '12%',
             render: (row => {
                 return <Switch disabled={true} defaultChecked={row.active} checked={row.active} onChange={() => {
                     changeActive(row.id, row.active)
                 }}/>
             })
-        },
+        }, */
         {
             id: '', label: '', filter: false,
-            render: ((value) => {
+            render: ((row, value) => {
                 return (
                     <>
                         <Space size="small">
+                        <Tooltip title="Check usage">
+                                <AntButton
+                                    type={'link'}
+                                    style={{color: Palette.MAIN_THEME}}
+                                    onClick={async () => {
+                                        setSelectedReferralUsage(row)
+                                        //console.log(row.id)
+                                        //let tmp = await User.getByReferralId(row.id)
+                                        //console.log(value, tmp)
+                                    }}
+                                    className={"d-flex align-items-center justify-content-center"}
+                                    shape="circle"
+                                    icon={<Iconify icon={"mdi:people"}/>}>
+                                    Check usage
+                                </AntButton>
+                            </Tooltip>
                             <Tooltip title="Edit">
                                 <AntButton
                                     type={'link'}
@@ -205,6 +224,16 @@ const ReferralList = () => {
                         await initializeData()
                     }
                     setOpenReferralModal(false)
+                }}
+            />
+            <ReferralUsageModal
+                isOpen={selectedReferralUsage}
+                referralData={selectedReferralUsage}
+                close={async (refresh) => {
+                    if (refresh) {
+                        await initializeData()
+                    }
+                    setSelectedReferralUsage(null)
                 }}
             />
         </>

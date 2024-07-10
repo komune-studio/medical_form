@@ -52,7 +52,7 @@ const TopUpList = () => {
         {
             id: 'active', label: 'Status Paket', filter: false, width: '12%',
             render: (row => {
-                return <Switch disabled={true} defaultChecked={row.active} onChange={() => {
+                return <Switch disabled={false} checked={row.active} onChange={() => {
                     changeActive(row.id, row.active)
                 }}/>
             })
@@ -77,7 +77,7 @@ const TopUpList = () => {
                                     icon={<Iconify icon={"material-symbols:edit"}/>}
                                 >Ubah</AntButton>
                             </Tooltip>
-                            <Tooltip title={value?.active ? 'Hapus' : 'Restore'}>
+                            {/* <Tooltip title={value?.active ? 'Hapus' : 'Restore'}>
                                 {
                                     value?.active ?
                                         <AntButton
@@ -102,7 +102,7 @@ const TopUpList = () => {
                                         >Restore</AntButton>
                                 }
 
-                            </Tooltip>
+                            </Tooltip> */}
                         </Space>
                     </>
                 )
@@ -113,7 +113,8 @@ const TopUpList = () => {
     ]
 
     const changeActive = (id, currStatus) => {
-
+        if(currStatus == true) onDelete(id)
+        else onRestore(id)
     }
 
     const deleteItem = async (id) => {

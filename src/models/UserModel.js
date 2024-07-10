@@ -44,4 +44,8 @@ export default class User {
     return await ApiRequest.set(`v1/user/email/${email}`, "GET");
   }
 
+  static getByReferralId = async (id) => {
+    return await ApiRequest.set(`v1/user/referral/${id}`, "GET");
+  }
+
 }

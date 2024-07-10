@@ -4,6 +4,8 @@ export default class Palette {
     static CATALYST_PINK = "#ef6024";
 
     static BARCODE_ORANGE = "#ef6024";
+    static BARCODE_GRAY = "#E0E0E0";
+    static BARCODE_BLUE = "#004EEB";
     static BACKGROUND_BLACK = "#121212";
     static BACKGROUND_DARK_GRAY = "#1d1d1d";
     static INACTIVE_GRAY = "#c2c2c2";
