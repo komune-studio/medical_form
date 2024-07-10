@@ -18,6 +18,7 @@ TopUpFormModal.propTypes = {
     topUpData: PropTypes.object,
 };
 
+const CURRENCY = ["COIN", "BEGINNER_RIDES", "ADVANCED_RIDES", "PRO_RIDES"];
 
 export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) {
     const [packageName, setPackageName] = useState(null)
@@ -66,10 +67,10 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
             let msg = ''
             if (isNewRecord) {
                 await TopUp.create(body)
-                msg = "Berhasil membuat Pakat Top Up"
+                msg = "Berhasil membuat Paket Top Up"
             } else {
                 await TopUp.edit(topUpData?.id, body)
-                msg = "Berhasil ubah Pakat Top Up"
+                msg = "Berhasil ubah Paket Top Up"
             }
             message.success(msg)
             handleClose(true)
@@ -209,8 +210,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                             setCurrency(e.target.value)
                         }} as="select">
                             <option>Pilih tipe paket</option>
-                            <option value={"COIN"}>COIN</option>
-                            <option value={"RIDES"}>RIDE</option>
+                            {CURRENCY.map((name, index) => <option value={name} key={name}>{name}</option>)}
                         </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-3 mt-2">
@@ -245,13 +245,13 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label style={{fontSize: "0.8em"}}>Koin Yang Didapat</Form.Label>
+                        <Form.Label style={{fontSize: "0.8em"}}>Barcoin / Rides Yang Didapat</Form.Label>
                         <Form.Control
 
                             value={coins}
                             autoComplete={"pricing"}
                             onChange={(e) => setCoins(e.target.value)} type="number"
-                            placeholder="Masukan Koin yang didapat"/>
+                            placeholder="Masukan Barcoin / Rides yang didapat"/>
                     </Form.Group>
 
 
