@@ -46,9 +46,10 @@ export default function Dashboard() {
 		let topUpHistoryFilterResult = [];
 		let barcoinUsagesFilterResult = [];
 		let topUpIncomeTrendData = {};
-		let barcoinUsagesTrendData = {};
+		let barcoinTransactionTrendData = {};
 
 		// Filters & groups data by selected time period
+		// TODO: 
 		switch (period) {
 			case 'monthly':
 				topUpHistoryFilterResult = topUpHistory.filter(
@@ -59,7 +60,7 @@ export default function Dashboard() {
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
 					moment(usage.created_at).isBetween(lastMonth, today, [])
 				);
-				barcoinUsagesTrendData = _.groupBy(barcoinUsagesFilterResult, (usage) =>
+				barcoinTransactionTrendData = _.groupBy(barcoinUsagesFilterResult, (usage) =>
 					moment(usage.created_at).week()
 				);
 
@@ -75,7 +76,7 @@ export default function Dashboard() {
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
 					moment(usage.created_at).isBetween(lastWeek, today, [])
 				);
-				barcoinUsagesTrendData = _.groupBy(barcoinUsagesFilterResult, (usage) =>
+				barcoinTransactionTrendData = _.groupBy(barcoinUsagesFilterResult, (usage) =>
 					moment(usage.created_at).weekday()
 				);
 
@@ -90,7 +91,7 @@ export default function Dashboard() {
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
 					today.isSame(moment(usage.created_at), 'day')
 				);
-				barcoinUsagesTrendData = _.groupBy(barcoinUsagesFilterResult, (usage) =>
+				barcoinTransactionTrendData = _.groupBy(barcoinUsagesFilterResult, (usage) =>
 					moment(usage.created_at).hour()
 				);
 		}
@@ -130,21 +131,21 @@ export default function Dashboard() {
 			}
 		}
 
-		let barcoinUsagesTrendDataKeys = Object.keys(barcoinUsagesTrendData);
-		if (barcoinUsagesTrendDataKeys.length > 0) {
-			for (let keys of barcoinUsagesTrendDataKeys) {
+		let barcoinTransactionTrendDataKeys = Object.keys(barcoinTransactionTrendData);
+		if (barcoinTransactionTrendDataKeys.length > 0) {
+			for (let keys of barcoinTransactionTrendDataKeys) {
 				let totalTransaction = 0;
-				totalTransaction = barcoinUsagesTrendData[keys].reduce(
+				totalTransaction = barcoinTransactionTrendData[keys].reduce(
 					(accumulator, currentData) => accumulator + parseInt(currentData.total_coins || 0),
 					totalTransaction
 				);
 
-				barcoinUsagesTrendData[keys] = totalTransaction;
+				barcoinTransactionTrendData[keys] = totalTransaction;
 			}
 		}
 
 		setTopUpIncomeTrend(topUpIncomeTrendData);
-		setBarcoinTransactionTrend(barcoinUsagesTrendData);
+		setBarcoinTransactionTrend(barcoinTransactionTrendData);
 	};
 
 	useEffect(() => {
