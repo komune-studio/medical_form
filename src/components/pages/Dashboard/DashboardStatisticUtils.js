@@ -65,11 +65,6 @@ export function calculateHeatMap({
 
 	let outerGroup = _.groupBy(filteredData, outerGroupingKeyExtractor);
 	for (let outerKey of outerKeys) {
-		if (!outerGroup[outerKey]) {
-			result.push(new Array(outerKeys.length).fill(0));
-			continue;
-		}
-
 		let innerArray = [];
 		let innerGroup = _.groupBy(outerGroup[outerKey], innerGroupingKeyExtractor);
 		for (let innerKey of innerKeys) {

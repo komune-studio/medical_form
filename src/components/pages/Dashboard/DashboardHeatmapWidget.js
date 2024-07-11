@@ -23,7 +23,7 @@ export default function DashboardHeatmapWidget(props) {
 					xLabels={props.data.innerKeys}
 					yLabels={props.data.outerKeys}
 					cellRender={(x, y, value) => (
-						<div title={`Pos(${x}, ${y}) = ${value}`}>&nbsp;</div>
+						<div title={`Pos(${x}, ${y}) = ${value}`}>{value}</div>
 					)}
 					xLabelsStyle={(index) => ({
 						color: Palette.INACTIVE_GRAY,
@@ -34,10 +34,10 @@ export default function DashboardHeatmapWidget(props) {
 						color: Palette.INACTIVE_GRAY,
 					})}
 					cellStyle={(_x, _y, ratio) => ({
-						background: `rgb(139, 15, 6, ${ratio})`,
+						background: `rgb(239, 96, 36, ${ratio + 0.1})`,
 						fontSize: ".8rem",
 						color: `rgb(255, 255, 255, ${ratio / 2 + 0.4})`,
-						width: "7.5rem",
+						width: "5.5rem",
 						border: "none",
 						borderRadius: 0,
 					})}

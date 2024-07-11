@@ -160,8 +160,6 @@ export default function Dashboard() {
 			period: period,
 		});
 
-		console.log('Heat Map', heatMap);
-
 		setSchedules(scheduleData);
 		setSlots({ total_slots: totalSlots, booked_slots: bookedSlots });
 		setHeatMap(heatMap);
@@ -246,15 +244,10 @@ export default function Dashboard() {
 				</Row>
 				<Row gutter={24} style={{ marginTop: 24 }}>
 					<Col span={18}>
-						<DashboardStackedColumnChartWidget title="Customer Purchasing Behaviour" />
+						{heatMap.result && <DashboardHeatmapWidget title="Peak Hours" data={heatMap} />}
 					</Col>
 					<Col span={6}>
 						<DashboardDoughnutChartWidget title="Slots Available" data={slots} />
-					</Col>
-				</Row>
-				<Row gutter={24} style={{ marginTop: 24 }}>
-					<Col span={24}>
-						{heatMap.result && <DashboardHeatmapWidget title="Peak Hours" data={heatMap} />}
 					</Col>
 				</Row>
 			</div>
