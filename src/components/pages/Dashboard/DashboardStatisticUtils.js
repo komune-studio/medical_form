@@ -33,7 +33,6 @@ export function calculateTrends({ filteredData, groupingKeyExtractor, accumulato
 		case 'daily':
 		default:
 			keys = Helper.getOperationalHours();
-			break;
 	}
 
 	const groupedData = _.groupBy(filteredData, groupingKeyExtractor);

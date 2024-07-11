@@ -17,7 +17,7 @@ export default function DashboardNumericMetricWidget(props) {
 					>
 						<Iconify icon={'mdi:trending-up'} width={16} height={16} color={'#3894F3'} />
 					</Flex>
-					<div style={{ color: Palette.INACTIVE_GRAY, fontWeight: 600 }}>+36% than Yesterday</div>
+					<div style={{ color: Palette.INACTIVE_GRAY, fontWeight: 600 }}>+##% than Yesterday</div>
 				</Flex>
 			</Flex>
 		</DashboardWidgetContainer>

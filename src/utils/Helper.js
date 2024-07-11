@@ -54,8 +54,8 @@ export default class Helper {
 	}
 
 	static getDaysOfWeek() {
-		const start = moment().day(0).set({ hour: 0, minute: 0, second: 0 });
-		const end = moment().day(6).set({ hour: 23, minute: 59, second: 59 });
+		const start = moment().startOf('week');
+		const end = moment().endOf('week');
 		const daysOfWeek = []
 
 		while (start.isSameOrBefore(end)) {
@@ -68,7 +68,7 @@ export default class Helper {
 
 	static getWeeksOfCurrentMonth() {
 		const currentMonth = moment().month();
-		const start = moment().startOf('month').set({hour: 0, minute: 0, second: 0});
+		const start = moment().startOf('month');
 		const weeksOfCurrentMonth = [];
 
 		while (start.month() === currentMonth) {

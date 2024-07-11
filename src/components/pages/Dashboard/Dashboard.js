@@ -6,7 +6,6 @@ import { Chart, registerables } from 'chart.js';
 import moment from 'moment';
 import _ from 'lodash';
 import Palette from 'utils/Palette';
-import Helper from 'utils/Helper';
 import DashboardNumericMetricWidget from './DashboardNumericMetricWidget';
 import DashboardColumnChartWidget from './DashboardColumnChartWidget';
 import DashboardStackedColumnChartWidget from './DashboardStackedColumnChartWidget';
@@ -15,6 +14,7 @@ import DashboardHeatmapWidget from './DashboardHeatmapWidget';
 import { arraySum, calculateTrends } from './DashboardStatisticUtils';
 import TopUpHistoryModel from 'models/TopUpHistoryModel';
 import OrderModel from 'models/OrderModel';
+import ScheduleModel from 'models/ScheduleModel';
 
 Chart.register(...registerables);
 
@@ -23,6 +23,7 @@ export default function Dashboard() {
 	const [loading, setLoading] = useState(false);
 	const [topUpHistory, setTopUpHistory] = useState([]);
 	const [barcoinUsages, setBarcoinUsages] = useState([]);
+	const [schedules, setSchedules] = useState([]);
 	const [topUpIncome, setTopUpIncome] = useState();
 	const [barcoinTransaction, setBarcoinTransaction] = useState();
 	const [topUpIncomeTrend, setTopUpIncomeTrend] = useState({});
@@ -35,6 +36,41 @@ export default function Dashboard() {
 
 			let barcoinUsages = await OrderModel.getAllBarcoinUsages();
 			setBarcoinUsages(barcoinUsages);
+
+			let scheduleData = null,
+				start = null,
+				end = null;
+
+			switch (period) {
+				case 'monthly':
+					start = moment().startOf('month');
+					end = moment().endOf('month');
+					scheduleData = await ScheduleModel.getAllInTimeRange({
+						start_time: start,
+						end_time: end,
+					});
+					break;
+				case 'weekly':
+					start = moment().startOf('week');
+					end = moment().endOf('week');
+					scheduleData = await ScheduleModel.getAllInTimeRange({
+						start_time: start,
+						end_time: end,
+					});
+					break;
+				case 'daily':
+				default:
+					start = moment().startOf('day');
+					end = moment().endOf('day');
+					scheduleData = await ScheduleModel.getAllInTimeRange({
+						start_time: start,
+						end_time: end,
+					});
+					break;
+			}
+
+			console.log('Schedule', scheduleData);
+			setSchedules(scheduleData);
 		} catch (e) {
 			console.log(e);
 		}
@@ -42,35 +78,38 @@ export default function Dashboard() {
 
 	const filterDataByPeriod = () => {
 		const today = moment();
-		const lastWeek = moment().set({ hour: 0, minute: 0, second: 0 }).subtract(1, 'weeks');
-		const lastMonth = moment().set({ hour: 0, minute: 0, second: 0 }).subtract(1, 'months');
+		const startOfWeek = moment().startOf('week');
+		const endOfWeek = moment().endOf('week');
+		const startOfMonth = moment().startOf('month');
+		const endOfMonth = moment().endOf('month');
 
 		let topUpHistoryFilterResult = [];
 		let barcoinUsagesFilterResult = [];
-		let topUpIncomeTrendResult = {};
-		let barcoinTransactionTrendResult = {};
+
+		// NOTE: Read note in line 17 of DashboardStatisticUtils.js
 		let groupingKeyExtractor = () => null;
 
 		// Filters & groups data by selected time period
 		switch (period) {
 			case 'monthly':
 				topUpHistoryFilterResult = topUpHistory.filter(
-					(topUp) => moment(topUp.created_at).isBetween(lastMonth, today, []) && topUp.status === 'SUCCESS'
+					(topUp) =>
+						moment(topUp.created_at).isBetween(startOfMonth, endOfMonth, []) && topUp.status === 'SUCCESS'
 				);
 
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
-					moment(usage.created_at).isBetween(lastMonth, today, [])
+					moment(usage.created_at).isBetween(startOfMonth, endOfMonth, [])
 				);
 
 				groupingKeyExtractor = (item) => moment(item.created_at).week();
 				break;
 			case 'weekly':
 				topUpHistoryFilterResult = topUpHistory.filter(
-					(topUp) => moment(topUp.created_at).isBetween(lastWeek, today, []) && topUp.status === 'SUCCESS'
+					(topUp) => moment(topUp.created_at).isBetween(startOfWeek, endOfWeek, []) && topUp.status === 'SUCCESS'
 				);
 
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
-					moment(usage.created_at).isBetween(lastWeek, today, [])
+					moment(usage.created_at).isBetween(startOfWeek, endOfWeek, [])
 				);
 
 				groupingKeyExtractor = (item) => moment(item.created_at).format('dddd');
@@ -100,24 +139,29 @@ export default function Dashboard() {
 		);
 
 		// Calculate top up income & barcoin transaction trends data
-		topUpIncomeTrendResult = calculateTrends({
+		let topUpIncomeTrendResult = calculateTrends({
 			filteredData: topUpHistoryFilterResult,
 			groupingKeyExtractor: groupingKeyExtractor,
 			accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.price || 0),
 			period: period,
 		});
 
-		barcoinTransactionTrendResult = calculateTrends({
+		let barcoinTransactionTrendResult = calculateTrends({
 			filteredData: barcoinUsagesFilterResult,
 			groupingKeyExtractor: groupingKeyExtractor,
 			accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.total_coins || 0),
 			period: period,
 		});
 
+		// Calculate slots data
+
 		setTopUpIncome(totalTopUpIncome);
 		setBarcoinTransaction(totalBarcoinTransaction);
 		setTopUpIncomeTrend(topUpIncomeTrendResult);
 		setBarcoinTransactionTrend(barcoinTransactionTrendResult);
+
+		console.log('Top Up Trend', topUpIncomeTrendResult);
+		console.log('Barcoin Transaction', barcoinTransactionTrendResult);
 	};
 
 	useEffect(() => {
