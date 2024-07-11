@@ -45,7 +45,7 @@ export default class Helper {
 		});
 		const operationalHours = [];
 
-		while (start.isSameOrBefore(end)) {
+		while (start.isBefore(end)) {
 			operationalHours.push(start.format('HH'));
 			start.add(1, 'hours');
 		}

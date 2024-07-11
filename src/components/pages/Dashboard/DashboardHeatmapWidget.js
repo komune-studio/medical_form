@@ -28,16 +28,18 @@ export default function DashboardHeatmapWidget(props) {
 					xLabelsStyle={(index) => ({
 						color: Palette.INACTIVE_GRAY,
 						fontSize: ".8rem",
+						paddingTop: 10,
 					})}
 					yLabelsStyle={() => ({
 						fontSize: ".7rem",
 						color: Palette.INACTIVE_GRAY,
+						paddingRight: 10
 					})}
 					cellStyle={(_x, _y, ratio) => ({
-						background: `rgb(239, 96, 36, ${ratio + 0.1})`,
+						background: `rgb(239, 96, 36, ${ratio + 0.08})`,
 						fontSize: ".8rem",
 						color: `rgb(255, 255, 255, ${ratio / 2 + 0.4})`,
-						width: "5.5rem",
+						width: "5.3rem",
 						border: "none",
 						borderRadius: 0,
 					})}

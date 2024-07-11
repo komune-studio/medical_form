@@ -244,7 +244,7 @@ export default function Dashboard() {
 				</Row>
 				<Row gutter={24} style={{ marginTop: 24 }}>
 					<Col span={18}>
-						{heatMap.result && <DashboardHeatmapWidget title="Peak Hours" data={heatMap} />}
+						{heatMap.result && <DashboardHeatmapWidget title="Schedule Heat Map" data={heatMap} />}
 					</Col>
 					<Col span={6}>
 						<DashboardDoughnutChartWidget title="Slots Available" data={slots} />
