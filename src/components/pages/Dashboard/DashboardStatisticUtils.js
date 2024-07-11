@@ -2,23 +2,30 @@ import _ from 'lodash';
 import Helper from 'utils/Helper';
 
 export function arraySum(data, accumulatorFunction) {
-    if (!data || data.length <= 0) {
-        return 0;
-    } 
+	if (!data || data.length <= 0) {
+		return 0;
+	}
 
-    let result = 0;
-    result = data.reduce(accumulatorFunction, result)
+	let result = 0;
+	result = data.reduce(accumulatorFunction, result);
 
-    return result
+	return result;
 }
 
-export function calculateTrends({filteredData, keys, groupingKeyExtractor, accumulatorFunction, period}) {
-	let keysV2 = [];
-    let result = {};
+export function calculateTrends({ filteredData, groupingKeyExtractor, accumulatorFunction, period }) {
+	/*
+        NOTE: key format from groupingKeyExtractor MUST match with key format that used in this function
+        -> period === 'daily' ? 'HH', e.g.: '10'
+        -> period === 'weekly' ? 'dddd', e.g.: 'Sunday'
+        -> period === 'monthly' ? Week Number, e.g: 20
+    */
+
+	let keys = [];
+	let result = {};
 
 	switch (period) {
 		case 'monthly':
-            keys = Helper.getWeeksOfCurrentMonth();
+			keys = Helper.getWeeksOfCurrentMonth();
 			break;
 		case 'weekly':
 			keys = Helper.getDaysOfWeek();
@@ -29,12 +36,11 @@ export function calculateTrends({filteredData, keys, groupingKeyExtractor, accum
 			break;
 	}
 
-    const groupedData = _.groupBy(filteredData, groupingKeyExtractor);
-    for (let key of keys) {
-        if (groupedData[key]) result[key] =  arraySum(groupedData[key], accumulatorFunction)
-        else result[key] = 0
-    }
+	const groupedData = _.groupBy(filteredData, groupingKeyExtractor);
+	for (let key of keys) {
+		if (groupedData[key]) result[key] = arraySum(groupedData[key], accumulatorFunction);
+		else result[key] = 0;
+	}
 
-    return result;
+	return result;
 }
-

@@ -47,62 +47,33 @@ export default function Dashboard() {
 
 		let topUpHistoryFilterResult = [];
 		let barcoinUsagesFilterResult = [];
-		let barcoinTransactionTrendData = {};
 		let topUpIncomeTrendResult = {};
 		let barcoinTransactionTrendResult = {};
+		let groupingKeyExtractor = () => null;
 
 		// Filters & groups data by selected time period
-		// TODO: change the grouping data algorithm
 		switch (period) {
 			case 'monthly':
 				topUpHistoryFilterResult = topUpHistory.filter(
 					(topUp) => moment(topUp.created_at).isBetween(lastMonth, today, []) && topUp.status === 'SUCCESS'
 				);
 
-				topUpIncomeTrendResult = calculateTrends({
-					filteredData: topUpHistoryFilterResult,
-					groupingKeyExtractor: (item) => moment(item.created_at).week(),
-					accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.price || 0),
-					period: period,
-				});
-
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
 					moment(usage.created_at).isBetween(lastMonth, today, [])
 				);
 
-				barcoinTransactionTrendResult = calculateTrends({
-					filteredData: barcoinUsagesFilterResult,
-					groupingKeyExtractor: (item) => moment(item.created_at).week(),
-					accumulatorFunction: (accumulator, currentData) =>
-						accumulator + parseInt(currentData.total_coins || 0),
-					period: period,
-				});
-
+				groupingKeyExtractor = (item) => moment(item.created_at).week();
 				break;
 			case 'weekly':
 				topUpHistoryFilterResult = topUpHistory.filter(
 					(topUp) => moment(topUp.created_at).isBetween(lastWeek, today, []) && topUp.status === 'SUCCESS'
 				);
 
-				topUpIncomeTrendResult = calculateTrends({
-					filteredData: topUpHistoryFilterResult,
-					groupingKeyExtractor: (item) => moment(item.created_at).format('dddd'),
-					accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.price || 0),
-					period: period,
-				});
-
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
 					moment(usage.created_at).isBetween(lastWeek, today, [])
 				);
 
-				barcoinTransactionTrendResult = calculateTrends({
-					filteredData: barcoinUsagesFilterResult,
-					groupingKeyExtractor: (item) => moment(item.created_at).format('dddd'),
-					accumulatorFunction: (accumulator, currentData) =>
-						accumulator + parseInt(currentData.total_coins || 0),
-					period: period,
-				});
-
+				groupingKeyExtractor = (item) => moment(item.created_at).format('dddd');
 				break;
 			case 'daily':
 			default:
@@ -110,26 +81,14 @@ export default function Dashboard() {
 					(topUp) => today.isSame(moment(topUp.created_at), 'day') && topUp.status === 'SUCCESS'
 				);
 
-				topUpIncomeTrendResult = calculateTrends({
-					filteredData: topUpHistoryFilterResult,
-					groupingKeyExtractor: (item) => moment(item.created_at).format('HH'),
-					accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.price || 0),
-					period: period,
-				});
-
 				barcoinUsagesFilterResult = barcoinUsages.filter((usage) =>
 					today.isSame(moment(usage.created_at), 'day')
 				);
 
-				barcoinTransactionTrendResult = calculateTrends({
-					filteredData: barcoinUsagesFilterResult,
-					groupingKeyExtractor: (item) => moment(item.created_at).format('HH'),
-					accumulatorFunction: (accumulator, currentData) =>
-						accumulator + parseInt(currentData.total_coins || 0),
-					period: period,
-				});
+				groupingKeyExtractor = (item) => moment(item.created_at).format('HH');
 		}
 
+		// Calculate total top up income & barcoin transaction
 		let totalTopUpIncome = arraySum(
 			topUpHistoryFilterResult,
 			(accumulator, currentData) => accumulator + parseInt(currentData.price || 0)
@@ -139,6 +98,21 @@ export default function Dashboard() {
 			barcoinUsagesFilterResult,
 			(accumulator, currentData) => accumulator + parseInt(currentData.total_coins || 0)
 		);
+
+		// Calculate top up income & barcoin transaction trends data
+		topUpIncomeTrendResult = calculateTrends({
+			filteredData: topUpHistoryFilterResult,
+			groupingKeyExtractor: groupingKeyExtractor,
+			accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.price || 0),
+			period: period,
+		});
+
+		barcoinTransactionTrendResult = calculateTrends({
+			filteredData: barcoinUsagesFilterResult,
+			groupingKeyExtractor: groupingKeyExtractor,
+			accumulatorFunction: (accumulator, currentData) => accumulator + parseInt(currentData.total_coins || 0),
+			period: period,
+		});
 
 		setTopUpIncome(totalTopUpIncome);
 		setBarcoinTransaction(totalBarcoinTransaction);
