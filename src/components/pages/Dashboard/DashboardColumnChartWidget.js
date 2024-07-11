@@ -12,7 +12,7 @@ export default function DashboardColumnChartWidget(props) {
 		labels: Object.keys(props.data),
 		datasets: [
 			{
-				label: 'My First Dataset',
+				label: 'Data',
 				data: Object.values(props.data),
 				backgroundColor: new Array(props.data.length).fill(Palette.BARCODE_ORANGE),
 				borderRadius: 4,
@@ -22,6 +22,12 @@ export default function DashboardColumnChartWidget(props) {
 
 	const chartOptions = {
 		barThickness: 24,
+		plugins: {
+			legend: {
+				display: false
+			}
+		}
+
 	};
 
 	useEffect(() => {
