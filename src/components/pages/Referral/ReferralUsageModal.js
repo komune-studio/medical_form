@@ -12,6 +12,7 @@ ReferralUsageModal.propTypes = {
 }
 
 export default function ReferralUsageModal({ isOpen, close, referralData }) {
+
 	const [dataSource, setDataSource] = useState([])
 	const columns = [
 		{
@@ -20,13 +21,8 @@ export default function ReferralUsageModal({ isOpen, close, referralData }) {
 			filter: true
 		},
 		{
-			id: "full_name",
-			label: "Full Name",
-			filter: true
-		},
-		{
 			id: "count",
-			label: "Referral Usage",
+			label: "Used Times",
 			filter: true,
 			render: (row) => {
 				let noun = row.count == 1 ? "time" : "times"

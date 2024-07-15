@@ -2,7 +2,7 @@ import ApiRequest from "../utils/ApiRequest";
 
 export default class PromotionModel {
     static getAll = async () => {
-        return await ApiRequest.set("v1/promos", "GET");
+        return await ApiRequest.set("v1/promos/active", "GET");
     }
 
     static create = async (body) => {

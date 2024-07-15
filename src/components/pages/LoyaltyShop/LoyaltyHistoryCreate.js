@@ -85,7 +85,7 @@ export default function LoyaltyHistoryCreate() {
 
 	const getLoyaltyItems = async () => {
 		try {
-			let result = await LoyaltyShopModel.getAll();
+			let result = await LoyaltyShopModel.getAllActive();
 			setLoyaltyItems(result);
 
 			let quantityObject = {};

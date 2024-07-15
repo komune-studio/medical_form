@@ -56,6 +56,9 @@ const TopUpHistory = () => {
             })
         },
         {
+            id: 'package_name', dataIndex: 'package_name', label: 'Nama Paket', filter: true
+        },
+        {
             id: 'amount', label: 'Jumlah top up', filter: true,
             render: (row => {
                 return <>
@@ -92,7 +95,6 @@ const TopUpHistory = () => {
     const initializeData = async () => {
         setLoading(true)
         try {
-            console.log('masuk sinih')
             let result = await TopUpHistoryModel.getAll()
             console.log('isi res', result)
             setDataSource(result)

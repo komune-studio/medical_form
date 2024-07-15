@@ -108,6 +108,7 @@ const CustomTable = ({
                          showFilter = false,
                          mode = 'dark',
                          extendToolbar = null,
+                         defaultOrder = null,
                          rowAction
                      }) => {
 
@@ -119,7 +120,12 @@ const CustomTable = ({
     const [rowsPerPage, setRowsPerPage] = useState(10);
     useEffect(() => {
         if (columns && columns.length > 0) {
-            setOrderBy(columns[0].id)
+            if (defaultOrder) {
+                setOrderBy(columns[0][defaultOrder])
+            } else {
+                setOrderBy(columns[0].id)
+            }
+
         }
     }, [columns])
 
@@ -129,7 +135,7 @@ const CustomTable = ({
     };
 
     const filteredData = applySortFilter(data, getComparator(order, orderBy), filterName, columns);
-
+    console.log('value of filteredData', filteredData)
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
@@ -234,7 +240,8 @@ const CustomTable = ({
                         const selectedItem = selected.indexOf(id) !== -1;
 
                         return (
-                            <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedItem} style={{cursor: rowAction?.onClick ? 'pointer' : 'default'}}>
+                            <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedItem}
+                                      style={{cursor: rowAction?.onClick ? 'pointer' : 'default'}}>
                                 {
                                     checkbox && <TableCell padding="checkbox">
                                         <Checkbox checked={selectedItem} onChange={(event) => handleClick(event, id)}/>

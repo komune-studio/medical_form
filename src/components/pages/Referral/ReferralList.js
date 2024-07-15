@@ -36,21 +36,33 @@ const ReferralList = () => {
                 return row?.type === "percentage" ? row.value + '%' : 'Rp.' + Helper.formatNumber(row.value)
             })
         },
-        /* {
-            id: 'active', label: 'Status Paket', filter: false, width: '12%',
-            render: (row => {
-                return <Switch disabled={true} defaultChecked={row.active} checked={row.active} onChange={() => {
-                    changeActive(row.id, row.active)
-                }}/>
-            })
-        }, */
+
+        {
+            id: "active",
+            label: "Status",
+            filter: false,
+            width: "12%",
+            render: (row) => {
+                return (
+                    <Switch
+                        defaultChecked={row.active}
+                        checked={row.active}
+                        style={{backgroundColor: row.active}}
+                        onChange={() => {
+                            changeActive(row.id, row.active, row)
+                        }}
+                    />
+                );
+            },
+        },
+
         {
             id: '', label: '', filter: false,
             render: ((row, value) => {
                 return (
                     <>
                         <Space size="small">
-                        <Tooltip title="Check usage">
+                            <Tooltip title="Check usage">
                                 <AntButton
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}
@@ -71,7 +83,7 @@ const ReferralList = () => {
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}
                                     onClick={() => {
-                                        setSelectedReferral(value)
+                                        setSelectedReferral(row)
                                         setOpenReferralModal(true)
                                         setIsNewRecord(false)
                                     }}
@@ -81,34 +93,34 @@ const ReferralList = () => {
                                     Ubah
                                 </AntButton>
                             </Tooltip>
-                            <Tooltip title={value?.active ? 'Aktif' : 'Tidak Aktif'}>
-                                {
-                                    value?.active ?
-                                        <AntButton
-                                            onClick={() => {
-                                                onDelete(value.id)
-                                            }}
-                                            type={'link'}
-                                            style={{color: Palette.MAIN_THEME}}
-                                            className={"d-flex align-items-center justify-content-center"}
-                                            shape="circle"
-                                            icon={<Iconify icon={"material-symbols:delete-outline"}/>}>
-                                            Hapus
-                                        </AntButton>
-                                        : <AntButton
-                                            onClick={() => {
-                                                onRestore(value.id)
-                                            }}
-                                            style={{color: Palette.MAIN_THEME}}
-                                            type={'link'}
-                                            className={"d-flex align-items-center justify-content-center"}
-                                            shape="circle"
-                                            icon={<Iconify icon={"mdi:restore"}/>}>
-                                            Restore
-                                        </AntButton>
-                                }
+                            {/*<Tooltip title={value?.active ? 'Aktif' : 'Tidak Aktif'}>*/}
+                            {/*    {*/}
+                            {/*        value?.active ?*/}
+                            {/*            <AntButton*/}
+                            {/*                onClick={() => {*/}
+                            {/*                    onDelete(value.id)*/}
+                            {/*                }}*/}
+                            {/*                type={'link'}*/}
+                            {/*                style={{color: Palette.MAIN_THEME}}*/}
+                            {/*                className={"d-flex align-items-center justify-content-center"}*/}
+                            {/*                shape="circle"*/}
+                            {/*                icon={<Iconify icon={"material-symbols:delete-outline"}/>}>*/}
+                            {/*                Hapus*/}
+                            {/*            </AntButton>*/}
+                            {/*            : <AntButton*/}
+                            {/*                onClick={() => {*/}
+                            {/*                    onRestore(value.id)*/}
+                            {/*                }}*/}
+                            {/*                style={{color: Palette.MAIN_THEME}}*/}
+                            {/*                type={'link'}*/}
+                            {/*                className={"d-flex align-items-center justify-content-center"}*/}
+                            {/*                shape="circle"*/}
+                            {/*                icon={<Iconify icon={"mdi:restore"}/>}>*/}
+                            {/*                Restore*/}
+                            {/*            </AntButton>*/}
+                            {/*    }*/}
 
-                            </Tooltip>
+                            {/*</Tooltip>*/}
                         </Space>
                     </>
                 )
@@ -120,6 +132,29 @@ const ReferralList = () => {
 
     const changeActive = (id, currStatus) => {
 
+        Modal.confirm({
+            title: currStatus
+                ? "Apakah Anda yakin ingin nonaktifkan referral ini?"
+                : "Apakah Anda yakin ingin mengaktifkan referral ini?",
+            okText: "Yes",
+            okButtonProps: {
+                danger: false,
+                type: "primary",
+            },
+            cancelButtonProps: {
+                danger: false,
+                type: "link",
+                style: {color: "#fff"},
+            },
+            okType: "danger",
+            onOk: () => {
+                if (currStatus) {
+                    deleteItem(id)
+                } else {
+                    restoreItem(id)
+                }
+            },
+        });
     }
 
     const deleteItem = async (id) => {
@@ -127,9 +162,8 @@ const ReferralList = () => {
             await Referral.delete(id)
             message.success('Referral berhasil dinonaktifkan')
             initializeData();
-            window.location.reload()
         } catch (e) {
-            message.error('There was error from server')
+            message.error('Gagal Menonaktifkan referral')
             setLoading(true)
         }
     }
@@ -139,7 +173,6 @@ const ReferralList = () => {
             await Referral.restore(id)
             message.success('Referral berhasil diaktifkan')
             initializeData();
-            window.location.reload()
         } catch (e) {
             message.error('There was error from server')
             setLoading(true)
@@ -172,7 +205,6 @@ const ReferralList = () => {
         setLoading(true)
         try {
             let result = await Referral.getAll()
-            console.log('value of', result)
             setDataSource(result)
             setLoading(false)
         } catch (e) {
@@ -209,6 +241,7 @@ const ReferralList = () => {
                             pagination={true}
                             searchText={''}
                             data={dataSource}
+                            defaultOrder={'created_at'}
                             columns={columns}
                         />
                     </CardBody>

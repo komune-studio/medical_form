@@ -35,6 +35,10 @@ export default function LoyaltyModalForm({isOpen, close, isNewRecord, selectedDa
             swal.fireError({text: "Harga Wajib diisi",})
             return
         }
+        if (parseInt(price) <= 0) {
+            swal.fireError({text: "Harga Harus lebih dari 0",})
+            return
+        }
         if (!description) {
             swal.fireError({text: "Deskripsi Wajib diisi",})
             return
@@ -88,7 +92,7 @@ export default function LoyaltyModalForm({isOpen, close, isNewRecord, selectedDa
         }
 
     }
-    
+
     useEffect(() => {
         if (isNewRecord) {
             reset()
@@ -218,7 +222,6 @@ export default function LoyaltyModalForm({isOpen, close, isNewRecord, selectedDa
                     <Form.Group className="mb-3">
                         <Form.Label style={{fontSize: "0.8em"}}>Harga</Form.Label>
                         <Form.Control
-
                             value={price}
                             autoComplete={"pricing"}
                             onChange={(e) => setPrice(e.target.value)} type="number" placeholder="Masukan Harga"/>
@@ -228,7 +231,7 @@ export default function LoyaltyModalForm({isOpen, close, isNewRecord, selectedDa
                             <span className={'text-white'} style={{fontSize: 16}}>Aktifkan di Barcode Gokart App</span>
                             <p>Promo aktif akan muncul di Barcode Gokart App dan bisa dilihat oleh pelanggan.</p>
                         </div>
-                        <Switch defaultChecked={active} checked={active} onChange={() => setActive(!active)} />
+                        <Switch defaultChecked={active} checked={active} onChange={() => setActive(!active)}/>
                     </div>
                 </Col>
             </Row>

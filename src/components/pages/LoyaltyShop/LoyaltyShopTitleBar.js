@@ -17,7 +17,7 @@ export default function LoyaltyShopTitleBar() {
                             // style={{background: '#121212'}}
                             className={`btn ${location.pathname === '/loyalty-history' ? 'btn-primary-tab' : 'btn-default-tab'}`}
                             to={'/loyalty-history'}>
-                            Histori Tukar Poin
+                            Tukar Poin
                         </Link>
                         <Link
                             // style={{background: '#404040', border: 'none'}}

@@ -4,6 +4,9 @@ export default class LoyaltyShopModel {
     static getAll = async () => {
         return await ApiRequest.set("v1/loyalty-shops", "GET");
     }
+    static getAllActive = async () => {
+        return await ApiRequest.set("/v1/loyalty-shops/active", "GET");
+    }
 
     static create = async (body) => {
         return await ApiRequest.set("v1/loyalty-shop", "POST", body);

@@ -33,14 +33,14 @@ const PromotionList = () => {
         {
             id: 'description', label: 'Deskripsi Promo', filter: true,
         },
-        {
-            id: 'active', label: 'Status Promo', filter: false, width: '12%',
-            render: (row => {
-                return <Switch disabled={true} defaultChecked={row.active} checked={row.active} onChange={() => {
-                    changeActive(row.id, row.active)
-                }}/>
-            })
-        },
+        // {
+        //     id: 'active', label: 'Status Promo', filter: false, width: '12%',
+        //     render: (row => {
+        //         return <Switch disabled={true} defaultChecked={row.active} checked={row.active} onChange={() => {
+        //             changeActive(row.id, row.active)
+        //         }}/>
+        //     })
+        // },
         // {
         //     id: 'created_at', label: 'Tanggal Dibuat', filter: true,
         //     render: (row => {
@@ -109,11 +109,10 @@ const PromotionList = () => {
     const deleteItem = async (id) => {
         try {
             await PromotionModel.delete(id)
-            message.success('Promosi berhasil dinonaktifkan')
+            message.success('Promosi berhasil dihapus')
             initializeData();
-            window.location.reload()
         } catch (e) {
-            message.error('There was error from server')
+            message.error('Gagal menghapus promosi')
             setLoading(true)
         }
     }

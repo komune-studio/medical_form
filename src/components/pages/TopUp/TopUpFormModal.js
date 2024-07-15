@@ -92,14 +92,13 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
     }
 
     const initForm = () => {
-        console.log('datax', topUpData)
         if (!isNewRecord) {
             setPackageName(topUpData?.package_name)
             setPrice(topUpData?.price)
             setDescription(topUpData?.description)
             setTopUpImage(topUpData?.image)
             setCurrency(topUpData?.currency)
-            setPromotionalText(topUpData?.promotional_texnp)
+            setPromotionalText(topUpData?.promotional_text)
         }
 
     }
