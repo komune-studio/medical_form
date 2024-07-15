@@ -34,6 +34,17 @@ export default function ReferralModalForm({isOpen, close, isNewRecord, referralD
             swal.fireError({text: "Type Referral Wajib diisi",})
             return
         }
+
+        if (!value) {
+            swal.fireError({text: "Nilai hadiah Wajib diisi",})
+            return
+        }
+
+        if (parseInt(value) <= 0) {
+            swal.fireError({text: "Nilai hadiah harus lebih dari 0",})
+            return
+        }
+
         try {
             let body = {
                 code: code,
@@ -143,7 +154,7 @@ export default function ReferralModalForm({isOpen, close, isNewRecord, referralD
                         <Form.Control
                             value={value}
                             autoComplete={"values"}
-                            onChange={(e) => setValue(e.target.value)} type="number" placeholder="Masukan Harga Paket"/>
+                            onChange={(e) => setValue(e.target.value)} type="number" placeholder="Masukan Nilai Hadiah"/>
                     </Form.Group>
 
                 </Col>
@@ -153,7 +164,7 @@ export default function ReferralModalForm({isOpen, close, isNewRecord, referralD
                     <span className={'text-white'} style={{fontSize: 16}}>Aktifkan di Barcode Gokart App</span>
                     <p>Promo aktif akan muncul di Barcode Gokart App dan bisa dilihat oleh pelanggan.</p>
                 </div>
-                <Switch defaultChecked={true} checked={active} onChange={() => setActive(!active)} />
+                <Switch defaultChecked={true} checked={active} onChange={() => setActive(!active)}/>
             </div>
 
             <div className={"d-flex flex-row justify-content-end"}>
