@@ -40,7 +40,7 @@ export default function LoyaltyHistory() {
             label: "Jumlah Poin Ditukar",
             filter: true,
             render: (row) => {
-                return <>{`${Helper.formatNumber(row.total_coins)}`}</>;
+                return <>{`${Helper.formatNumber(row.total_points)}`}</>;
             },
         },
     ];
