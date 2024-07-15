@@ -45,7 +45,7 @@ export default function DashboardHeatmapWidget(props) {
 					})}
 					cellHeight="2.5rem"
 					xLabelsPos="bottom"
-					onClick={(x, y) => alert(`Clicked (${x}, ${y})`)}
+					onClick={(x, y) => null}
 					yLabelsPos="left"
 				/>
 			</Flex>
