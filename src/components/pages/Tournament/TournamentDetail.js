@@ -98,6 +98,10 @@ export default function TournamentDetail() {
 			render: (row) => <>{`${row.time_in_millisecond} ms`}</>,
 		},
 		{
+			id: 'championship_points',
+			label: 'POINTS',
+		},
+		{
 			id: '',
 			label: '',
 			filter: false,
@@ -254,12 +258,12 @@ export default function TournamentDetail() {
 
 							{/* Tournament result */}
 							<div className="mt-5">
-								<div className="mb-2">Hasil Turnamen</div>
 								{detail?.drivers?.length > 0 ? (
 									<div>
 										<CustomTableSortable
 											data={detail?.drivers || []}
 											columns={columns}
+											title="Hasil Turnamen"
 										/>
 									</div>
 								) : (
@@ -313,6 +317,7 @@ function TournamentDetailModalForm({
 			username: '',
 			laps: 0,
 			time_in_millisecond: 0,
+			championship_points: 0
 		});
 	};
 
@@ -344,6 +349,8 @@ function TournamentDetailModalForm({
 					body: {
 						...initialData,
 						...formData,
+						index_sort: +formData.index_sort,
+						championship_points: +formData.championship_points
 					},
 				});
 				swal.fire({ text: 'Hasil berhasil diubah!', icon: 'success' });
@@ -367,6 +374,8 @@ function TournamentDetailModalForm({
 				username: initialData?.username || '',
 				laps: initialData?.laps || '',
 				time_in_millisecond: initialData?.time_in_millisecond || '',
+				championship_points: initialData?.championship_points? parseInt(initialData?.championship_points) : 0,
+				index_sort: initialData?.index_sort? parseInt(initialData?.index_sort) : ''
 			});
 	}, [formType, initialData]);
 
@@ -433,6 +442,21 @@ function TournamentDetailModalForm({
 								onChange={(e) =>
 									updateFormData(
 										'time_in_millisecond',
+										e.target.value
+									)
+								}
+							/>
+						</Flex>
+						<Flex vertical gap={8}>
+							<Form.Label>Championship Points</Form.Label>
+							<Form.Control
+								placeholder={'...'}
+								type={'number'}
+								//step={1}
+								value={formData.championship_points}
+								onChange={(e) =>
+									updateFormData(
+										'championship_points',
 										e.target.value
 									)
 								}

@@ -26,7 +26,6 @@ import { useEffect, useState } from "react"
 import { filter } from "lodash"
 import { alpha, styled } from "@mui/material/styles"
 import ListTableToolbar from "./ListTableToolbar"
-import { ReactSortable } from "react-sortablejs"
 import {
 	DragDropContext,
 	Droppable,
@@ -37,6 +36,10 @@ import {
 	DroppableProvided,
 	DraggableStateSnapshot
 } from "react-beautiful-dnd"
+import { Flex, Button as AntButton } from "antd"
+import TournamentModel from "models/TournamentModel"
+import swal from 'components/reusable/CustomSweetAlert';
+
 function applySortFilter(array, comparator, query, columns) {
 	if (!array) return []
 	const stabilizedThis = array.map((el, index) => [el, index])
@@ -125,15 +128,16 @@ const CustomTableSortable = ({
 	pagination = false,
 	showFilter = false,
 	mode = "dark",
-	extendToolbar = null,
+	extendToolbar = false,
 	defaultOrder = null,
-	rowAction
+	rowAction,
+	title
 }) => {
-	const [sortedData, setSortedData] = useState(
-		data.map((el, idx) => {
-			return { ...el, indexSort: idx+"" }
-		})
-	)
+	const [sortedData, setSortedData] = useState(applySortFilter(
+		data,
+		getComparator("asc", "index_sort"),
+		"",
+		columns))
 	const [selected, setSelected] = useState([])
 	const [order, setOrder] = useState("desc")
 	const [orderBy, setOrderBy] = useState("name")
@@ -212,26 +216,45 @@ const CustomTableSortable = ({
 
 	const isNotFound = !filteredData.length && !!filterName
 
-    const handleDragEnd = (result, provided) => {
-        if (!result.destination) {
-          return;
-        }
-    
-        if (result.destination.index === result.source.index) {
-          return;
-        }
-        console.log(result)
-    
-        setSortedData((prev) => {
-          const temp = [...prev];
-          const d = temp[result.destination.index];
-          temp[result.destination.index] = temp[result.source.index];
-          temp[result.source.index] = d;
-        
-          console.log(temp, "TEMP")
-          return temp;
-        });
-      };
+	const handleDragEnd = (result, provided) => {
+		if (!result.destination) {
+			return
+		}
+
+		if (result.destination.index === result.source.index) {
+			return
+		}
+		console.log(result)
+
+		setSortedData((prev) => {
+			const temp = [...prev]
+			const d = temp[result.destination.index]
+			temp[result.destination.index] = temp[result.source.index]
+			temp[result.destination.index].index_sort = result.destination.index + ""
+			temp[result.source.index] = d
+			temp[result.source.index].index_sort = result.source.index + ""
+
+			console.log(temp, "TEMP")
+			return temp
+		})
+	}
+
+	const handleSortSubmission = async () => {
+		//console.log(sortedData)
+		let body = sortedData.map(el => {return {...el, index_sort: +el.index_sort}})
+		console.log(body)
+		try {
+			let res = await TournamentModel.sortDriver(body)
+			swal.fire({
+				text: 'Urutan berhasil diubah!',
+				icon: 'success',
+			});
+		} catch (error) {
+			swal.fireError({
+				text: error?.error_message || 'Gagal mengubah urutan',
+			});
+		}
+	}
 
 	return (
 		<>
@@ -243,6 +266,23 @@ const CustomTableSortable = ({
 					extendToolbar={extendToolbar}
 				/>
 			)}
+
+			<div>
+				<Flex className="mb-1" justify={"space-between"} align={"center"}>
+					<Flex
+						gap={8}
+						className="mb-3"
+						style={{ fontWeight: "bold", fontSize: "1.1em" }}
+					>
+						<div className="mb-2">{title}</div>
+					</Flex>
+					{data !== sortedData && (
+						<AntButton size={"middle"} type={"primary"} onClick={handleSortSubmission}>
+							Simpan Urutan Driver
+						</AntButton>
+					)}
+				</Flex>
+			</div>
 
 			<TableContainer sx={{ minWidth: 0, fontFamily: "Open Sans" }}>
 				<Table>
@@ -351,62 +391,67 @@ const CustomTableSortable = ({
 										const selectedItem = selected.indexOf(id) !== -1
 
 										return (
-											<Draggable key={row.indexSort} draggableId={row.indexSort} index={key}>
+											<Draggable
+												key={row.username}
+												draggableId={row.username}
+												index={key}
+											>
 												{(draggableProvided, snapshot) => {
 													return (
-                                                     <TableRow
-														
-														ref={draggableProvided.innerRef}
-														{...draggableProvided.draggableProps}
-														hover
-														key={id}
-														tabIndex={-1}
-														role="checkbox"
-														selected={selectedItem}
-														style={{
-															...draggableProvided.draggableProps.style,
-															cursor: rowAction?.onClick
-																? "pointer"
-																: "default",
-															//minWidth: "100%",
-															//backgroundColor: "red"
-														}}
-													>
-														{checkbox && (
-															<TableCell padding="checkbox">
-																<Checkbox
-																	checked={selectedItem}
-																	onChange={(event) => handleClick(event, id)}
-																/>
-															</TableCell>
-														)}
+														<TableRow
+															ref={draggableProvided.innerRef}
+															{...draggableProvided.draggableProps}
+															hover
+															key={id}
+															tabIndex={-1}
+															role="checkbox"
+															selected={selectedItem}
+															style={{
+																...draggableProvided.draggableProps.style,
+																cursor: rowAction?.onClick
+																	? "pointer"
+																	: "default"
+																//minWidth: "100%",
+																//backgroundColor: "red"
+															}}
+														>
+															{checkbox && (
+																<TableCell padding="checkbox">
+																	<Checkbox
+																		checked={selectedItem}
+																		onChange={(event) => handleClick(event, id)}
+																	/>
+																</TableCell>
+															)}
 
-														{columns.map((columnSetting, key) => {
-															return (
-																<>
-																	<TableCell
-                                                                    {...draggableProvided.dragHandleProps}
-																		style={{
-																			color: mode === "dark" ? "white" : "black"
-																		}}
-																		onClick={
-																			columnSetting.link
-																				? () => rowAction?.onClick(row)
-																				: null
-																		}
-																		align={columnSetting.alignment}
-																	>
-																		{columnSetting.render
-																			? columnSetting.render(row)
-																			: row[columnSetting.id]
-																			? row[columnSetting.id]
-																			: "-"}
-																	</TableCell>
-																</>
-															)
-														})}
-													</TableRow>
-												)}}
+															{columns.map((columnSetting, key) => {
+																return (
+																	<>
+																		<TableCell
+																			{...draggableProvided.dragHandleProps}
+																			style={{
+																				color:
+																					mode === "dark" ? "white" : "black"
+																			}}
+																			onClick={
+																				columnSetting.link
+																					? () => rowAction?.onClick(row)
+																					: null
+																			}
+																			align={columnSetting.alignment}
+																		>
+																			{columnSetting.render
+																				? columnSetting.render(row)
+																				: row[columnSetting.id]
+																				? row[columnSetting.id]
+																				: "-"}
+																		</TableCell>
+																	</>
+																)
+															})}
+														</TableRow>
+													)
+												}}
 											</Draggable>
 										)
 									})}
