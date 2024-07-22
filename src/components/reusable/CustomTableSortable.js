@@ -38,7 +38,7 @@ import {
 } from "react-beautiful-dnd"
 import { Flex, Button as AntButton } from "antd"
 import TournamentModel from "models/TournamentModel"
-import swal from 'components/reusable/CustomSweetAlert';
+import swal from "components/reusable/CustomSweetAlert"
 
 function applySortFilter(array, comparator, query, columns) {
 	if (!array) return []
@@ -133,17 +133,19 @@ const CustomTableSortable = ({
 	rowAction,
 	title
 }) => {
-	const [sortedData, setSortedData] = useState(applySortFilter(
-		data,
-		getComparator("asc", "index_sort"),
-		"",
-		columns))
+	const [sortedData, setSortedData] = useState(
+		applySortFilter(data, getComparator("asc", "index_sort"), "", columns)
+	)
+	const [customColumns, setCustomColumns] = useState(columns)
 	const [selected, setSelected] = useState([])
 	const [order, setOrder] = useState("desc")
 	const [orderBy, setOrderBy] = useState("name")
 	const [filterName, setFilterName] = useState("")
 	const [page, setPage] = useState(0)
 	const [rowsPerPage, setRowsPerPage] = useState(10)
+
+	const [sortDriverPlacement, setSortDriverPlacement] = useState(false)
+
 	useEffect(() => {
 		if (columns && columns.length > 0) {
 			if (defaultOrder) {
@@ -153,6 +155,19 @@ const CustomTableSortable = ({
 			}
 		}
 	}, [columns])
+
+	useEffect(() => {
+		if(sortDriverPlacement){
+			setCustomColumns([{
+				id: 'handle',
+				label: '',
+			}, ...columns])
+		} else {
+			if(customColumns[0].id == 'handle'){
+				setCustomColumns(columns)
+			}
+		}
+	},[sortDriverPlacement])
 
 	const handleFilterByName = (event) => {
 		setPage(0)
@@ -241,18 +256,20 @@ const CustomTableSortable = ({
 
 	const handleSortSubmission = async () => {
 		//console.log(sortedData)
-		let body = sortedData.map(el => {return {...el, index_sort: +el.index_sort}})
+		let body = sortedData.map((el) => {
+			return { ...el, index_sort: +el.index_sort }
+		})
 		console.log(body)
 		try {
 			let res = await TournamentModel.sortDriver(body)
 			swal.fire({
-				text: 'Urutan berhasil diubah!',
-				icon: 'success',
-			});
+				text: "Urutan berhasil diubah!",
+				icon: "success"
+			})
 		} catch (error) {
 			swal.fireError({
-				text: error?.error_message || 'Gagal mengubah urutan',
-			});
+				text: error?.error_message || "Gagal mengubah urutan"
+			})
 		}
 	}
 
@@ -276,10 +293,24 @@ const CustomTableSortable = ({
 					>
 						<div className="mb-2">{title}</div>
 					</Flex>
-					{data !== sortedData && (
-						<AntButton size={"middle"} type={"primary"} onClick={handleSortSubmission}>
-							Simpan Urutan Driver
+					{!sortDriverPlacement ? (
+						<AntButton
+							size={"middle"}
+							type={"primary"}
+							onClick={() => setSortDriverPlacement(true)}
+						>
+							Ubah Urutan Driver
 						</AntButton>
+					) : (
+						data !== sortedData && (
+							<AntButton
+								size={"middle"}
+								type={"primary"}
+								onClick={handleSortSubmission}
+							>
+								Simpan Urutan Driver
+							</AntButton>
+						)
 					)}
 				</Flex>
 			</div>
@@ -299,7 +330,7 @@ const CustomTableSortable = ({
 									/>
 								</TableCell>
 							)}
-							{columns.map((headCell) => (
+							{customColumns.map((headCell) => (
 								<TableCell
 									width={headCell?.width}
 									style={{ color: mode === "dark" ? "white" : "black" }}
@@ -415,6 +446,14 @@ const CustomTableSortable = ({
 																//backgroundColor: "red"
 															}}
 														>
+															{sortDriverPlacement && <TableCell {...draggableProvided.dragHandleProps}>
+																<div {...draggableProvided.dragHandleProps}>
+																	<Iconify
+																		icon={"material-symbols:reorder"}
+																		style={{ color: "white" }}
+																	/>
+																</div>
+															</TableCell>}
 															{checkbox && (
 																<TableCell padding="checkbox">
 																	<Checkbox
@@ -428,7 +467,6 @@ const CustomTableSortable = ({
 																return (
 																	<>
 																		<TableCell
-																			{...draggableProvided.dragHandleProps}
 																			style={{
 																				color:
 																					mode === "dark" ? "white" : "black"

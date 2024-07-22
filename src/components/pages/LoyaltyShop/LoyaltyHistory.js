@@ -19,8 +19,8 @@ export default function LoyaltyHistory() {
 			key: "id"
 		},
 		{
-			label: "ID User",
-			key: "user_id"
+			label: "Username",
+			key: "user_username"
 		},
 		{
 			label: "Jumlah Poin Ditukar",

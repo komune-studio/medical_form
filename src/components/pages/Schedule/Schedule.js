@@ -652,7 +652,7 @@ function ScheduleActionModal({isOpen, isCreateMode, scheduleData, handleClose, r
                             </Flex>
 
                             {/* Driver Regisration Form */}
-                            {scheduleData.skill_level !== 'EVENT' && scheduleData.skill_level !== 'MAINTENANCE' ? (
+                            {scheduleData.skill_level !== 'EVENT' && scheduleData.skill_level !== 'MAINTENANCE' && scheduleData.skill_level !== 'FULL' ? (
                                 <>
                                     <Flex vertical gap={8} style={{marginTop: 24}}>
                                         <Form.Label style={{fontWeight: 400}}>Daftarkan Driver</Form.Label>
