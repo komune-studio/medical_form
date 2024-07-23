@@ -266,6 +266,7 @@ const CustomTableSortable = ({
 				text: "Urutan berhasil diubah!",
 				icon: "success"
 			})
+			setSortDriverPlacement(false)
 		} catch (error) {
 			swal.fireError({
 				text: error?.error_message || "Gagal mengubah urutan"

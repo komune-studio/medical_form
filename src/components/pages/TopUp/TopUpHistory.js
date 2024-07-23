@@ -61,8 +61,8 @@ const TopUpHistory = () => {
 			key: "transactions.paid_status"
 		},
 		{
-			label: "Tanggal & Jam",
-			key: "created_at"
+			label: "Waktu Transaksi",
+			key: "Waktu Transaksi"
 		}
 	]
 	const columns = [
@@ -144,8 +144,8 @@ const TopUpHistory = () => {
 			filter: true,
 			render: (row) => {
 				return row?.transactions?.paid_status === "SETTLEMENT" ||
-					"CAPTURE" ||
-					"APPROVED" ? (
+					row?.transactions?.paid_status === "CAPTURE" ||
+					row?.transactions?.paid_status === "APPROVED" ? (
 					<span style={{ color: Palette.THEME_GREEN }}>
 						<Iconify icon={"lets-icons:check-fill"}></Iconify>{" "}
 						{row?.transactions?.paid_status}
@@ -165,7 +165,12 @@ const TopUpHistory = () => {
 		try {
 			let result = await TopUpHistoryModel.getAll()
 			console.log("isi res", result)
-			setDataSource(result)
+			setDataSource(result.map(obj=>{
+				return {
+					...obj,
+					"Waktu Transaksi" : new moment(obj.created_at).format("dddd, MMMM Do YYYY, HH:mm")
+				}
+			}))
 			setLoading(false)
 		} catch (e) {
 			console.log("masuk sinih", e)
@@ -212,7 +217,13 @@ const TopUpHistory = () => {
 									new moment().format("dddd, MMMM Do YYYY, HH:mm") +
 									".csv"
 								}
-								data={dataSource}
+								data={dataSource.map(obj=>{
+									// console.log("DDSS", dataSource)
+									return {
+										...obj,
+										"Waktu Transaksi" : new moment(obj.created_at).format("dddd, MMMM Do YYYY, HH:mm")
+									}
+								})}
 							>
 								<Button className={"ml-1 bg-transparent text-white"}>
 									<Iconify icon={"mdi:download"}></Iconify> Export
