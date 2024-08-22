@@ -1,11 +1,11 @@
-import {Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input} from 'antd';
+import { Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input } from 'antd';
 import HeaderNav from "components/Headers/HeaderNav.js";
-import React, {useState, useEffect} from 'react';
-import {Card, Row, CardBody, Container, Button} from "reactstrap";
+import React, { useState, useEffect } from 'react';
+import { Card, Row, CardBody, Container, Button } from "reactstrap";
 import User from '../../../models/UserModel'
-import {Link, useHistory} from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
-import {InputGroup, Form, Col,} from "react-bootstrap";
+import { InputGroup, Form, Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import UserFormModal from "./UserFormModal";
@@ -13,6 +13,8 @@ import UserResetPasswordModal from "./UserResetPasswordModal";
 import UserHistoryModal from "./UserHistoryModal";
 import UserLinkChildrenModal from './UserLinkChildrenModal';
 import UserAddPointsModal from './UserAddPointsModal';
+import UserVIPModal from './UserVIPModal';
+import moment from "moment"
 
 const UserList = () => {
 
@@ -27,6 +29,7 @@ const UserList = () => {
     const [openLinkChildren, setOpenLinkChildren] = useState(false)
 
     const [selectedForAddLoyaltyPoints, setSelectedForAddLoyaltyPoints] = useState(null)
+    const [selectedForVIP, setSelectedForVIP] = useState(null)
 
     const columns = [
         {
@@ -34,6 +37,18 @@ const UserList = () => {
         },
         {
             id: 'username', label: 'Username', filter: true,
+            render : (value)=>{
+                return <div style={{display : "flex", flexDirection : "row", alignItems : "center", justifyContent : "flex-start"}}>
+                    <div style={{marginRight : 5}}>{value?.username}</div>
+                    
+                    {
+                        moment(value?.vip_until).isAfter() &&
+                        <Tooltip title={`VIP sampai ${moment(value?.vip_until).format("DD MMM YYYY")}`}>
+                            <Iconify icon={"mdi:crown-outline"} />
+                        </Tooltip>
+                    }
+                </div>
+            }
         },
         // {
         //     id: 'full_name', label: 'Full Name', filter: true,
@@ -59,7 +74,7 @@ const UserList = () => {
                             <Tooltip title="Transaction History">
                                 <AntButton
                                     type={'link'}
-                                    style={{color: Palette.MAIN_THEME}}
+                                    style={{ color: Palette.MAIN_THEME }}
                                     onClick={() => {
                                         setSelectedUser(value)
                                         setOpenHistory(true)
@@ -69,12 +84,12 @@ const UserList = () => {
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"ic:outline-history"}/>}/>
+                                    icon={<Iconify icon={"ic:outline-history"} />} />
                             </Tooltip>
                             <Tooltip title="Edit">
                                 <AntButton
                                     type={'link'}
-                                    style={{color: Palette.MAIN_THEME}}
+                                    style={{ color: Palette.MAIN_THEME }}
                                     onClick={() => {
                                         setOpenUserResetModal(false)
                                         setOpenUserModal(true)
@@ -86,23 +101,23 @@ const UserList = () => {
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"material-symbols:edit"}/>}/>
+                                    icon={<Iconify icon={"material-symbols:edit"} />} />
                             </Tooltip>
                             <Tooltip title="Tambah Loyalty">
                                 <AntButton
                                     type={'link'}
-                                    style={{color: Palette.MAIN_THEME}}
+                                    style={{ color: Palette.MAIN_THEME }}
                                     onClick={() => {
                                         setSelectedForAddLoyaltyPoints(value)
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"mdi:coins-plus-outline"}/>}/>
+                                    icon={<Iconify icon={"mdi:coins-plus-outline"} />} />
                             </Tooltip>
                             <Tooltip title="Ubah kata sandi">
                                 <AntButton
                                     type={'link'}
-                                    style={{color: Palette.MAIN_THEME}}
+                                    style={{ color: Palette.MAIN_THEME }}
                                     onClick={() => {
                                         setSelectedUser(value)
                                         setOpenUserResetModal(true)
@@ -111,12 +126,23 @@ const UserList = () => {
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"material-symbols:lock"}/>}/>
+                                    icon={<Iconify icon={"material-symbols:lock"} />} />
+                            </Tooltip>
+                            <Tooltip title="Jadikan VIP">
+                                <AntButton
+                                    type={'link'}
+                                    style={{ color: Palette.MAIN_THEME }}
+                                    onClick={() => {
+                                        setSelectedForVIP(value)
+                                    }}
+                                    className={"d-flex align-items-center justify-content-center"}
+                                    shape="circle"
+                                    icon={<Iconify icon={"mdi:crown-outline"} />} />
                             </Tooltip>
                             <Tooltip title="Sambungkan akun children">
                                 <AntButton
                                     type={'link'}
-                                    style={{color: Palette.MAIN_THEME}}
+                                    style={{ color: Palette.MAIN_THEME }}
                                     onClick={() => {
                                         setSelectedUser(value)
                                         setOpenHistory(false)
@@ -126,18 +152,18 @@ const UserList = () => {
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"material-symbols:link"}/>}/>
+                                    icon={<Iconify icon={"material-symbols:link"} />} />
                             </Tooltip>
                             <Tooltip title="Hapus">
                                 <AntButton
                                     type={'link'}
-                                    style={{color: Palette.MAIN_THEME}}
+                                    style={{ color: Palette.MAIN_THEME }}
                                     onClick={() => {
                                         onDelete(value.id)
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"material-symbols:delete-outline"}/>}/>
+                                    icon={<Iconify icon={"material-symbols:delete-outline"} />} />
                             </Tooltip>
                         </Space>
                     </>
@@ -199,13 +225,13 @@ const UserList = () => {
     return (
         <>
             <Container fluid>
-                <Card style={{background: Palette.BACKGROUND_DARK_GRAY, color: "white"}}
-                      className="card-stats mb-4 mb-xl-0">
+                <Card style={{ background: Palette.BACKGROUND_DARK_GRAY, color: "white" }}
+                    className="card-stats mb-4 mb-xl-0">
                     <CardBody>
 
                         <Row>
                             <Col className='mb-3' md={6}>
-                                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>User</div>
+                                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>User</div>
                             </Col>
                             <Col className='mb-3 text-right' md={6}>
                                 <AntButton onClick={() => {
@@ -265,7 +291,7 @@ const UserList = () => {
                 }}
             />
 
-            <UserLinkChildrenModal 
+            <UserLinkChildrenModal
                 isOpen={openLinkChildren}
                 userData={selectedUser}
                 handleClose={async (refresh) => {
@@ -276,11 +302,22 @@ const UserList = () => {
                 }}
             />
 
-            <UserAddPointsModal 
+            <UserAddPointsModal
                 isOpen={!!selectedForAddLoyaltyPoints}
                 userData={selectedForAddLoyaltyPoints}
                 handleClose={async () => {
                     setSelectedForAddLoyaltyPoints(null)
+                }}
+            />
+
+            <UserVIPModal
+                isOpen={!!selectedForVIP}
+                userData={selectedForVIP}
+                handleClose={async (refresh) => {
+                    if (refresh) {
+                        await initializeData();
+                    }
+                    setSelectedForVIP(null)
                 }}
             />
 

@@ -17,6 +17,7 @@ export default class User {
   }
 
   static edit = async (id, body) => {
+    console.log("BODYZ", body)
     return await ApiRequest.set(`v1/user/${id}`, "PUT", body);
   }
 
@@ -46,6 +47,10 @@ export default class User {
 
   static getByReferralId = async (id) => {
     return await ApiRequest.set(`v1/user/referral/${id}`, "GET");
+  }
+
+  static removeVIP = async (id) => {
+    return await ApiRequest.set(`v1/user/${id}/removeVIP`, "DELETE");
   }
 
 }
