@@ -42,6 +42,9 @@ const UserList = () => {
             id: 'email', label: 'Email', filter: false,
         },
         {
+            id: 'city', label: 'Address', filter: false,
+        },
+        {
             id: 'gender', label: 'Gender', filter: false,
         },
         // {

@@ -18,7 +18,7 @@ TopUpFormModal.propTypes = {
     topUpData: PropTypes.object,
 };
 
-const CURRENCY = ["COIN", "BEGINNER_RIDES", "ADVANCED_RIDES", "PRO_RIDES"];
+const CURRENCY = ["COIN", "BEGINNER_RIDES", "ADVANCED_RIDES", "PRO_RIDES", "OTHER"];
 
 export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) {
     const [packageName, setPackageName] = useState(null)
