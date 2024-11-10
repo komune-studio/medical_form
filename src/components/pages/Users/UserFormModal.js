@@ -56,18 +56,18 @@ export default function UserFormModal({isOpen, close, isNewRecord, userData}) {
             swal.fireError({text: "Username Wajib diisi",})
             return
         }
-        if (!fullName) {
-            swal.fireError({text: "Nama Lengkap Wajib diisi",})
-            return
-        }
+        // if (!fullName) {
+        //     swal.fireError({text: "Nama Lengkap Wajib diisi",})
+        //     return
+        // }
         if (!email) {
             swal.fireError({text: "Email Wajib diisi",})
             return
         }
-        if (!phoneNumber) {
-            swal.fireError({text: "Nomor Telepon Wajib diisi",})
-            return
-        }
+        // if (!phoneNumber) {
+        //     swal.fireError({text: "Nomor Telepon Wajib diisi",})
+        //     return
+        // }
 
         try {
             let result;
