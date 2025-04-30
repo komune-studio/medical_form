@@ -146,6 +146,12 @@ const SIDEBAR = [
         name: "Tournament",
         icon: "mdi:tournament",
         color: Palette.BARCODE_ORANGE
+    },
+    {
+        path: "/datasync",
+        name: "DataSync",
+        icon: "mdi:database",
+        color: Palette.BARCODE_ORANGE
     }
     // {
     //     path: "/banners",

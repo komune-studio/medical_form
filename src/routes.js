@@ -34,6 +34,7 @@ import LoyaltyHistoryCreate from "components/pages/LoyaltyShop/LoyaltyHistoryCre
 import TournamentList from "components/pages/Tournament/TournamentList";
 import TournamentDetail from "components/pages/Tournament/TournamentDetail";
 import Dashboard from "components/pages/Dashboard/Dashboard";
+import DataSync from "components/pages/DataSync/DataSync";
 
 var routes = [
     {
@@ -144,6 +145,12 @@ var routes = [
         layout: "/admin",
         component: TournamentList,
     },
+    {
+        path: "/datasync",
+        name: "DataSync",
+        layout: "/admin",
+        component: DataSync,
+    }
 
 ];
 export default routes;

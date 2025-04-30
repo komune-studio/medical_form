@@ -12,6 +12,16 @@ export default class Upload {
         formData.append('upload', file, file.name);
         return await ApiRequest.setMultipart("v1/upload/image", "POST", formData);
     }
+
+    static uploadApex = async (file) => {
+        let formData = new FormData();
+        formData.append('file', file, file.name);
+        for (var key of formData.entries()) {
+            console.log(key[0] + ', ' + key[1]+ ', ' + key[2]);
+            console.log(formData[key])
+        }
+        return await ApiRequest.setMultipart("v1/upload/apex", "POST", formData);
+    }
     
     // static uploadFile = async (body) => {
     //     return await ApiRequest.setMultipart("v1/upload/public/file", "POST", body);
