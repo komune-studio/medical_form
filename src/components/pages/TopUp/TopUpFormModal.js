@@ -18,7 +18,7 @@ TopUpFormModal.propTypes = {
     topUpData: PropTypes.object,
 };
 
-const CURRENCY = ["COIN", "BEGINNER_RIDES", "ADVANCED_RIDES", "PRO_RIDES", "OTHER"];
+const CURRENCY = ["COIN", "BEGINNER_RIDES", "BEGINNER_BOOST_RIDES", "ADVANCED_RIDES", "ADVANCED_BOOST_RIDES", "PRO_RIDES", "OTHER"];
 
 export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) {
     const [packageName, setPackageName] = useState(null)
@@ -209,7 +209,7 @@ export default function TopUpFormModal({isOpen, close, isNewRecord, topUpData}) 
                             setCurrency(e.target.value)
                         }} as="select">
                             <option>Pilih tipe paket</option>
-                            {CURRENCY.map((name, index) => <option value={name} key={name}>{name}</option>)}
+                            {CURRENCY.map((name, index) => <option value={name} key={name}>{name.replaceAll('_', ' ')}</option>)}
                         </Form.Control>
                     </Form.Group>
                     <Form.Group className="mb-3 mt-2">

@@ -18,7 +18,7 @@ const ORDER_BARCOINS_VALUE = [50000, 100000, 150000, 200000, 250000, 300000];
 
 const ORDER_RIDES_VALUE = [1, 2, 3, 4, 5, 6];
 
-const CURRENCIES = ['BARCOIN', 'BEGINNER_RIDES', 'ADVANCED_RIDES', 'PRO_RIDES'];
+const CURRENCIES = ['BARCOIN', 'BEGINNER_RIDES', 'BEGINNER_BOOST_RIDES', 'ADVANCED_RIDES', 'ADVANCED_BOOST_RIDES', 'PRO_RIDES'];
 
 export default function OrderCreateV2() {
 	const history = useHistory();
@@ -167,7 +167,7 @@ export default function OrderCreateV2() {
 											onChange={(e) => setOrderCurrency(e.target.value)}
 										>
 											{CURRENCIES.map((currency) => (
-												<option value={currency}>{currency.replace('_', ' ')}</option>
+												<option value={currency}>{currency.replaceAll('_', ' ')}</option>
 											))}
 										</Form.Select>
 									</div>
@@ -233,7 +233,7 @@ export default function OrderCreateV2() {
 function OrderValueOptions({ options, currency, handleValueClick }) {
 	return (
 		<div style={{ gap: 8 }} className="d-flex flex-column">
-			<div>{Helper.toTitleCase(currency.replace('_', ' '))}</div>
+			<div>{Helper.toTitleCase(currency.replaceAll('_', ' '))}</div>
 			<div
 				style={{
 					display: 'grid',
