@@ -110,6 +110,7 @@ const Login = () => {
                                         onChange={(e) => {
                                             setUsername(e.target.value)
                                         }}
+                                        className="px-2"
                                     />
                                 </InputGroup>
                             </FormGroup>
@@ -133,6 +134,7 @@ const Login = () => {
                                                 handleSubmit()
                                             }
                                         }}
+                                        className="px-2"
                                     />
                                 </InputGroup>
                             </FormGroup>
