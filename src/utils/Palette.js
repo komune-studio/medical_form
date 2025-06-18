@@ -18,4 +18,6 @@ export default class Palette {
 
     static LIGHT_GRAY = "#404040";
     static WHITE_GRAY = "#757575";
+
+    static WHITE = '#FFF';
 }
