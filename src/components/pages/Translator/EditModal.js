@@ -8,17 +8,17 @@ import PropTypes from "prop-types";
 import Iconify from "../../reusable/Iconify";
 import swal from "../../reusable/CustomSweetAlert";
 import LoadingButton from "../../reusable/LoadingButton";
-EditModal.propTypes = {
+EditTranslatorModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
-    admin_data: PropTypes.object
+    translatorData: PropTypes.object
 };
 
 
-export default function EditModal({ isOpen, itemId, close, admin_data }) {
+export default function EditTranslatorModal({ isOpen, itemId, close, translatorData }) {
 
     const [username, setUsername] = useState("")
-    console.log('isi admin', admin_data)
+    console.log('isi admin', translatorData)
     const onSubmit = async (event) => {
         event.preventDefault();
         if (!username) {
@@ -28,7 +28,7 @@ export default function EditModal({ isOpen, itemId, close, admin_data }) {
         
         try {
             // Still using Admin Model, need to be changed later
-            let result2 = await AdminModel.edit(admin_data?.id, {
+            let result2 = await AdminModel.edit(translatorData?.id, {
                 username: username,
             })
             if (result2?.success) {
@@ -61,7 +61,7 @@ export default function EditModal({ isOpen, itemId, close, admin_data }) {
     }, [])
 
     const initializeData = async () => {
-        setUsername(admin_data?.username)
+        setUsername(translatorData?.username)
     }
 
     const reset = () => {

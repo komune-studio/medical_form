@@ -8,9 +8,9 @@ import Iconify from "../../reusable/Iconify";
 import Palette from 'utils/Palette';
 import {InputGroup, Form, Col,} from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
-import CreateModal from "./CreateModal";
-import EditModal from "./EditModal";
 import swal from "../../reusable/CustomSweetAlert";
+import EditTranslatorModal from './EditModal';
+import CreateTranslatorModal from './CreateModal';
 
 const TranslatorList = () => {
 
@@ -213,9 +213,9 @@ const TranslatorList = () => {
                 </Card>
 
             </Container>
-            <CreateModal
+            <CreateTranslatorModal
                 isOpen={isCreateOpen}
-                list={dataSource}
+                translatorList={dataSource}
                 close={async (refresh) => {
                     if (refresh) {
                         await initializeData()
@@ -223,9 +223,9 @@ const TranslatorList = () => {
                     setIsCreateOpen(false)
                 }}
             />
-            {isEditModalOpen ? <EditModal
+            {isEditModalOpen ? <EditTranslatorModal
                 isOpen={isEditModalOpen}
-                admin_data={selectedAdmin}
+                translatorData={selectedAdmin}
                 close={(refresh) => {
                     if (refresh) {
                         initializeData()
