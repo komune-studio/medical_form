@@ -124,6 +124,13 @@ const SIDEBAR = [
         color: Palette.BARCODE_ORANGE
     },
     {
+        path: "/ilustrator",
+        name: "Ilustrator",
+        icon: "fluent:draw-image-20-filled",
+        color: Palette.BARCODE_ORANGE
+    },
+    
+    {
         path: "/promotion",
         name: "Promotion",
         icon: "mdi:announcement",

@@ -12,7 +12,7 @@ import CreateModal from "./CreateModal";
 import EditModal from "./EditModal";
 import swal from "../../reusable/CustomSweetAlert";
 
-const TranslatorList = () => {
+const IlustratorList = () => {
 
     const history = useHistory();
     const [loading, setLoading] = useState(false);
@@ -176,7 +176,7 @@ const TranslatorList = () => {
 
                         <Row>
                             <Col className='mb-3' md={6}>
-                                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Translator</div>
+                                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Ilustrator</div>
                             </Col>
                             <Col className='mb-3 text-right' md={6}>
                                 <AntButton 
@@ -238,7 +238,7 @@ const TranslatorList = () => {
     )
 }
 
-export default TranslatorList;
+export default IlustratorList;
 
 
 
