@@ -8,7 +8,6 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import moment from "moment"
 import { CSVLink } from "react-csv";
-import BookFormModal from './BookFormModal';
 
 const BookList = () => {
 
