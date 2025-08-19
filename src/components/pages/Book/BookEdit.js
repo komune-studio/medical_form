@@ -19,11 +19,7 @@ const BookEdit = () => {
     return {
       id: 1,
       title: "a",
-      title_en: "b",
-      description: "aaaaaa",
-      description_en: "bbbbbb",
-      publish_date: moment(new Date().toISOString()).format('YYYY-MM-DD'),
-      isbn: 123123123123,
+      image_cover: "https://youtooz.com/cdn/shop/products/sb_nailonheadpatrick_characterai_el_779x1000trim_min-46a6.png?v=1682023304"
     }
   }
 

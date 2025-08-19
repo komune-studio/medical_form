@@ -1,4 +1,4 @@
-import { Space, Button as AntButton, Tooltip, Modal, message } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message, Image } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Card, Row, CardBody, Container } from "reactstrap";
 import { Link } from 'react-router-dom';
@@ -19,23 +19,23 @@ const BookList = () => {
 
   const columns = [
     {
-      id: 'id', label: 'ID', filter: false,
+      id: 'image_cover', label: 'Cover Image', filter: false,
+      render: (row) => {
+        return <Image height={100} width={150} style={{ objectFit: "contain" }} src={row.image_cover}></Image>
+      }
     },
     {
       id: 'title', label: 'Title', filter: true,
     },
     {
-      id: 'description', label: 'Description', filter: true,
+      id: 'publisher', label: 'Publisher', filter: true,
     },
     {
-      id: 'publish_date', label: 'Publish Date', filter: false,
-    },
-    {
-      id: 'isbn', label: 'ISBN', filter: false,
+      id: 'categories', label: 'Categories', filter: false,
     },
     {
       id: '', label: '', filter: false,
-      render: ((value) => {
+      render: ((row) => {
         return (
           <>
             <Space size="small">
@@ -45,17 +45,15 @@ const BookList = () => {
                   style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
                     setOpenBookModal(true)
-                    setSelectedBook(value)
+                    setSelectedBook(row)
                     setIsNewRecord(false)
-
-
                   }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:search-rounded"} />} />
               </Tooltip>
               <Tooltip title="Edit">
-                <Link to={`/books/${value.id}/edit`}>
+                <Link to={`/books/${row.id}/edit`}>
                   <AntButton
                     type={'link'}
                     style={{ color: Palette.MAIN_THEME }}
@@ -71,7 +69,7 @@ const BookList = () => {
                   type={'link'}
                   style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
-                    onDelete(value.id)
+                    onDelete(row.id)
                   }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
@@ -126,11 +124,8 @@ const BookList = () => {
         {
           id: 1,
           title: "a",
-          title_en: "b",
           description: "aaaaaa",
-          description_end: "bbbbbb",
-          publish_date: new Date().toISOString(),
-          isbn: 123123123123,
+          image_cover: "https://youtooz.com/cdn/shop/products/sb_nailonheadpatrick_characterai_el_779x1000trim_min-46a6.png?v=1682023304"
         },
       ]
       console.log(result)
