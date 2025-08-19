@@ -1,6 +1,5 @@
 import Modal from 'react-bootstrap/Modal';
-import { Form, Input, message } from "antd";
-import { Button } from 'react-bootstrap';
+import { Button, Form, Input, message } from "antd";
 import FileUpload from "../../reusable/FileUpload";
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
@@ -21,34 +20,22 @@ CreateIlustratorModal.propTypes = {
 
 
 export default function CreateIlustratorModal({ isOpen, itemId, close, ilustratorList }) {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    // const [email, setEmail] = useState("")
+    const [form] = Form.useForm();
 
-    const onSubmit = async () => {
-
-        if (!username) {
-            swal.fireError({ text: "Username Wajib diisi", })
-            return
-        }
-
-        if (!password) {
-            swal.fireError({ text: "Password Wajib diisi", })
-            return
-        }
-
-        // if(!email){
-        //     swal.fireError({text: "Username Wajib diisi",})
-        //     return
-        // }
+    const onSubmit = async (values) => {
 
         try {
-            // Still using Admin Model, need to be changed later
-            let result2 = await AdminModel.create({
-                password,
-                username: username,
-            })
+            let body = {
+                name: values.name,
+                email: values.email,
+                phone_number: values.phoneNumber,
+            }
+            // let result2 = await AdminModel.create({
+            //     password,
+            //     name: name,
+            // })
 
+            console.log("Body's body: ", body)
             message.success('Berhasil menambahkan Admin')
             handleClose(true)
 
@@ -63,20 +50,11 @@ export default function CreateIlustratorModal({ isOpen, itemId, close, ilustrato
                 confirmButtonText: 'Okay'
             })
         }
-
     }
 
-    const handleClose = (refresh) => {
-        close(refresh)
-    }
-
-    useEffect(() => {
-        reset()
-    }, [isOpen])
-
-    const reset = () => {
-        setUsername("")
-        setPassword("")
+    const handleClose = () => {
+        close();
+        form.resetFields();
     }
 
     return <Modal
@@ -89,44 +67,63 @@ export default function CreateIlustratorModal({ isOpen, itemId, close, ilustrato
         </Modal.Header>
         <Modal.Body>
             <Form
+                form={form}
                 name="basic"
                 layout={'vertical'}
                 onFinish={onSubmit}
                 autoComplete="off"
+                validateTrigger= "onSubmit"
             >
-                {/* Admin username */}
                 <Form.Item
-                    label="Nama admin"
+                    label="Nama"
                     name="name"
                     rules={[
                         {
                             required: true,
-                            message: 'Mohon memasukkan nama admin!',
+                            message: 'Mohon memasukkan nama!',
                         },
                     ]}
                 >
-                    <Input value={username} onChange={(e) => { setUsername(e.target.value) }} />
+                    <Input />
                 </Form.Item>
-
-                {/* Password */}
                 <Form.Item
-                    label="Kata sandi"
-                    name="password"
+                    label="Email"
+                    name="email"
                     rules={[
                         {
                             required: true,
-                            message: 'Mohon memasukkan kata sandi admin!',
+                            message: 'Mohon memasukkan email!',
+                        },
+                        {
+                            type: 'email',
+                            message: 'Email tidak valid.',
                         },
                     ]}
                 >
-                    <Input value={password} onChange={(e) => { setPassword(e.target.value) }} type='password' />
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label="Phone Number"
+                    name="phoneNumber"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Mohon memasukkan Nomor HP!',
+                        },
+                        {
+                            pattern: /^[0-9]+$/,
+                            message: 'Nomor HP hanya bisa angka.',
+                        },
+                    ]}
+                >
+                    <Input />
                 </Form.Item>
                 <Form.Item>
                     <div className={"d-flex flex-row justify-content-end"}>
-                        <Button size="sm" variant="outline-danger" onClick={() => handleClose()} style={{ marginRight: '5px' }}>
+                        <Button  variant="outline-danger" onClick={handleClose} style={{ marginRight: '5px' }}>
                             Batal
                         </Button>
-                        <Button size="sm" variant="primary" type="submit">
+                        <Button  htmlType="submit" type="primary">
                             Buat
                         </Button>
                     </div>
