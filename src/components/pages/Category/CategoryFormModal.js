@@ -1,6 +1,5 @@
 import Modal from 'react-bootstrap/Modal';
-import { Button, message, Flex } from "antd";
-import { Form } from 'react-bootstrap';
+import { Button, message, Flex, Form, Input } from "antd";
 import { useEffect, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
@@ -15,33 +14,21 @@ CategoryFormModal.propTypes = {
 
 
 export default function CategoryFormModal({ isOpen, close, isNewRecord, categoryData }) {
-    const [name, setName] = useState(null)
-    const [description, setDescription] = useState(null)
+    const [form] = Form.useForm();
 
 
     const onSubmit = async () => {
-        if (!name) {
-            swal.fireError({ text: "Nama Kategori Wajib diisi", })
-            return
-        }
-        if (description) {
-            swal.fireError({ text: "Deskripsi Wajib diisi", })
-            return
-        }
 
         try {
             let result;
-            let body = {
-                name: name,
-                description: description,
-            }
+            let body = form.getFieldsValue();
             let msg = ''
             if (isNewRecord) {
                 // await UserModel.create(body)
-                msg = "Berhasil membuat Kategori"
+                msg = "Successfully added new category"
             } else {
                 // await UserModel.edit(publisherData?.id, body)
-                msg = "Berhasil update Kategori"
+                msg = "Successfully updated category"
             }
 
             message.success(msg)
@@ -64,10 +51,12 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
     }
 
     const initForm = () => {
-        console.log('isi categoryData', categoryData)
         if (!isNewRecord) {
-            setName(categoryData?.name)
-            setDescription(categoryData?.description)
+            form.setFieldsValue({
+                id: categoryData?.id,
+                name: categoryData?.name,
+                description: categoryData?.description,
+            })
         }
 
     }
@@ -82,8 +71,7 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
     }, [isOpen])
 
     const reset = () => {
-        setName("")
-        setDescription("")
+        form.resetFields();
     }
 
     return <Modal
@@ -93,7 +81,7 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
     >
         <Modal.Header>
             <div className={'d-flex w-100 justify-content-between'}>
-                <Modal.Title>{isNewRecord ? 'Buat Penerbit' : `Ubah Penerbit`}</Modal.Title>
+                <Modal.Title>{isNewRecord ? 'Add Category' : `Update Category`}</Modal.Title>
                 <Button onClick={() => {
                     close()
                 }} style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"
@@ -101,33 +89,42 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
             </div>
         </Modal.Header>
         <Modal.Body>
-            <Flex vertical gap={8} className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Nama Kategori</Form.Label>
-                <Form.Control
-                    value={name}
-                    autoComplete={"name"}
-                    onChange={(e) => setName(e.target.value)} type="text" placeholder="Nama Kategori" />
-            </Flex>
-            <Flex vertical gap={8} className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Deskripsi Kategori</Form.Label>
-                <Form.Control
-                    value={description}
-                    autoComplete={"description"}
-                    as="textarea" rows={2}
-                    onChange={(e) => setName(e.target.value)} type="text" placeholder="Deskripsi Kategori" />
-            </Flex>
+            <Form
+                layout='vertical'
+                form={form}
+                onFinish={onSubmit}
+                validateTrigger="onSubmit"
+            >
+                <Form.Item
+                    label={"Name"}
+                    name={"name"}
+                    rules={[{
+                        required: true,
+                    }]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label={"Description"}
+                    name={"description"}
+                >
+                    <Input.TextArea />
+                </Form.Item>
 
-            <div className={"d-flex flex-row justify-content-end"}>
-                <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
-                    onClick={() => handleClose()} style={{ marginRight: '5px' }}>
-                    Batal
-                </Button>
-                <Button type={'primary'} size="sm" variant="primary" onClick={() => {
-                    onSubmit()
-                }}>
-                    {isNewRecord ? 'Simpan' : 'Ubah'}
-                </Button>
-            </div>
+                <div className={"d-flex flex-row justify-content-end"}>
+                    <Form.Item>
+                        <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
+                            onClick={() => handleClose()} style={{ marginRight: '5px' }}>
+                            Batal
+                        </Button>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button size="sm" type='primary' variant="primary" htmlType='submit'>
+                            {isNewRecord ? 'Add' : 'Save'}
+                        </Button>
+                    </Form.Item>
+                </div>
+            </Form>
         </Modal.Body>
     </Modal>
 }

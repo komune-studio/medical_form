@@ -28,7 +28,10 @@ const PublisherList = () => {
       id: 'address', label: 'Address', filter: true,
     },
     {
-      id: 'website', label: 'Website', filter: false,
+      id: 'phone', label: 'Phone', filter: false,
+    },
+    {
+      id: 'email', label: 'Email', filter: false,
     },
     {
       id: '', label: '', filter: false,
@@ -84,7 +87,7 @@ const PublisherList = () => {
   const deleteItem = async (id) => {
     try {
       // await User.delete(id)
-      message.success('Penerbit telah dihapus')
+      message.success('Publisher deleted')
       initializeData();
     } catch (e) {
       message.error('There was error from server')
@@ -94,7 +97,7 @@ const PublisherList = () => {
 
   const onDelete = (record) => {
     Modal.confirm({
-      title: "Apakah Anda yakin ingin menghapus data penerbit ini?",
+      title: "Are you sure you want to delete this publisher data?",
       okText: "Yes",
       okType: "danger",
       onOk: () => {
@@ -112,13 +115,11 @@ const PublisherList = () => {
           "id": 1,
           "name": "Beta Solutions",
           "address": "321 Pine Rd, Ogdenville",
-          "website": "https://deltatech.io"
         },
         {
           "id": 2,
           "name": "Test Data",
           "address": "654 ruko aniva",
-          "website": "https://example.com"
         }
       ]
       console.log(result)
@@ -149,7 +150,8 @@ const PublisherList = () => {
                   headers={[
                     { label: "Name", key: "name" },
                     { label: "Address", key: "address" },
-                    { label: "Website", key: "website" },
+                    { label: "Phone", key: "address" },
+                    { label: "Email", key: "address" },
                   ]}
                   filename={
                     "Publisher Data - " +
@@ -162,7 +164,8 @@ const PublisherList = () => {
                       ...obj,
                       name: obj.name,
                       address: obj.address,
-                      website: obj.website,
+                      phone: obj.phone,
+                      email: obj.email,
                     }
                   })}
                 >
@@ -174,7 +177,7 @@ const PublisherList = () => {
                 <AntButton onClick={() => {
                   setIsNewRecord(true)
                   setOpenPublisherModal(true)
-                }} size={'middle'} type={'primary'} style={{ border: "1px solid #ef6024" }}>Tambah Penerbit</AntButton>
+                }} size={'middle'} type={'primary'} style={{ border: "1px solid #ef6024" }}>Add Publisher</AntButton>
               </Col>
             </Row>
             <Row>

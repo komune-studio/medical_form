@@ -41,8 +41,6 @@ const CategoryList = () => {
                     setOpenCateogryModal(true)
                     setSelectedCateogry(value)
                     setIsNewRecord(false)
-
-
                   }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
@@ -81,7 +79,7 @@ const CategoryList = () => {
   const deleteItem = async (id) => {
     try {
       // await User.delete(id)
-      message.success('Kategori telah dihapus')
+      message.success('Category deleted')
       initializeData();
     } catch (e) {
       message.error('There was error from server')
@@ -91,7 +89,7 @@ const CategoryList = () => {
 
   const onDelete = (record) => {
     Modal.confirm({
-      title: "Apakah Anda yakin ingin menghapus kategori ini?",
+      title: "Are you sure you want to delete this category data?",
       okText: "Yes",
       okType: "danger",
       onOk: () => {
@@ -148,7 +146,7 @@ const CategoryList = () => {
                     { label: "Website", key: "website" },
                   ]}
                   filename={
-                    "Publisher Data - " +
+                    "Category Data - " +
                     new moment().format("dddd, MMMM Do YYYY, HH:mm") +
                     ".csv"
                   }
@@ -157,8 +155,7 @@ const CategoryList = () => {
                     return {
                       ...obj,
                       name: obj.name,
-                      address: obj.address,
-                      website: obj.website,
+                      description: obj.description
                     }
                   })}
                 >

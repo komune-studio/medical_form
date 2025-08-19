@@ -1,6 +1,6 @@
 import Modal from 'react-bootstrap/Modal';
-import { Button, message, Flex } from "antd";
-import { Form } from 'react-bootstrap';
+import { Button, message, Flex, Form, Input } from "antd";
+// import { Form } from 'react-bootstrap';
 import { useEffect, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
@@ -15,39 +15,21 @@ PublisherFormModal.propTypes = {
 
 
 export default function PublisherFormModal({ isOpen, close, isNewRecord, publisherData }) {
-    const [name, setName] = useState(null)
-    const [address, setAddress] = useState(null)
-    const [website, setWebsite] = useState(null)
+    const [form] = Form.useForm()
 
 
     const onSubmit = async () => {
-        if (!name) {
-            swal.fireError({ text: "Nama Penerbit Wajib diisi", })
-            return
-        }
-        if (!address) {
-            swal.fireError({ text: "Lokasi Wajib diisi", })
-            return
-        }
-        if (!website) {
-            swal.fireError({ text: "Website Wajib diisi", })
-            return
-        }
 
         try {
             let result;
-            let body = {
-                name: name,
-                address: address,
-                website: website
-            }
+            let body = form.getFieldsValue()
             let msg = ''
             if (isNewRecord) {
                 // await UserModel.create(body)
-                msg = "Berhasil menambah Penerbit"
+                msg = "Successfully added new Publisher"
             } else {
                 // await UserModel.edit(publisherData?.id, body)
-                msg = "Berhasil update Penerbit"
+                msg = "Successfully updated publisher"
             }
 
             message.success(msg)
@@ -57,7 +39,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
             let errorMessage = "An Error Occured"
             await swal.fire({
                 title: 'Error',
-                text: e.error_message ? e.error_message : "An Error Occured",
+                text: e.error_message ? e.error_message : errorMessage,
                 icon: 'error',
                 confirmButtonText: 'Okay'
             })
@@ -70,11 +52,14 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
     }
 
     const initForm = () => {
-        console.log('isi publisherData', publisherData)
         if (!isNewRecord) {
-            setName(publisherData?.name)
-            setAddress(publisherData?.address)
-            setWebsite(publisherData?.website)
+            form.setFieldsValue({
+                id: publisherData?.id,
+                name: publisherData?.name,
+                address: publisherData?.address,
+                phone: publisherData?.phone,
+                email: publisherData?.email,
+            })
         }
 
     }
@@ -89,9 +74,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
     }, [isOpen])
 
     const reset = () => {
-        setName("")
-        setAddress("")
-        setWebsite("")
+        form.resetFields();
     }
 
     return <Modal
@@ -101,7 +84,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
     >
         <Modal.Header>
             <div className={'d-flex w-100 justify-content-between'}>
-                <Modal.Title>{isNewRecord ? 'Buat Penerbit' : `Ubah Penerbit`}</Modal.Title>
+                <Modal.Title>{isNewRecord ? 'Create Publisher' : `Update Publisher`}</Modal.Title>
                 <Button onClick={() => {
                     close()
                 }} style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"
@@ -109,40 +92,124 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
             </div>
         </Modal.Header>
         <Modal.Body>
-            <Flex vertical gap={8} className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Nama Penerbit</Form.Label>
+            <Form
+                layout='vertical'
+                form={form}
+                onFinish={onSubmit}
+                validateTrigger="onSubmit"
+            >
+                <Form.Item
+                    label={"Name"}
+                    name={"name"}
+                    rules={[{
+                        required: true,
+                    }]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label={"Address"}
+                    name={"address"}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label={"Phone"}
+                    name={"phone"}
+                    rules={[
+                        {
+                            pattern: /^[0-9]+$/g,
+                            message: "Invalid phone format"
+                        }
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label={"Email"}
+                    name={"email"}
+                    rules={[
+                        {
+                            pattern: /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/g,
+                            message: "Invalid email format"
+                        }
+                    ]}
+                >
+                    <Input/>
+                </Form.Item>
+
+                <div className={"d-flex flex-row justify-content-end"}>
+                    <Form.Item>
+                        <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
+                            onClick={() => handleClose()} style={{ marginRight: '5px' }}>
+                            Batal
+                        </Button>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button size="sm" type='primary' variant="primary" htmlType='submit'>
+                            {isNewRecord ? 'Add' : 'Save'}
+                        </Button>
+                    </Form.Item>
+                </div>
+            </Form>
+            {/* <Flex vertical gap={8} className="mb-3">
+                <Form.Label style={{ fontSize: "0.8em" }}>Name</Form.Label>
                 <Form.Control
-                    value={name}
+                    value={formData.name}
                     autoComplete={"name"}
-                    onChange={(e) => setName(e.target.value)} type="text" placeholder="Nama Penerbit" />
+                    onChange={(e) => setFormData({
+                        ...formData,
+                        name: e.target.value
+                    })} 
+                    type="text" placeholder="Name" />
             </Flex>
             <Flex vertical gap={8} className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Lokasi</Form.Label>
+                <Form.Label style={{ fontSize: "0.8em" }}>Address</Form.Label>
                 <Form.Control
-                    value={address}
+                    value={formData.address}
                     autoComplete={"address"}
-                    onChange={(e) => setAddress(e.target.value)} type="text" placeholder="Lokasi" />
+                    onChange={(e) => setFormData({
+                        ...formData,
+                        address: e.target.value
+                    })} 
+                    type="text" placeholder="Address" />
             </Flex>
             <Flex vertical gap={8} className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Website</Form.Label>
+                <Form.Label style={{ fontSize: "0.8em" }}>Phone</Form.Label>
                 <Form.Control
-                    value={website}
-                    autoComplete={"website"}
+                    value={formData.phone}
+                    autoComplete={"phone"}
                     pattern=''
-                    onChange={(e) => setWebsite(e.target.value)} type="text" placeholder="Website" />
+                    onChange={(e) => setFormData({
+                        ...formData,
+                        phone: e.target.value
+                    })} 
+                    type="text" placeholder="Phone" />
+            </Flex>
+            <Flex vertical gap={8} className="mb-3">
+                <Form.Label style={{ fontSize: "0.8em" }}>Email</Form.Label>
+                <Form.Control
+                    value={formData.email}
+                    autoComplete={"email"}
+                    pattern=''
+                    onChange={(e) => setFormData({
+                        ...formData,
+                        email: e.target.value
+                    })} 
+                    type="email" placeholder="Email" />
             </Flex>
 
             <div className={"d-flex flex-row justify-content-end"}>
                 <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
                     onClick={() => handleClose()} style={{ marginRight: '5px' }}>
-                    Batal
+                    Cancel
                 </Button>
                 <Button type={'primary'} size="sm" variant="primary" onClick={() => {
                     onSubmit()
                 }}>
-                    {isNewRecord ? 'Simpan' : 'Ubah'}
+                    {isNewRecord ? 'Add' : 'Save'}
                 </Button>
-            </div>
+            </div> */}
         </Modal.Body>
     </Modal>
 }
