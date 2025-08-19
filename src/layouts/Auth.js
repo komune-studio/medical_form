@@ -68,7 +68,7 @@ const Auth = (props) => {
             display: 'flex',
             justifyContent: 'center',
             background: "#1d1d1d",
-            backgroundImage: `url("${authBG}")`,
+            // backgroundImage: `url("${authBG}")`,
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat'
           }}
