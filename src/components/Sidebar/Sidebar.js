@@ -21,7 +21,7 @@ import { NavLink as NavLinkRRD, Link, useHistory } from "react-router-dom";
 // nodejs library to set properties for components
 import { PropTypes } from "prop-types";
 
-import logo from "../../assets/img/brand/barcode.png"
+import logo from "../../assets/img/brand/read_indonesia_logo_4.png"
 
 // reactstrap components
 import {
@@ -179,7 +179,7 @@ const Sidebar = (props) => {
             className="navbar-vertical fixed-left"
             expand="md"
             id="sidenav-main"
-            style={{background : Palette.BACKGROUND_BLACK}}
+            style={{ background: Palette.BACKGROUND_BLACK }}
         >
             <Container fluid>
                 {/* Toggler */}
@@ -188,7 +188,16 @@ const Sidebar = (props) => {
                     type="button"
                     onClick={toggleCollapse}
                 >
-                    <span className="navbar-toggler-icon" />
+                    <span className="navbar-toggler-icon">
+                        <Iconify
+                            style={{
+                                marginRight: "1rem",
+                                lineHeight: "1.5rem",
+                                fontSize: "30px",
+                                color: "white"
+                            }}
+                            icon="mdi:menu" />
+                    </span>
                 </button>
                 {/* Brand */}
                 {/* {logo ? (
@@ -208,9 +217,9 @@ const Sidebar = (props) => {
                 <Collapse navbar isOpen={collapseOpen}>
                     {/* Collapse header */}
                     <div className="d-flex align-items-start justify-content-start mb-2">
-                        <img 
-                            style={{height : 30, objectFit : "contain"}}
-                            src={logo}/>
+                        <img
+                            style={{ height: 100, objectFit: "contain" }}
+                            src={logo} />
                     </div>
                     {/* Navigation */}
                     <Nav navbar>{createLinks(routes)}</Nav>
