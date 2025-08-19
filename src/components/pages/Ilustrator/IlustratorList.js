@@ -13,7 +13,6 @@ import CreateIlustratorModal from './CreateIlustratorModal';
 import EditIlustratorModal from './EditIlustratorModal';
 
 const IlustratorList = () => {
-
     const history = useHistory();
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -21,74 +20,25 @@ const IlustratorList = () => {
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [selectedAdmin, setSelectedAdmin] = useState(null)
 
-    /* const columns = [
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            filter: true,
-            sorter: (a, b) => a.id.length - b.id.length,
-        },
-        {
-            title: 'Nama admin',
-            dataIndex: 'username',
-            filter: true,
-            sorter: (a, b) => a.username.length - b.username.length,
-        },
-        {
-            title: '',
-            key: 'operation',
-            fixed: 'right',
-            width: 100,
-            render: (value) => (
-                <Space size="small">
-                    <Tooltip title="Detail">
-                        <AntButton
-                            onClick={() => {
-                                setSelectedAdmin(value)
-                                setIsEditModalOpen(true)
-
-                            }}
-                            className={"d-flex align-items-center justify-content-center"}
-                            shape="circle"
-                            icon={<Iconify icon={"material-symbols:edit"} />} />
-                    </Tooltip>
-                    <Tooltip title="Ubah kata sandi">
-                        <Link to={"/admin-edit-password/" + value?.id}>
-                        <AntButton
-                            onClick={() => {
-                                setSelectedAdmin(value)
-                                setIsEditPasswordModalOpen(true)
-                            }}
-                            className={"d-flex align-items-center justify-content-center"}
-                            shape="circle"
-                            icon={<Iconify icon={"material-symbols:lock"} />} />
-                        </Link>
-                    </Tooltip>
-                    <Tooltip title="Hapus">
-                        <AntButton
-                            onClick={() => {
-                                onDelete(value.id)
-                            }}
-                            danger
-                            className={"d-flex align-items-center justify-content-center"}
-                            shape="circle"
-                            icon={<Iconify icon={"material-symbols:delete-outline"} />} />
-                    </Tooltip>
-                </Space>
-            ),
-        },
-    ] */
-
     const columns = [
         {
             id: 'id', label: 'ID', filter: false,
         },
         {
-            id: 'username', label: 'Username', filter: true,
+            id: 'name', label: 'Name', filter: true,
         },
-        // {
-        //   id: 'created_at', label: 'Created At', filter: false,
-        // },
+        {
+            id: 'email', label: 'Email At', filter: false,
+        },
+        {
+            id: 'phone_number', label: 'Phone No.', filter: false,
+        },
+        {
+            id: 'created_at', label: 'Created At', filter: false,
+        },
+        {
+            id: 'modified_at', label: 'Modified At', filter: false,
+        },
         {
             id: '', label: '', filter: false,
             render: ((value) => {
@@ -100,14 +50,15 @@ const IlustratorList = () => {
                                     onClick={() => {
                                         setSelectedAdmin(value)
                                         setIsEditModalOpen(true)
-
                                     }}
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"material-symbols:edit"}/>}>Ubah</AntButton>
-
+                                    icon={<Iconify icon={"material-symbols:edit"}/>}
+                                >
+                                    Ubah
+                                </AntButton>
                             </Tooltip>
                             <Tooltip title="Hapus">
                                 <AntButton
@@ -118,13 +69,14 @@ const IlustratorList = () => {
                                     }}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={"material-symbols:delete-outline"}/>}>Hapus</AntButton>
-
+                                    icon={<Iconify icon={"material-symbols:delete-outline"}/>}
+                                >
+                                    Hapus
+                                </AntButton>
                             </Tooltip>
                         </Space>
                     </>
                 )
-
             })
         },
     ]
@@ -154,7 +106,26 @@ const IlustratorList = () => {
     const initializeData = async () => {
         setLoading(true)
         try {
-            let result = await Admin.getAll()
+            // Need to fetch real data later
+            // let result = await Admin.getAll()
+            let result = [
+                {
+                "id": 1,
+                "name": "Budi kreatfi",
+                "email": "budikreatfi@gmail.com",
+                "phone_number": "321 Pine Rd, Ogdenville",
+                "created_at": "today",
+                "modified_at": "today",
+                },
+                {
+                "id": 2,
+                "name": "Susi kreatfi",
+                "email": "susikreatfi@gmail.com",
+                "phone_number": "123 Pine Rd, Ogdenville",
+                "created_at": "today",
+                "modified_at": "today",
+                },
+            ]
             console.log(result)
             setDataSource(result)
             setLoading(false)
@@ -173,7 +144,6 @@ const IlustratorList = () => {
                 <Card style={{background: Palette.BACKGROUND_DARK_GRAY, color: "white"}}
                       className="card-stats mb-4 mb-xl-0">
                     <CardBody>
-
                         <Row>
                             <Col className='mb-3' md={6}>
                                 <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Ilustrator</div>
@@ -190,25 +160,12 @@ const IlustratorList = () => {
                                 </AntButton>
                             </Col>
                         </Row>
-
-
-                        {/* <CustomTableOld
-                            toolBar={<Button size={'sm'} onClick={() => {
-                                setIsCreateAdminOpen(true)
-                            }} color="primary" style={{ float: 'right' }}>Buat baru</Button>}
-                            loading={loading} columns={columns}
-                            dataSource={dataSource}
-                        /> */}
-
                         <CustomTable
-
                             pagination={false}
                             searchText={''}
                             data={dataSource}
                             columns={columns}
                         />
-
-
                     </CardBody>
                 </Card>
 
