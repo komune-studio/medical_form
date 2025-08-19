@@ -32,6 +32,7 @@ import OrderCreateV2 from "./components/pages/Order/OrderCreateV2";
 import LoyaltyHistory from "components/pages/LoyaltyShop/LoyaltyHistory";
 import LoyaltyHistoryCreate from "components/pages/LoyaltyShop/LoyaltyHistoryCreate";
 import IlustratorList from "components/pages/Ilustrator/IlustratorList";
+import LiteraryAgencyList from "components/pages/LiteraryAgency/LiteraryAgencyList";
 import TournamentList from "components/pages/Tournament/TournamentList";
 import TranslatorList from "components/pages/Translator/TranslatorList";
 import TournamentDetail from "components/pages/Tournament/TournamentDetail";
@@ -79,6 +80,12 @@ var routes = [
         path: "/ilustrator",
         name: "Ilustrator",
         component: IlustratorList,
+        layout: "/admin",
+    },
+    {
+        path: "/literaryAgency",
+        name: "Literary Agency",
+        component: LiteraryAgencyList,
         layout: "/admin",
     },
     {

@@ -129,7 +129,12 @@ const SIDEBAR = [
         icon: "fluent:draw-image-20-filled",
         color: Palette.BARCODE_ORANGE
     },
-    
+    {
+        path: "/literaryAgency",
+        name: "Literary Agency",
+        icon: "famicons:people",
+        color: Palette.BARCODE_ORANGE
+    },
     {
         path: "/promotion",
         name: "Promotion",
