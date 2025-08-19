@@ -1,13 +1,10 @@
 import Modal from 'react-bootstrap/Modal';
-import { Button, DatePicker, message, Spin, Upload as AntUpload, Flex } from "antd";
+import { Button, message, Flex } from "antd";
 import { Form } from 'react-bootstrap';
 import { useEffect, useState } from "react";
-import UserModel from "../../../models/UserModel";
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
-import moment from "moment/moment";
-import UploadModel from "../../../models/UploadModel"
 
 CategoryFormModal.propTypes = {
     close: PropTypes.func,

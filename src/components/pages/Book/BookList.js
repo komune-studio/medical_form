@@ -1,6 +1,6 @@
-import { Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { Card, Row, CardBody, Container, Button } from "reactstrap";
+import { Card, Row, CardBody, Container } from "reactstrap";
 import { Link } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import { Col, } from "react-bootstrap";

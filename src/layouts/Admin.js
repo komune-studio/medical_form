@@ -21,9 +21,7 @@ import { useLocation, Route, Switch, Redirect } from "react-router-dom";
 import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
-import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
-import {Upload as AntUpload, message, Spin, Input} from "antd";
 
 import routes from "routes.js";
 import Palette from "utils/Palette";
@@ -79,7 +77,7 @@ const Admin = (props) => {
           imgAlt: "..."
         }}
       />
-      <div className="main-content" ref={mainContent} style={{paddingTop : 80, background : Palette.BACKGROUND_DARK_GRAY}}>
+      <div className="main-content" ref={mainContent} style={{paddingTop : 80, background : Palette.BACKGROUND_DARK_GRAY, height: "100dvh"}}>
         <AdminNavbar
           {...props}
           brandText={getBrandText(props.location.pathname)}
@@ -90,19 +88,20 @@ const Admin = (props) => {
         {/*    fluid>*/}
           <div
               style={{
-                minHeight: "80vh",
+                display: "flex",
+                flexGrow: 1,
               background: Palette.BACKGROUND_DARK_GRAY
               }}
           >
             <Switch>
               {getRoutes(routes)}
-              <Redirect from="/" to="/schedule" />
+              <Redirect from="/" to="/books" />
               {/* <Route path={"*"} component={Dashboard}/> */}
             </Switch>
           </div>
-          <Container fluid>
+          {/* <Container fluid>
               <AdminFooter />
-          </Container>
+          </Container> */}
         {/*</Container>*/}
       </div>
     </>

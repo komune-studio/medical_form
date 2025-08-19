@@ -1,12 +1,10 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Checkbox, Flex, message, Spin, Typography } from 'antd';
-import Modal from 'react-bootstrap/Modal';
+import { Button, Flex, message, Spin, Typography } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import Palette from '../../../utils/Palette';
-import Helper from 'utils/Helper';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import User from 'models/UserModel';
