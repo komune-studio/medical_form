@@ -1,12 +1,6 @@
 import ApiRequest from "../utils/ApiRequest";
 
 export default class User {
-  static login = async (username, password) => {
-    return await ApiRequest.set('v1/user/login', "POST", {
-      username: username,
-      password: password
-    });
-  }
 
   static getAll = async () => {
     return await ApiRequest.set("v1/users/complete", "GET");
@@ -33,32 +27,12 @@ export default class User {
     return await ApiRequest.set(`v1/user/${id}`, "DELETE");
   }
 
-  static processUserQR = async (body) => {
-    return await ApiRequest.set("v1/user/getQR", "POST", body);
-  }
-
   static getByUsername = async (username) => {
     return await ApiRequest.set(`v1/user/name/${username}`, "GET");
   }
 
   static getByEmail = async (email) => {
     return await ApiRequest.set(`v1/user/email/${email}`, "GET");
-  }
-
-  static getByReferralId = async (id) => {
-    return await ApiRequest.set(`v1/user/referral/${id}`, "GET");
-  }
-
-  static removeVIP = async (id) => {
-    return await ApiRequest.set(`v1/user/${id}/removeVIP`, "DELETE");
-  }
-
-  static getUserBalance = async (id) => {
-    return await ApiRequest.set(`v1/user/balance/${id}`, "GET");
-  }
-
-  static getUserRideBalance = async (id) => {
-    return await ApiRequest.set(`v1/rides/balance/${id}`, "GET");
   }
 
 }
