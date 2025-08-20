@@ -110,3 +110,24 @@ input.order-input {
 .MuiTableCell-root, .MuiTypography-root {
     font-family: 'Open Sans' !important;
 }
+
+/* style input if google auto filled */
+.ant-input:autofill,
+.ant-input:-webkit-autofill {
+    box-shadow: 0 0 0 1000px var(--ant-color-bg-container) inset;
+    -webkit-text-fill-color: #FFF !important;
+    -webkit-background-clip: text !important;
+}
+
+.ant-input:autofill:hover,
+.ant-input:-webkit-autofill:hover,
+.ant-input:autofill:focus,
+.ant-input:-webkit-autofill:focus,
+.ant-input:autofill:active,
+.ant-input:-webkit-autofill:active {
+    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.12) inset;
+    transition: background-color 5000s ease-in-out 0s;
+    -webkit-text-fill-color: #FFF !important;
+    -webkit-background-clip: text !important;
+}
+

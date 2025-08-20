@@ -40,17 +40,19 @@ const BookList = () => {
           <>
             <Space size="small">
               <Tooltip title="Detail">
-                <AntButton
-                  type={'link'}
-                  style={{ color: Palette.MAIN_THEME }}
-                  onClick={() => {
-                    setOpenBookModal(true)
-                    setSelectedBook(row)
-                    setIsNewRecord(false)
-                  }}
-                  className={"d-flex align-items-center justify-content-center"}
-                  shape="circle"
-                  icon={<Iconify icon={"material-symbols:search-rounded"} />} />
+                <Link to={`/books/${row.id}`}>
+                  <AntButton
+                    type={'link'}
+                    style={{ color: Palette.MAIN_THEME }}
+                    onClick={() => {
+                      setOpenBookModal(true)
+                      setSelectedBook(row)
+                      setIsNewRecord(false)
+                    }}
+                    className={"d-flex align-items-center justify-content-center"}
+                    shape="circle"
+                    icon={<Iconify icon={"material-symbols:search-rounded"} />} />
+                </Link>
               </Tooltip>
               <Tooltip title="Edit">
                 <Link to={`/books/${row.id}/edit`}>
@@ -107,7 +109,7 @@ const BookList = () => {
 
   const onDelete = (record) => {
     Modal.confirm({
-      title: "Apakah Anda yakin ingin menghapus data Buku ini?",
+      title: "Are you sure you want to delete this book data?",
       okText: "Yes",
       okType: "danger",
       onOk: () => {
@@ -152,36 +154,10 @@ const BookList = () => {
                 <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Book</div>
               </Col>
               <Col className='mb-3 text-right' md={6}>
-                <CSVLink
-                  headers={[
-                    { label: "Name", key: "name" },
-                    { label: "Address", key: "address" },
-                    { label: "Website", key: "website" },
-                  ]}
-                  filename={
-                    "Publisher Data - " +
-                    new moment().format("dddd, MMMM Do YYYY, HH:mm") +
-                    ".csv"
-                  }
-                  data={dataSource.map(obj => {
-                    // console.log("DDSS", dataSource)
-                    return {
-                      ...obj,
-                      name: obj.name,
-                      address: obj.address,
-                      website: obj.website,
-                    }
-                  })}
-                >
-                  <AntButton className={"mr-1 bg-transparent text-white"}>
-                    <Iconify icon={"mdi:download"}></Iconify> Export
-                  </AntButton>
-                </CSVLink>
-
                 <Link to="/books/create">
                   <AntButton
                     onClick={() => { }}
-                    size={'middle'} type={'primary'} style={{ border: "1px solid #ef6024" }}>Add Book</AntButton>
+                    size={'middle'} type={'primary'}>Add Book</AntButton>
                 </Link>
               </Col>
             </Row>

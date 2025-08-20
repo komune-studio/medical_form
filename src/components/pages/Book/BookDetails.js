@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom";
 import BookFormPage from "./BookFormPage";
-import moment from "moment";
 
-const BookEdit = () => {
+const BookDetails = () => {
   const [bookData, setBookData] = useState({})
 
   const params = useParams();
@@ -23,8 +22,8 @@ const BookEdit = () => {
   }, [params])
 
   return (
-    <BookFormPage bookData={bookData}></BookFormPage>
+    <BookFormPage bookData={bookData} disabled={true}></BookFormPage>
   )
 }
 
-export default BookEdit
+export default BookDetails

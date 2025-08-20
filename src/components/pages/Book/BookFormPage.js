@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload, Space } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 // import Form from 'react-bootstrap/Form';
@@ -10,12 +10,14 @@ import swal from '../../reusable/CustomSweetAlert';
 import User from 'models/UserModel';
 
 export default function BookFormPage({
-  bookData
+  bookData,
+  disabled,
 }) {
   const history = useHistory();
 
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
+  const [formDisabled, setFormDisabled] = useState(false);
 
   const [publishers, setPublishers] = useState([]);
   const [translators, setTranslators] = useState([]);
@@ -187,6 +189,9 @@ export default function BookFormPage({
         setImagePreview(bookData.image_cover);
       }
     }
+    if (disabled) {
+      setFormDisabled(disabled);
+    }
   }, [bookData])
 
   return (
@@ -197,21 +202,27 @@ export default function BookFormPage({
           <CardBody>
             <Row>
               <Col className='mb-3' md={6}>
-                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Book</div>
+                <Space align='center'>
+                  <Link to={'/books'}>
+                    <Space align='center'>
+                      <Iconify icon={'material-symbols:arrow-back'} style={{ fontSize: "16px", color: "white" }}></Iconify>
+                    </Space>
+                  </Link>
+                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Book</span>
+                </Space>
               </Col>
-              <Col md="12">
-                <Link to={'/books'}>
-                  <Flex align='center' gap={"8px"} className='text-white'>
-                    <Iconify icon={'material-symbols:arrow-back'}></Iconify>
-                    <Typography.Text
-                      style={{
-                        color: "inherit",
-                        fontSize: "16px",
-                      }}>
-                      Back
-                    </Typography.Text>
-                  </Flex>
-                </Link>
+              <Col md={6} className='text-right'>
+                {formDisabled ? (
+                  <Link to={`${window.location.pathname}/edit`}>
+                    <Button
+                      onClick={() => {
+                        setFormDisabled(false);
+                      }}
+                      size={'middle'} type={'primary'} style={{ border: "1px solid #ef6024" }}>Edit Book</Button>
+                  </Link>
+                ) : (
+                  <></>
+                )}
               </Col>
             </Row>
             <Row>
@@ -226,6 +237,8 @@ export default function BookFormPage({
                     form={form}
                     onFinish={onSubmit}
                     validateTrigger="onSubmit"
+                    disabled={formDisabled}
+                    autoComplete='off'
                   >
                     <Flex gap={"48px"} >
                       <Flex vertical style={{ width: "60%" }}>
@@ -236,25 +249,25 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Input />
+                          <Input variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Title (Translated)"}
                           name={"title_tl"}
                         >
-                          <Input />
+                          <Input variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Description"}
                           name={"description"}
                         >
-                          <Input.TextArea />
+                          <Input.TextArea variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Description (Translated)"}
                           name={"description_tl"}
                         >
-                          <Input.TextArea />
+                          <Input.TextArea variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Publisher"}
@@ -263,7 +276,7 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select options={publishers} />
+                          <Select options={publishers} variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Illustrator"}
@@ -272,7 +285,7 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select options={illustrators} />
+                          <Select options={illustrators} variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Translator"}
@@ -281,7 +294,7 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select options={translators} />
+                          <Select options={translators} variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Categories"}
@@ -290,14 +303,18 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select mode='tags' options={categories} />
+                          <Select mode='multiple' options={categories} variant='filled' />
                         </Form.Item>
 
-                        <div className={"d-flex flex-row"}>
-                          <Button size="sm" type='primary' variant="primary" htmlType='submit'>
-                            Add
-                          </Button>
-                        </div>
+                        {!formDisabled ? (
+                          <div className={"d-flex flex-row"}>
+                            <Button size="sm" type='primary' variant="primary" htmlType='submit'>
+                              Add Book
+                            </Button>
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </Flex>
                       <Flex vertical style={{ width: "40%" }} className='text-white'>
                         <Form.Item
@@ -312,7 +329,7 @@ export default function BookFormPage({
                             onChange={handleUpload}
                             beforeUpload={onImageBeforeUpload}
                           >
-                            <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px" }} type='button'>
+                            <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px", ...(formDisabled && { cursor: "not-allowed" }) }} type='button'>
                               {imagePreview ? (
                                 <img src={imagePreview} style={{ maxWidth: "100%" }} />
                               ) : (
