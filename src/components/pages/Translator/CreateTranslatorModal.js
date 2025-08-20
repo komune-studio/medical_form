@@ -1,54 +1,32 @@
 import Modal from 'react-bootstrap/Modal';
-import { Form, Input, message } from "antd";
-import { Button } from 'react-bootstrap';
-import FileUpload from "../../reusable/FileUpload";
-import Swal from "sweetalert2";
+import { Button, Form, Input, message } from "antd";
 import { useEffect, useState } from "react";
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import UploadModel from "../../../models/UploadModel";
-import AdminModel from "../../../models/AdminModel";
-
+import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
-import Iconify from "../../reusable/Iconify";
 import swal from "../../reusable/CustomSweetAlert";
-import LoadingButton from "../../reusable/LoadingButton";
 
 CreateTranslatorModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
-    translator_List: PropTypes.object
 };
 
 
-export default function CreateTranslatorModal({ isOpen, itemId, close, translatorList }) {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    // const [email, setEmail] = useState("")
-
-    const onSubmit = async () => {
-
-        if (!username) {
-            swal.fireError({ text: "Username Wajib diisi", })
-            return
-        }
-
-        if (!password) {
-            swal.fireError({ text: "Password Wajib diisi", })
-            return
-        }
-
-        // if(!email){
-        //     swal.fireError({text: "Username Wajib diisi",})
-        //     return
-        // }
-
+export default function CreateTranslatorModal({ isOpen, close }) {
+    const [form] = Form.useForm();
+    const onSubmit = async (values) => {
         try {
             // Still using Admin Model, need to be changed later
-            let result2 = await AdminModel.create({
-                password,
-                username: username,
-            })
-
+            // let result2 = await AdminModel.create({
+            //     password,
+            //     username: username,
+            // })
+            let body = {
+                name: values.name,
+                email: values.email,
+                phone: values.phoneNumber,
+                languages: values.languages,
+            }
+            // console.log("Body's body: ", body)
             message.success('Berhasil menambahkan Admin')
             handleClose(true)
 
@@ -67,16 +45,8 @@ export default function CreateTranslatorModal({ isOpen, itemId, close, translato
     }
 
     const handleClose = (refresh) => {
+        form.resetFields();
         close(refresh)
-    }
-
-    useEffect(() => {
-        reset()
-    }, [isOpen])
-
-    const reset = () => {
-        setUsername("")
-        setPassword("")
     }
 
     return <Modal
@@ -85,49 +55,81 @@ export default function CreateTranslatorModal({ isOpen, itemId, close, translato
         keyboard={false}
     >
         <Modal.Header>
-            <Modal.Title>Buat Translator</Modal.Title>
+            <Modal.Title>Create Translator</Modal.Title>
+            <Button 
+                onClick={handleClose} 
+                style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"
+                icon={<CloseOutlined />} 
+            />
         </Modal.Header>
         <Modal.Body>
             <Form
+                form={form}
                 name="basic"
                 layout={'vertical'}
                 onFinish={onSubmit}
                 autoComplete="off"
+                validateTrigger= "onSubmit"
             >
-                {/* Admin username */}
                 <Form.Item
-                    label="Nama admin"
+                    label="Nama"
                     name="name"
                     rules={[
                         {
                             required: true,
-                            message: 'Mohon memasukkan nama admin!',
+                            message: 'Mohon memasukkan nama!',
                         },
                     ]}
                 >
-                    <Input value={username} onChange={(e) => { setUsername(e.target.value) }} />
+                    <Input />
                 </Form.Item>
-
-                {/* Password */}
                 <Form.Item
-                    label="Kata sandi"
-                    name="password"
+                    label="Email"
+                    name="email"
                     rules={[
                         {
                             required: true,
-                            message: 'Mohon memasukkan kata sandi admin!',
+                            message: 'Mohon memasukkan email!',
+                        },
+                        {
+                            type: 'email',
+                            message: 'Email tidak valid.',
                         },
                     ]}
                 >
-                    <Input value={password} onChange={(e) => { setPassword(e.target.value) }} type='password' />
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label="Phone Number"
+                    name="phoneNumber"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Mohon memasukkan Nomor HP.',
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label="Languages"
+                    name="languages"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Mohon memasukkan bahasa.',
+                        },
+                    ]}
+                >
+                    <Input />
                 </Form.Item>
                 <Form.Item>
                     <div className={"d-flex flex-row justify-content-end"}>
-                        <Button size="sm" variant="outline-danger" onClick={() => handleClose()} style={{ marginRight: '5px' }}>
-                            Batal
+                        <Button  variant="outline-danger" onClick={handleClose} style={{ marginRight: '5px' }}>
+                            Cancel
                         </Button>
-                        <Button size="sm" variant="primary" type="submit">
-                            Buat
+                        <Button  htmlType="submit" type="primary">
+                            Add
                         </Button>
                     </div>
                 </Form.Item>

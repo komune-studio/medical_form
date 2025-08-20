@@ -1,13 +1,9 @@
 import Modal from 'react-bootstrap/Modal';
-import { Button, Form } from "react-bootstrap";
-import { message, Flex } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import AdminModel from "../../../models/AdminModel";
-
+import { Button, Form, Input, message } from "antd";
+import { CloseOutlined } from '@ant-design/icons';
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import Iconify from "../../reusable/Iconify";
 import swal from "../../reusable/CustomSweetAlert";
-import LoadingButton from "../../reusable/LoadingButton";
 EditTranslatorModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
@@ -15,31 +11,23 @@ EditTranslatorModal.propTypes = {
 };
 
 
-export default function EditTranslatorModal({ isOpen, itemId, close, translatorData }) {
-
-    const [username, setUsername] = useState("")
-    console.log('isi admin', translatorData)
-    const onSubmit = async (event) => {
-        event.preventDefault();
-        if (!username) {
-            message.error({ text: "Name Wajib diisi", })
-            return
-        }
-        
+export default function EditTranslatorModal({ isOpen, close, translatorData }) {
+    const [form] = Form.useForm();
+    const onSubmit = async (values) => {
         try {
-            // Still using Admin Model, need to be changed later
-            let result2 = await AdminModel.edit(translatorData?.id, {
-                username: username,
-            })
-            if (result2?.success) {
-                message.success('Berhasil menyimpan')
-                handleClose(true)
-            }else{
-                message.error('Gagal menyimpan')
+            let body = {
+                name: values.name,
+                email: values.email,
+                phone_number: values.phoneNumber,
+                languages: values.languages,
             }
-
-
-
+            // Still using Admin Model, need to be changed later
+            // let result2 = await AdminModel.edit(translatorData?.id, {
+            //     username: username,
+            // })
+            // console.log("body: ", body)
+            message.success('Berhasil menyimpan')
+            handleClose(true)
         } catch (e) {
             console.log(e)
             let errorMessage = "An Error Occured"
@@ -56,17 +44,22 @@ export default function EditTranslatorModal({ isOpen, itemId, close, translatorD
     const handleClose = (refresh) => {
         close(refresh)
     }
+
+    const initializeData = () => {
+        if (translatorData) {
+            form.setFieldsValue({
+                id: translatorData?.id,
+                name: translatorData?.name,
+                email: translatorData?.email,
+                phoneNumber: translatorData?.phone,
+                languages: translatorData?.languages,
+            })
+        }
+    }
+
     useEffect(() => {
         initializeData()
-    }, [])
-
-    const initializeData = async () => {
-        setUsername(translatorData?.username)
-    }
-
-    const reset = () => {
-        setUsername("")
-    }
+    }, [isOpen])
 
     return <Modal
         show={isOpen}
@@ -74,47 +67,87 @@ export default function EditTranslatorModal({ isOpen, itemId, close, translatorD
         keyboard={false}
     >
         <Modal.Header>
-            <Modal.Title>Perbarui Nama</Modal.Title>
+            <Modal.Title>Update Translator</Modal.Title>
+            <Button 
+                onClick={() => {
+                    close()
+                }} 
+                style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"
+                icon={<CloseOutlined />} 
+            />
         </Modal.Header>
         <Modal.Body>
-        <Form onSubmit={onSubmit}>
-            <Flex className="mb-3" vertical gap={8}>
-                <Form.Label style={{ fontSize: "0.8em" }}>Nama</Form.Label>
-                <Form.Control
-                    value={username ? username : ''}
-                    onChange={(e) => setUsername(e.target.value)} type="text" placeholder="Nama admin" style={{color: '#000000'}}/>
-            </Flex>
-            {/* <Form.Group className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Active</Form.Label>
-                <Form.Check // prettier-ignore
-                type="switch"
-                id="custom-switch"
-                label="Check this switch"
-                /> */}
-                {/* <Form.Check type='switch' onChange={(e) => setActive(!active)} checked={active}/> */}
-            {/* </Form.Group> */}
-            {/* <Form.Group className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Phone Number</Form.Label>
-                <Form.Control
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)} type="text" placeholder="Phone Number" />
-            </Form.Group>
-            <Form.Group className="mb-3">
-                <Form.Label style={{ fontSize: "0.8em" }}>Domain</Form.Label>
-                <Form.Control
-                    value={domain}
-                    onChange={(e) => setDomain(e.target.value)} type="text" placeholder="Domain" />
-            </Form.Group> */}
-
-            <div className={"d-flex flex-row justify-content-end"}>
-                <Button size="sm" variant="outline-danger" onClick={() => handleClose(false)}>
-                    Batal
-                </Button>
-                <Button size="sm" variant="primary" type="submit">
-                    Perbarui
-                </Button>
-            </div>
-        </Form>
+                <Form
+                    form={form}
+                    name="basic"
+                    layout={'vertical'}
+                    onFinish={onSubmit}
+                    autoComplete="off"
+                    validateTrigger= "onSubmit"
+                >
+                    <Form.Item
+                        label="Nama"
+                        name="name"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Mohon memasukkan nama!',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Mohon memasukkan email!',
+                            },
+                            {
+                                type: 'email',
+                                message: 'Email tidak valid.',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Phone Number"
+                        name="phoneNumber"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Mohon memasukkan Nomor HP.',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label="Languages"
+                        name="languages"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Mohon memasukkan bahasa.',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item>
+                        <div className={"d-flex flex-row justify-content-end"}>
+                            <Button  variant="outline-danger" onClick={handleClose} style={{ marginRight: '5px' }}>
+                                Cancel
+                            </Button>
+                            <Button  htmlType="submit" type="primary">
+                                Save
+                            </Button>
+                        </div>
+                    </Form.Item>
+                </Form>
         </Modal.Body>
     </Modal>
 }
