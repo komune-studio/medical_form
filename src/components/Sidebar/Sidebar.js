@@ -58,15 +58,9 @@ import Palette from "../../utils/Palette";
 
 const SIDEBAR = [
     {
-        path: "/admins",
-        name: "Admin",
-        icon: "material-symbols:person",
-        color: Palette.BARCODE_ORANGE
-    },
-    {
         path: "/users",
         name: "User",
-        icon: "mdi:user-group",
+        icon: "mdi:user",
         color: Palette.BARCODE_ORANGE
     },
     {

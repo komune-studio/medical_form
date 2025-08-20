@@ -17,7 +17,6 @@
 */
 import Logout from "./components/pages/Logout";
 import Login from "./components/pages/Login";
-import AdminList from "./components/pages/Admins/AdminList";
 import UserList from "./components/pages/Users/UserList";
 import IlustratorList from "components/pages/Ilustrator/IlustratorList";
 import LiteraryAgencyList from "components/pages/LiteraryAgency/LiteraryAgencyList";
@@ -27,14 +26,9 @@ import BookList from "components/pages/Book/BookList";
 import BookCreate from "components/pages/Book/BookCreate";
 import BookEdit from "components/pages/Book/BookEdit";
 import CategoryList from "components/pages/Category/CategoryList";
+import BookDetails from "components/pages/Book/BookDetails";
 
 var routes = [
-    {
-        path: "/admins",
-        name: "Admins",
-        component: AdminList,
-        layout: "/admin",
-    },
     {
         path: "/users",
         name: "Users",
@@ -57,6 +51,12 @@ var routes = [
         path: "/books/:id/edit",
         name: "Book",
         component: BookEdit,
+        layout: "/admin",
+    },
+    {
+        path: "/books/:id",
+        name: "Book",
+        component: BookDetails,
         layout: "/admin",
     },
     {
