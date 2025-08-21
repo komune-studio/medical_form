@@ -1,5 +1,6 @@
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Input, message } from "antd";
+import Translator from '../../../models/TranslatorModel'
 import { CloseOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
@@ -15,17 +16,21 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
     const [form] = Form.useForm();
     const onSubmit = async (values) => {
         try {
-            let body = {
+            console.log("id: ", translatorData?.id)
+            if (!translatorData?.id) {
+                message.error('Invalid translator ID');
+                return;
+            }
+            
+            let result = await Translator.edit(translatorData?.id, {
                 name: values.name,
                 email: values.email,
-                phone_number: values.phoneNumber,
+                phone: values.phoneNumber,
                 languages: values.languages,
-            }
-            // Still using Admin Model, need to be changed later
-            // let result2 = await AdminModel.edit(translatorData?.id, {
-            //     username: username,
-            // })
-            // console.log("body: ", body)
+            })
+            
+            
+            console.log("hasil update: ", result)
             message.success('Successfully updated Translator')
             handleClose(true)
         } catch (e) {

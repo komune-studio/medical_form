@@ -1,6 +1,7 @@
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Input, message } from "antd";
 import { CloseOutlined } from '@ant-design/icons';
+import Ilustrator from '../../../models/IlustratorModel'
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
@@ -11,19 +12,16 @@ EditIlustratorModal.propTypes = {
     ilustratorData: PropTypes.object
 };
 
-export default function EditIlustratorModal({ isOpen, itemId, close, ilustratorData }) {
+export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
     const [form] = Form.useForm();
     const onSubmit = async (values) => {
         try {
-            let body = {
+            let result = await Ilustrator.edit(ilustratorData?.id, {
                 name: values.name,
                 email: values.email,
                 phone_number: values.phoneNumber,
-            }
-            // let result2 = await AdminModel.edit(ilustratorData?.id, {
-            //     username: username,
-            // })
-            console.log("Body's body: ", body)
+            })
+            // console.log("Edited result: ", result)
             message.success('Successfully updated Illustrator')
             handleClose(true)
         } catch (e) {

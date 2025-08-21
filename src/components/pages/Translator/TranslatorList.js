@@ -2,6 +2,7 @@ import {Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input
 import HeaderNav from "components/Headers/HeaderNav.js";
 import React, {useState, useEffect} from 'react';
 import {Card, Row, CardBody, Container, Button} from "reactstrap";
+import Translator from '../../../models/TranslatorModel'
 import Admin from '../../../models/AdminModel'
 import {Link, useHistory} from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
@@ -92,7 +93,7 @@ const TranslatorList = () => {
 
     const onDelete = (record) => {
         Modal.confirm({
-            title: "Apakah Anda yakin ingin menghapus akun admin ini?",
+            title: "Apakah Anda yakin ingin menghapus akun Admin ini?",
             okText: "Yes",
             okType: "danger",
             onOk: () => {
@@ -104,25 +105,7 @@ const TranslatorList = () => {
     const initializeData = async () => {
         setLoading(true)
         try {
-            // Need to fetch real data later
-            // let result = await Admin.getAll()
-            let result = [
-                {
-                "id": 1,
-                "name": "Budi Inggris",
-                "email": "budikraetif@gmail.com",
-                "phone": "0811112222",
-                "languages": "English, Indonesia",
-                },
-                {
-                "id": 2,
-                "name": "Budi Chung",
-                "email": "budichungf@gmail.com",
-                "phone": "0811112223",
-                "languages": "Mandarin, Indonesia",
-                },
-            ]
-            console.log(result)
+            let result = await Translator.getAll()
             setDataSource(result)
             setLoading(false)
         } catch (e) {

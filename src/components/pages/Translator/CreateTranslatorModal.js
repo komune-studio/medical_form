@@ -1,5 +1,6 @@
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Input, message } from "antd";
+import Translator from '../../../models/TranslatorModel'
 import { useEffect, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
@@ -15,18 +16,14 @@ export default function CreateTranslatorModal({ isOpen, close }) {
     const [form] = Form.useForm();
     const onSubmit = async (values) => {
         try {
-            // Still using Admin Model, need to be changed later
-            // let result2 = await AdminModel.create({
-            //     password,
-            //     username: username,
-            // })
-            let body = {
+            let result = await Translator.create({
                 name: values.name,
                 email: values.email,
                 phone: values.phoneNumber,
                 languages: values.languages,
-            }
-            // console.log("Body's body: ", body)
+            })
+        
+            console.log("Result: ", result)
             message.success('Successfully created Translator')
             handleClose(true)
 

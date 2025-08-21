@@ -1,6 +1,7 @@
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Input, message } from "antd";
 import { CloseOutlined } from '@ant-design/icons';
+import Ilustrator from '../../../models/IlustratorModel'
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
@@ -18,17 +19,12 @@ export default function CreateIlustratorModal({ isOpen, itemId, close }) {
     const onSubmit = async (values) => {
 
         try {
-            let body = {
+            let result = await Ilustrator.create({
                 name: values.name,
                 email: values.email,
                 phone_number: values.phoneNumber,
-            }
-            // let result2 = await AdminModel.create({
-            //     password,
-            //     name: name,
-            // })
-
-            console.log("Body's body: ", body)
+            })
+            // console.log("result: ", result)
             message.success('Successfully added new Illustrator')
             handleClose(true)
 
