@@ -63,10 +63,10 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData }) 
                 //     password: password
                 // })
                 // await UserModel.create(body)
-                msg = "Berhasil membuat User"
+                msg = "Successfully created User"
             } else {
                 // await UserModel.edit(userData?.id, body)
-                msg = "Berhasil update User"
+                msg = "Successfully updated User"
             }
 
             message.success(msg)
@@ -119,7 +119,7 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData }) 
     >
         <Modal.Header>
             <div className={'d-flex w-100 justify-content-between'}>
-                <Modal.Title>{isNewRecord ? 'Buat User' : `Ubah User`}</Modal.Title>
+                <Modal.Title>{isNewRecord ? 'Create User' : `Update User`}</Modal.Title>
                 <Button onClick={() => {
                     close()
                 }} style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"

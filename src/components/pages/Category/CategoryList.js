@@ -5,9 +5,8 @@ import Iconify from "../../reusable/Iconify";
 import { Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
-import moment from "moment"
-import { CSVLink } from "react-csv";
 import CategoryFormModal from './CategoryFormModal';
+import Category from 'models/CategoryModel';
 
 const CategoryList = () => {
 
@@ -29,7 +28,7 @@ const CategoryList = () => {
     },
     {
       id: '', label: '', filter: false,
-      render: ((value) => {
+      render: ((row) => {
         return (
           <>
             <Space size="small">
@@ -39,7 +38,7 @@ const CategoryList = () => {
                   style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
                     setOpenCateogryModal(true)
-                    setSelectedCateogry(value)
+                    setSelectedCateogry(row)
                     setIsNewRecord(false)
                   }}
                   className={"d-flex align-items-center justify-content-center"}
@@ -51,7 +50,7 @@ const CategoryList = () => {
                   type={'link'}
                   style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
-                    onDelete(value.id)
+                    onDelete(row.id)
                   }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
@@ -78,7 +77,7 @@ const CategoryList = () => {
 
   const deleteItem = async (id) => {
     try {
-      // await User.delete(id)
+      await Category.delete(id)
       message.success('Category deleted')
       initializeData();
     } catch (e) {
@@ -101,20 +100,7 @@ const CategoryList = () => {
   const initializeData = async () => {
     setLoading(true)
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          "id": 1,
-          "name": "Fiction",
-          "description": "Stories created from imagination, including novels, short stories, and fantasy worlds."
-        },
-        {
-          "id": 2,
-          "name": "Non-Fiction",
-          "description": "Books based on real events, people, history, self-help, and factual information."
-        }
-      ]
-
+      let result = await Category.getAll();
       console.log(result)
       setDataSource(result)
       setLoading(false)

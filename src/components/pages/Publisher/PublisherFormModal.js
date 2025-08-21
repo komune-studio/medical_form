@@ -30,7 +30,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
                 msg = "Successfully added new Publisher"
             } else {
                 await Publisher.edit(publisherData?.id, body)
-                msg = "Successfully updated publisher"
+                msg = "Successfully updated Publisher"
             }
 
             message.success(msg)

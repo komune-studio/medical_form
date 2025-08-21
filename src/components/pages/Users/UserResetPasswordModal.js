@@ -25,7 +25,7 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData }) {
             // let result2 = await User.edit_password(userData?.id, body)
             console.log(body);
             if (true) {
-                message.success('Successfully ')
+                message.success('Successfully reset password')
             } else {
                 message.error('Unable to reset password')
             }

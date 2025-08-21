@@ -104,7 +104,7 @@ const UserList = () => {
   const deleteItem = async (id) => {
     try {
       await User.delete(id)
-      message.success('User telah dihapus')
+      message.success('User deleted')
       initializeData();
     } catch (e) {
       message.error('There was error from server')
@@ -114,7 +114,7 @@ const UserList = () => {
 
   const onDelete = (record) => {
     Modal.confirm({
-      title: "Apakah Anda yakin ingin menghapus akun admin ini?",
+      title: "Are you sure you want to delete this user data?",
       okText: "Yes",
       okType: "danger",
       onOk: () => {

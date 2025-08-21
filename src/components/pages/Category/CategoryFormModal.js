@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
+import Category from 'models/CategoryModel';
 
 CategoryFormModal.propTypes = {
     close: PropTypes.func,
@@ -23,11 +24,12 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
             let result;
             let body = form.getFieldsValue();
             let msg = ''
+            console.log(body);
             if (isNewRecord) {
-                // await UserModel.create(body)
+                await Category.create(body)
                 msg = "Successfully added new category"
             } else {
-                // await UserModel.edit(publisherData?.id, body)
+                await Category.edit(categoryData?.id, body)
                 msg = "Successfully updated category"
             }
 
