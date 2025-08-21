@@ -64,6 +64,13 @@ export default function (props) {
                     Input: {
                         activeBg: "#282828",
                     },
+                    Typography: {
+                        titleMarginBottom: 0,
+                        lineHeight: "1em"
+                    },
+                    Tag: {
+                        colorBgContainer: Palette.BACKGROUND_BLACK,
+                    },
                 }
             }}
         >

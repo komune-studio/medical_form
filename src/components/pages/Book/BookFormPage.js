@@ -1,13 +1,21 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload, Space } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
-// import Form from 'react-bootstrap/Form';
 import Palette from '../../../utils/Palette';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import User from 'models/UserModel';
+import Publisher from 'models/PublisherModel';
+import Ilustrator from 'models/IlustratorModel';
+import Category from 'models/CategoryModel';
+import Translator from 'models/TranslatorModel';
+import Book from 'models/BookModel';
+import BookCategory from 'models/BookCategoryModel';
+import Upload from 'models/UploadModel';
+
+const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp", "image/gif"]
 
 export default function BookFormPage({
   bookData,
@@ -18,27 +26,18 @@ export default function BookFormPage({
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
   const [formDisabled, setFormDisabled] = useState(false);
+  const [initialBookCategories, setInitialBookCategories] = useState([]);
 
   const [publishers, setPublishers] = useState([]);
   const [translators, setTranslators] = useState([]);
-  const [illustrators, setIllustrators] = useState([]);
+  const [ilustrators, setIlustrators] = useState([]);
   const [categories, setCategories] = useState([]);
 
   const [imagePreview, setImagePreview] = useState(null);
 
   const getPublishersData = async () => {
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          id: 1,
-          name: "pub1",
-        },
-        {
-          id: 2,
-          name: "pub2",
-        },
-      ]
+      let result = await Publisher.getAll()
       setPublishers(result.map((r) => ({
         value: r.id,
         label: r.name,
@@ -49,17 +48,7 @@ export default function BookFormPage({
 
   const getTranslatorsData = async () => {
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          id: 1,
-          name: "tra1",
-        },
-        {
-          id: 2,
-          name: "tra2",
-        },
-      ]
+      let result = await Translator.getAll()
       setTranslators(result.map((r) => ({
         value: r.id,
         label: r.name,
@@ -68,20 +57,10 @@ export default function BookFormPage({
     }
   }
 
-  const getIllustratorsData = async () => {
+  const getIlustratorsData = async () => {
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          id: 1,
-          name: "ill1",
-        },
-        {
-          id: 2,
-          name: "ill2",
-        },
-      ]
-      setIllustrators(result.map((r) => ({
+      let result = await Ilustrator.getAll()
+      setIlustrators(result.map((r) => ({
         value: r.id,
         label: r.name,
       })))
@@ -91,17 +70,7 @@ export default function BookFormPage({
 
   const getCategoriesData = async () => {
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          id: 1,
-          name: "cat1",
-        },
-        {
-          id: 2,
-          name: "cat2",
-        },
-      ]
+      let result = await Category.getAll();
       setCategories(result.map((r) => ({
         value: r.id,
         label: r.name,
@@ -115,19 +84,29 @@ export default function BookFormPage({
     await Promise.all([
       getPublishersData(),
       getTranslatorsData(),
-      getIllustratorsData(),
+      getIlustratorsData(),
       getCategoriesData(),
     ])
     setLoading(false);
   }
 
-  const handleUpload = ({ fileList }) => {
+  const handleUpload = async ({ fileList }) => {
     if (fileList.length > 0) {
       const file = fileList[fileList.length - 1].originFileObj;
       if (file) {
-        const url = URL.createObjectURL(file);
-        setImagePreview(url);
-        form.setFieldValue("image_cover", url);
+        try {
+          let result = await Upload.uploadPicutre(file);
+          console.log(result)
+
+          if (result?.location) {
+            setImagePreview(result?.location);
+            form.setFieldValue("image_cover", result?.location);
+            message.success("Image uploaded successfully");
+          }
+        } catch (e) {
+          console.log("isi e", e);
+          message.error("Failed to upload image");
+        }
       }
     } else {
       setImagePreview(null);
@@ -135,7 +114,7 @@ export default function BookFormPage({
   }
 
   const onImageBeforeUpload = (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isJpgOrPng = allowedImageType.includes(file.type);
     if (!isJpgOrPng) {
       message.error('You can only upload JPG/PNG file!');
       return Upload.LIST_IGNORE;
@@ -149,7 +128,39 @@ export default function BookFormPage({
       let body = form.getFieldsValue()
       console.log(body)
       let msg = 'Successfully created Book'
-      // await UserModel.create(body)
+      if (!bookData) {
+        result = await Book.create(body);
+      } else {
+        result = await Book.edit(bookData.id, body);
+      }
+
+      let bookCategoryUpdatePromises = [];
+      for (let bcId of body.categories) {
+        if (initialBookCategories.length > 0 && initialBookCategories.includes(bcId)) continue;
+        bookCategoryUpdatePromises.push(new Promise((resolve, reject) => {
+          try {
+            let res = BookCategory.create({
+              book_id: result.id,
+              category_id: bcId,
+            });
+            resolve(res)
+          } catch (err) {
+            reject(err)
+          }
+        }))
+      }
+      for (let ibcId of initialBookCategories) {
+        if (body.categories && body.categories.includes(ibcId)) continue;
+        bookCategoryUpdatePromises.push(new Promise((resolve, reject) => {
+          try {
+            let res = BookCategory.delete(parseInt(result.id), parseInt(ibcId));
+            resolve(res);
+          } catch (err) {
+            reject(err)
+          }
+        }))
+      }
+      await Promise.all(bookCategoryUpdatePromises);
 
       message.success(msg)
       history.push("/books")
@@ -158,7 +169,7 @@ export default function BookFormPage({
       let errorMessage = "An Error Occured"
       await swal.fire({
         title: 'Error',
-        text: e.error_message ? e.error_message : "An Error Occured",
+        text: e.error_message ? e.error_message : errorMessage,
         icon: 'error',
         confirmButtonText: 'Okay'
       })
@@ -182,7 +193,11 @@ export default function BookFormPage({
         illustrator_id: bookData.illustrator_id,
         translator_id: bookData.translator_id,
       })
-      console.log(bookData);
+      let categoryIds = bookData.categories?.map((c) => {
+        return c.id
+      })
+      setInitialBookCategories(categoryIds);
+      form.setFieldValue("categories", categoryIds);
       if (bookData.image_cover) {
         console.log(bookData.image_cover)
         form.setFieldValue("image_cover", bookData.image_cover);
@@ -205,28 +220,20 @@ export default function BookFormPage({
                 <Space align='center'>
                   <Link to={'/books'}>
                     <Space align='center'>
-                      <Iconify icon={'material-symbols:arrow-back'} style={{ fontSize: "16px", color: "white" }}></Iconify>
+                      <Iconify icon={'material-symbols:arrow-back-rounded'} style={{ fontSize: "16px", color: "white" }}></Iconify>
                     </Space>
                   </Link>
                   <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Book</span>
                 </Space>
               </Col>
-              <Col md={6} className='text-right'>
-                {formDisabled ? (
-                  <Link to={`${window.location.pathname}/edit`}>
-                    <Button
-                      onClick={() => {
-                        setFormDisabled(false);
-                      }}
-                      size={'middle'} type={'primary'} style={{ border: "1px solid #ef6024" }}>Edit Book</Button>
-                  </Link>
-                ) : (
-                  <></>
-                )}
+            </Row>
+            <Row>
+              <Col className='mb-3' md={12} style={{ marginTop: "40px" }}>
+                <Typography.Title level={3}>{!bookData ? "Create" : "Edit"} Book</Typography.Title>
               </Col>
             </Row>
             <Row>
-              <Col style={{ marginTop: "40px" }}>
+              <Col>
                 {loading ? (
                   <Flex justify="center" align="center">
                     <Spin />
@@ -285,23 +292,23 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select options={illustrators} variant='filled' />
+                          <Select options={ilustrators} variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Translator"}
                           name={"translator_id"}
-                          rules={[{
-                            required: true,
-                          }]}
+                        // rules={[{
+                        //   required: true,
+                        // }]}
                         >
                           <Select options={translators} variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={"Categories"}
                           name={"categories"}
-                          rules={[{
-                            required: true,
-                          }]}
+                        // rules={[{
+                        //   required: true,
+                        // }]}
                         >
                           <Select mode='multiple' options={categories} variant='filled' />
                         </Form.Item>
@@ -309,19 +316,19 @@ export default function BookFormPage({
                         {!formDisabled ? (
                           <div className={"d-flex flex-row"}>
                             <Button size="sm" type='primary' variant="primary" htmlType='submit'>
-                              Add Book
+                              {!bookData ? "Add Book" : "Save Book"}
                             </Button>
                           </div>
                         ) : (
                           <></>
                         )}
                       </Flex>
-                      <Flex vertical style={{ width: "40%" }} className='text-white'>
+                      <Flex vertical style={{ width: "30%" }} className='text-white'>
                         <Form.Item
                           label={"Cover Image"}
                           name={"image_cover"}
                         >
-                          <Upload.Dragger
+                          <AntUpload.Dragger
                             name="avatar"
                             listType="picture"
                             className="avatar-uploader"
@@ -329,9 +336,9 @@ export default function BookFormPage({
                             onChange={handleUpload}
                             beforeUpload={onImageBeforeUpload}
                           >
-                            <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px", ...(formDisabled && { cursor: "not-allowed" }) }} type='button'>
+                            <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px", width: "100%", ...(formDisabled && { cursor: "not-allowed" }) }} type='button'>
                               {imagePreview ? (
-                                <img src={imagePreview} style={{ maxWidth: "100%" }} />
+                                <img src={imagePreview} style={{ width: "100%", height: "auto" }} />
                               ) : (
                                 <Flex vertical align='center'>
                                   <Iconify icon={"mdi:tray-upload"} style={{ fontSize: "48px" }} />
@@ -339,7 +346,7 @@ export default function BookFormPage({
                                 </Flex>
                               )}
                             </button>
-                          </Upload.Dragger>
+                          </AntUpload.Dragger>
                         </Form.Item>
                       </Flex>
                     </Flex>

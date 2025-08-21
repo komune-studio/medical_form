@@ -1,4 +1,4 @@
-import { Space, Button as AntButton, Tooltip, Modal, message, Image } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message, Image, Flex, Tag } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Card, Row, CardBody, Container } from "reactstrap";
 import { Link } from 'react-router-dom';
@@ -6,8 +6,8 @@ import Iconify from "../../reusable/Iconify";
 import { Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
-import moment from "moment"
-import { CSVLink } from "react-csv";
+import Book from 'models/BookModel';
+import BookCategory from 'models/BookCategoryModel';
 
 const BookList = () => {
 
@@ -21,7 +21,20 @@ const BookList = () => {
     {
       id: 'image_cover', label: 'Cover Image', filter: false,
       render: (row) => {
-        return <Image height={100} width={150} style={{ objectFit: "contain" }} src={row.image_cover}></Image>
+        return (
+          <Flex style={{ height: "100px", width: "auto", aspectRatio: "3/4", alignItems: "center", justifyContent: "center" }}>
+            {!row?.image_cover ? (
+              <Iconify
+                icon={"material-symbols:hide-image-outline"}
+                style={{
+                  fontSize: "48px"
+                }}
+              />
+            ) : (
+              <Image height={"100%"} width={"100%"} style={{ objectFit: "contain" }} src={row?.image_cover}></Image>
+            )}
+          </Flex>
+        )
       }
     },
     {
@@ -29,9 +42,23 @@ const BookList = () => {
     },
     {
       id: 'publisher', label: 'Publisher', filter: true,
+      render: (row) => {
+        return row.publishers.name;
+      }
     },
     {
       id: 'categories', label: 'Categories', filter: false,
+      render: (row) => (
+        <Space wrap size={4} style={{ maxWidth: "200px" }}>
+          {!row?.categories ? (
+            <></>
+          ) : (
+            row?.categories?.map((category) => (
+              <Tag>{category.name}</Tag>
+            ))
+          )}
+        </Space>
+      )
     },
     {
       id: '', label: '', filter: false,
@@ -98,8 +125,8 @@ const BookList = () => {
 
   const deleteItem = async (id) => {
     try {
-      // await User.delete(id)
-      message.success('Buku telah dihapus')
+      await Book.delete(id)
+      message.success('Book deleted')
       initializeData();
     } catch (e) {
       message.error('There was error from server')
@@ -121,17 +148,20 @@ const BookList = () => {
   const initializeData = async () => {
     setLoading(true)
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          id: 1,
-          title: "a",
-          description: "aaaaaa",
-          image_cover: "https://youtooz.com/cdn/shop/products/sb_nailonheadpatrick_characterai_el_779x1000trim_min-46a6.png?v=1682023304"
-        },
-      ]
-      console.log(result)
-      setDataSource(result)
+      let result = await Book.getAll();
+      console.log(result);
+      let resultWithCategories = []
+      for (let book of result) {
+        let bookCategories = await BookCategory.getByBookId(book.id)
+        let categories = bookCategories.map((bookCategory) => ({
+          ...bookCategory.categories
+        }))
+        resultWithCategories.push({
+          ...book,
+          categories,
+        });
+      }
+      setDataSource(resultWithCategories)
       setLoading(false)
     } catch (e) {
       setLoading(false)
