@@ -2,6 +2,7 @@ import {Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input
 import HeaderNav from "components/Headers/HeaderNav.js";
 import React, {useState, useEffect} from 'react';
 import {Card, Row, CardBody, Container, Button} from "reactstrap";
+import Ilustrator from '../../../models/IlustratorModel'
 import Admin from '../../../models/AdminModel'
 import {Link, useHistory} from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
@@ -98,23 +99,9 @@ const IlustratorList = () => {
     const initializeData = async () => {
         setLoading(true)
         try {
-            // Need to fetch real data later
-            // let result = await Admin.getAll()
-            let result = [
-                {
-                "id": 1,
-                "name": "Budi kreatfi",
-                "email": "budikreatfi@gmail.com",
-                "phone_number": "0811112222",
-                },
-                {
-                "id": 2,
-                "name": "Susi kreatfi",
-                "email": "susikreatfi@gmail.com",
-                "phone_number": "0822221111",
-                },
-            ]
-            console.log(result)
+            let result = await Ilustrator.getAll()
+            
+            // console.log("Result: ", result)
             setDataSource(result)
             setLoading(false)
         } catch (e) {
