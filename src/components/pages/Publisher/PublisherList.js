@@ -5,9 +5,8 @@ import Iconify from "../../reusable/Iconify";
 import { Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
-import moment from "moment"
-import { CSVLink } from "react-csv";
 import PublisherFormModal from './PublisherFormModal';
+import Publisher from 'models/PublisherModel';
 
 const PublisherList = () => {
 
@@ -35,7 +34,7 @@ const PublisherList = () => {
     },
     {
       id: '', label: '', filter: false,
-      render: ((value) => {
+      render: ((row) => {
         return (
           <>
             <Space size="small">
@@ -45,7 +44,7 @@ const PublisherList = () => {
                   style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
                     setOpenPublisherModal(true)
-                    setSelectedPublisher(value)
+                    setSelectedPublisher(row)
                     setIsNewRecord(false)
 
 
@@ -59,7 +58,7 @@ const PublisherList = () => {
                   type={'link'}
                   style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
-                    onDelete(value.id)
+                    onDelete(row.id)
                   }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
@@ -86,7 +85,7 @@ const PublisherList = () => {
 
   const deleteItem = async (id) => {
     try {
-      // await User.delete(id)
+      await Publisher.delete(id)
       message.success('Publisher deleted')
       initializeData();
     } catch (e) {
@@ -109,19 +108,7 @@ const PublisherList = () => {
   const initializeData = async () => {
     setLoading(true)
     try {
-      // let result = await User.getAll()
-      let result = [
-        {
-          "id": 1,
-          "name": "Beta Solutions",
-          "address": "321 Pine Rd, Ogdenville",
-        },
-        {
-          "id": 2,
-          "name": "Test Data",
-          "address": "654 ruko aniva",
-        }
-      ]
+      let result = await Publisher.getAll();
       console.log(result)
       setDataSource(result)
       setLoading(false)

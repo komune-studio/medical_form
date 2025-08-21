@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
+import Publisher from 'models/PublisherModel';
 
 PublisherFormModal.propTypes = {
     close: PropTypes.func,
@@ -25,10 +26,10 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
             let body = form.getFieldsValue()
             let msg = ''
             if (isNewRecord) {
-                // await UserModel.create(body)
+                await Publisher.create(body)
                 msg = "Successfully added new Publisher"
             } else {
-                // await UserModel.edit(publisherData?.id, body)
+                await Publisher.edit(publisherData?.id, body)
                 msg = "Successfully updated publisher"
             }
 
@@ -119,7 +120,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
                     name={"phone"}
                     rules={[
                         {
-                            pattern: /^[0-9]+$/g,
+                            pattern: /^[0-9-]+$/g,
                             message: "Phone Number can only include numbers"
                         }
                     ]}

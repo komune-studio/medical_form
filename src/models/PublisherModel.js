@@ -2,22 +2,22 @@ import ApiRequest from "../utils/ApiRequest";
 
 export default class Publisher {
   static getAll = async () => {
-    return await ApiRequest.set("v1/publishers", "GET");
+    return await ApiRequest.set("v1/publishers/getall", "GET");
   }
 
   static getById = async (id) => {
-    return await ApiRequest.set(`v1/publisher/${id}`, "GET");
+    return await ApiRequest.set(`v1/publishers/getbyid/${id}`, "GET");
   }
 
   static create = async (body) => {
-    return await ApiRequest.set("v1/publisher", "POST", body);
+    return await ApiRequest.set("v1/publishers/create", "POST", body);
   }
 
   static edit = async (id, body) => {
-    return await ApiRequest.set(`v1/publisher/${id}`, "PUT", body);
+    return await ApiRequest.set(`v1/publishers/update/${id}`, "PUT", body);
   }
 
-  static delete = async (id, body) => {
-    return await ApiRequest.set(`v1/publisher/${id}`, "DELETE", body);
+  static delete = async (id) => {
+    return await ApiRequest.set(`v1/publishers/${id}`, "DELETE");
   }
 }
