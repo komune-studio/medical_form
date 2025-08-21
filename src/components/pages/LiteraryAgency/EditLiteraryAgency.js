@@ -1,5 +1,6 @@
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Input, message } from "antd";
+import LiteraryAgencies from '../../../models/LiteraryAgenciesModel'
 import { CloseOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
@@ -16,16 +17,10 @@ export default function EditliteraryAgencyModal({ isOpen, close, literaryAgencyD
     const onSubmit = async (values) => {
         
         try {
-            // Still using Admin Model, need to be changed later
-            // let result2 = await AdminModel.edit(literaryAgencyData?.id, {
-            //     username: username,
-            // })
-            let body = {
+            let result = await LiteraryAgencies.edit(literaryAgencyData?.id, {
                 name: values.name,
-                email: values.email,
-                phone: values.phoneNumber,
-                website: values.website,
-            }
+            })
+
             // console.log("body: ", body)
             message.success('Successfully updated Literary Agency')
             handleClose(true)
@@ -96,7 +91,7 @@ export default function EditliteraryAgencyModal({ isOpen, close, literaryAgencyD
                 >
                     <Input />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                     label="Email"
                     name="email"
                     rules={[
@@ -139,7 +134,7 @@ export default function EditliteraryAgencyModal({ isOpen, close, literaryAgencyD
                     ]}
                 >
                     <Input />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item>
                     <div className={"d-flex flex-row justify-content-end"}>
                         <Button  variant="outline-danger" onClick={handleClose} style={{ marginRight: '5px' }}>

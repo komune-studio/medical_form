@@ -1,18 +1,16 @@
     import {
-    Button,
     Card,
     CardHeader,
     CardBody,
     FormGroup,
-    Form,
-    Input,
     InputGroupAddon,
     InputGroupText,
     InputGroup,
     Row,
     Col
 } from "reactstrap";
-
+import { Button, Form, Input, message, Space } from "antd";
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Admin from "../../models/AdminModel"
 import React, {useEffect, useState} from 'react'
 import {useHistory} from 'react-router-dom'
@@ -23,32 +21,13 @@ import swal from "../../components/reusable/CustomSweetAlert";
 
 const Login = () => {
     const history = useHistory()
-
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-
-    const handleSubmit = async () => {
+    const [form] = Form.useForm();
+    const onSubmit = async (values) => {
         try {
-
-            if (!username) {
-                return await swal.fire({
-                    title: 'Error',
-                    text: "Please fill in username",
-                    icon: 'error',
-                    confirmButtonText: 'Okay'
-                })
-            }
-
-            if (!password) {
-                return await swal.fire({
-                    title: 'Error',
-                    text: "Please fill in password",
-                    icon: 'error',
-                    confirmButtonText: 'Okay'
-                })
-            }
-
-            let result = await Admin.login(username, password)
+            let result = await Admin.login({
+                username: values.username, 
+                password: values.password,
+            })
 
             localStorage.super_token = result.token;
             localStorage.token = result.token;
@@ -83,68 +62,59 @@ const Login = () => {
         <>
             <Col lg="5" md="7">
                 <Card style={{background:Palette.BACKGROUND_BLACK, borderRadius:14}} >
-                    <CardBody  className="px-lg-5 py-lg-5">
+                    <CardBody  className="px-5 py-5">
                         <div className="text-center text-muted mb-4">
                             <img
                                 style={{
                                     width: "100%",
                                     objectFit: "contain"
                                 }}
-                                src={logo}/>
+                                src={logo}
+                            />
                         </div>
-                        <Form role="form">
-                            <FormGroup className="mb-3">
-                                <InputGroup className="input-group-alternative">
-                                    <InputGroupAddon addonType="prepend" style={{background:Palette.BACKGROUND_DARK_GRAY}}
-                                    >
-                                        <InputGroupText style={{background:Palette.BACKGROUND_DARK_GRAY}}
-                                        >
-                                            <i className="ni ni-email-83"/>
-                                        </InputGroupText>
-                                    </InputGroupAddon>
-                                    <Input
-                                        style={{background:Palette.BACKGROUND_DARK_GRAY}}
-                                        placeholder="Username"
-                                        type="text"
-                                        autoComplete="username"
-                                        onChange={(e) => {
-                                            setUsername(e.target.value)
-                                        }}
-                                        className="px-2"
-                                    />
-                                </InputGroup>
-                            </FormGroup>
-                            <FormGroup>
-                                <InputGroup className="input-group-alternative">
-                                    <InputGroupAddon addonType="prepend" style={{background:Palette.BACKGROUND_DARK_GRAY}}>
-                                        <InputGroupText style={{background:Palette.BACKGROUND_DARK_GRAY}}>
-                                            <i className="ni ni-lock-circle-open"/>
-                                        </InputGroupText>
-                                    </InputGroupAddon>
-                                    <Input
-                                        style={{background:Palette.BACKGROUND_DARK_GRAY}}
-                                        placeholder="Kata sandi"
-                                        type="password"
-                                        autoComplete="new-password"
-                                        onChange={(e) => {
-                                            setPassword(e.target.value)
-                                        }}
-                                        onKeyUp={(event) => {
-                                            if (event.key === "Enter") {
-                                                handleSubmit()
-                                            }
-                                        }}
-                                        className="px-2"
-                                    />
-                                </InputGroup>
-                            </FormGroup>
-                            <div className="text-center">
-                                <Button onClick={() => {
-                                    handleSubmit()
-                                }} className="mt-2" color="info" type="button">
-                                    Masuk
+                        <Form
+                            form={form}
+                            name="basic"
+                            layout={'vertical'}
+                            onFinish={onSubmit}
+                            autoComplete="off"
+                            validateTrigger= "onSubmit"
+                        >
+                            <Form.Item
+                                name="username"
+                                rules={[
+                                    {
+                                        required: true,
+                                    },
+                                ]}
+                            >
+                                <Space.Compact block>
+                                    <Input addonBefore={<UserOutlined />} placeholder="Username" />
+                                </Space.Compact>
+                            </Form.Item>
+                            <Form.Item
+                                name="password"
+                                rules={[
+                                    {
+                                        required: true,
+                                    },
+                                ]}
+                            >
+                                <Space.Compact block>
+                                    <Input.Password addonBefore={<LockOutlined />} placeholder="Password" />
+                                </Space.Compact>
+                            </Form.Item>
+                            <Form.Item style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                                <Button 
+                                    htmlType="submit" 
+                                    type="primary"
+                                    style={{
+                                        marginTop: '10px',
+                                    }}
+                                >
+                                    LOGIN
                                 </Button>
-                            </div>
+                            </Form.Item>
                         </Form>
                     </CardBody>
                 </Card>

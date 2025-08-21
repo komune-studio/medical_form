@@ -19,6 +19,7 @@ export default class Ilustrator {
     return await ApiRequest.set(`/v1/illustrators/update/${id}`, "PUT", body);
   }
 
+  // NOTE: No Illustrator delete due to database reason
   // static delete = async (id) => {
   //   return await ApiRequest.set(`v1/user/${id}`, "DELETE");
   // }

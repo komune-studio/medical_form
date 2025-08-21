@@ -1,7 +1,7 @@
 import {Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input} from 'antd';
 import React, {useState, useEffect} from 'react';
 import {Card, Row, CardBody, Container, Button} from "reactstrap";
-import Admin from '../../../models/AdminModel'
+import LiteraryAgencies from '../../../models/LiteraryAgenciesModel'
 import {Link, useHistory} from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import Palette from 'utils/Palette';
@@ -26,15 +26,15 @@ const LiteraryAgencyList = () => {
         {
             id: 'name', label: 'Name', filter: true,
         },
-        {
-            id: 'email', label: 'Email', filter: false,
-        },
-        {
-            id: 'phone', label: 'Phone No.', filter: false,
-        },
-        {
-            id: 'website', label: 'Website Link', filter: false,
-        },
+        // {
+        //     id: 'email', label: 'Email', filter: false,
+        // },
+        // {
+        //     id: 'phone', label: 'Phone No.', filter: false,
+        // },
+        // {
+        //     id: 'website', label: 'Website Link', filter: false,
+        // },
         {
             id: '', label: '', filter: false,
             render: ((value) => {
@@ -77,8 +77,8 @@ const LiteraryAgencyList = () => {
 
     const deleteItem = async (id) => {
         try {
-            await Admin.delete(id)
-            message.success('Admin telah dihapus')
+            await LiteraryAgencies.delete(id)
+            message.success('Literary Agency telah dihapus')
             initializeData();
         } catch (e) {
             message.error('There was error from server')
@@ -88,7 +88,7 @@ const LiteraryAgencyList = () => {
 
     const onDelete = (record) => {
         Modal.confirm({
-            title: "Apakah Anda yakin ingin menghapus akun admin ini?",
+            title: "Apakah Anda yakin ingin menghapus akun Literary Agency ini?",
             okText: "Yes",
             okType: "danger",
             onOk: () => {
@@ -100,24 +100,8 @@ const LiteraryAgencyList = () => {
     const initializeData = async () => {
         setLoading(true)
         try {
-            // let result = await Admin.getAll()
-            let result = [
-                {
-                "id": 1,
-                "name": "Budi & Co.",
-                "email": "budicompany@gmail.com",
-                "phone": "0811112222",
-                "website": "budi-and-co.com",
-                },
-                {
-                "id": 2,
-                "name": "Lorex",
-                "email": "lorexcenter@gmail.com",
-                "phone": "0211112222",
-                "website": "Rolex.com",
-                },
-            ]
-            console.log(result)
+            let result = await LiteraryAgencies.getAll()
+            console.log("result: ", result)
             setDataSource(result)
             setLoading(false)
         } catch (e) {
@@ -188,18 +172,3 @@ const LiteraryAgencyList = () => {
 }
 
 export default LiteraryAgencyList;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

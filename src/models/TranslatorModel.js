@@ -19,8 +19,8 @@ export default class Translator {
     return await ApiRequest.set(`/v1/translators/update/${id}`, "PUT", body);
   }
 
-  // static delete = async (id) => {
-  //   return await ApiRequest.set(`v1/user/${id}`, "DELETE");
-  // }
+  static delete = async (id) => {
+    return await ApiRequest.set(`v1/translators/${id}`, "DELETE");
+  }
 
 }

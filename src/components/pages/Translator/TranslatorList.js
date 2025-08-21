@@ -3,7 +3,6 @@ import HeaderNav from "components/Headers/HeaderNav.js";
 import React, {useState, useEffect} from 'react';
 import {Card, Row, CardBody, Container, Button} from "reactstrap";
 import Translator from '../../../models/TranslatorModel'
-import Admin from '../../../models/AdminModel'
 import {Link, useHistory} from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import Palette from 'utils/Palette';
@@ -82,8 +81,8 @@ const TranslatorList = () => {
 
     const deleteItem = async (id) => {
         try {
-            await Admin.delete(id)
-            message.success('Admin telah dihapus')
+            await Translator.delete(id)
+            message.success('Translator telah dihapus')
             initializeData();
         } catch (e) {
             message.error('There was error from server')
@@ -93,7 +92,7 @@ const TranslatorList = () => {
 
     const onDelete = (record) => {
         Modal.confirm({
-            title: "Apakah Anda yakin ingin menghapus akun Admin ini?",
+            title: "Apakah Anda yakin ingin menghapus akun translator ini?",
             okText: "Yes",
             okType: "danger",
             onOk: () => {

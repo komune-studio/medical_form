@@ -1,6 +1,7 @@
 import Modal from 'react-bootstrap/Modal';
 import { Button, Form, Input, message } from "antd";
 import { CloseOutlined } from '@ant-design/icons';
+import LiteraryAgencies from '../../../models/LiteraryAgenciesModel'
 import { useEffect, useState } from "react";
 import AdminModel from "../../../models/AdminModel";
 import PropTypes from "prop-types";
@@ -16,18 +17,10 @@ export default function CreateLiteraryAgencyModal({ isOpen, close }) {
     const [form] = Form.useForm();
     const onSubmit = async (values) => {
         try {
-            // Still using Admin Model, need to be changed later
-            // let result2 = await AdminModel.create({
-            //     password,
-            //     username: username,
-            // })
-            let body = {
+            let result = await LiteraryAgencies.create({
                 name: values.name,
-                email: values.email,
-                phone: values.phoneNumber,
-                website: values.website,
-            }
-            // console.log("Body's body: ", body)
+            })
+            // console.log("Result: ", result)
             message.success('Successfully added new Literary Agency')
             handleClose(true)
 
@@ -85,7 +78,7 @@ export default function CreateLiteraryAgencyModal({ isOpen, close }) {
                 >
                     <Input />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                     label="Email"
                     name="email"
                     rules={[
@@ -128,7 +121,7 @@ export default function CreateLiteraryAgencyModal({ isOpen, close }) {
                     ]}
                 >
                     <Input />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item>
                     <div className={"d-flex flex-row justify-content-end"}>
                         <Button  variant="outline-danger" onClick={handleClose} style={{ marginRight: '5px' }}>

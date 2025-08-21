@@ -3,7 +3,6 @@ import HeaderNav from "components/Headers/HeaderNav.js";
 import React, {useState, useEffect} from 'react';
 import {Card, Row, CardBody, Container, Button} from "reactstrap";
 import Ilustrator from '../../../models/IlustratorModel'
-import Admin from '../../../models/AdminModel'
 import {Link, useHistory} from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import Palette from 'utils/Palette';
@@ -52,9 +51,9 @@ const IlustratorList = () => {
                                     shape="circle"
                                     icon={<Iconify icon={"material-symbols:edit"}/>}
                                 >
-                                </AntButton>
+                                </AntButton>   
                             </Tooltip>
-                            <Tooltip title="Hapus">
+                            {/* <Tooltip title="Hapus">
                                 <AntButton
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}
@@ -65,8 +64,8 @@ const IlustratorList = () => {
                                     shape="circle"
                                     icon={<Iconify icon={"material-symbols:delete-outline"}/>}
                                 >
-                                </AntButton>
-                            </Tooltip>
+                                </AntButton> 
+                            </Tooltip> */}
                         </Space>
                     </>
                 )
@@ -74,27 +73,27 @@ const IlustratorList = () => {
         },
     ]
 
-    const deleteItem = async (id) => {
-        try {
-            await Admin.delete(id)
-            message.success('Admin telah dihapus')
-            initializeData();
-        } catch (e) {
-            message.error('There was error from server')
-            setLoading(true)
-        }
-    }
+    // const deleteItem = async (id) => {
+    //     try {
+    //         await Admin.delete(id)
+    //         message.success('Admin telah dihapus')
+    //         initializeData();
+    //     } catch (e) {
+    //         message.error('There was error from server')
+    //         setLoading(true)
+    //     }
+    // }
 
-    const onDelete = (record) => {
-        Modal.confirm({
-            title: "Apakah Anda yakin ingin menghapus akun admin ini?",
-            okText: "Yes",
-            okType: "danger",
-            onOk: () => {
-                deleteItem(record)
-            }
-        });
-    };
+    // const onDelete = (record) => {
+    //     Modal.confirm({
+    //         title: "Apakah Anda yakin ingin menghapus akun admin ini?",
+    //         okText: "Yes",
+    //         okType: "danger",
+    //         onOk: () => {
+    //             deleteItem(record)
+    //         }
+    //     });
+    // };
 
     const initializeData = async () => {
         setLoading(true)
