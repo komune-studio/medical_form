@@ -21,7 +21,7 @@ import { useLocation, Route, Switch, Redirect } from "react-router-dom";
 import { Container } from "reactstrap";
 // core components
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
-import Sidebar from "components/Sidebar/Sidebar.js";
+import Sidebar from "components/Navbars/Sidebar.js";
 
 import routes from "routes.js";
 import Palette from "utils/Palette";
