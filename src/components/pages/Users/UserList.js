@@ -2,7 +2,6 @@ import {Table, Image, Space, Button as AntButton, Tooltip, Modal, message, Input
 import HeaderNav from "components/Headers/HeaderNav.js";
 import React, {useState, useEffect} from 'react';
 import {Card, Row, CardBody, Container, Button} from "reactstrap";
-import User from '../../../models/UserModel'
 import {Link, useHistory} from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import {InputGroup, Form, Col,} from "react-bootstrap";
@@ -10,8 +9,7 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import UserFormModal from "./UserFormModal";
 import UserResetPasswordModal from "./UserResetPasswordModal";
-import moment from "moment"
-import {CSVLink} from "react-csv";
+import Admin from 'models/AdminModel';
 
 const UserList = () => {
 
@@ -22,6 +20,8 @@ const UserList = () => {
   const [openUserModal, setOpenUserModal] = useState(false)
   const [isNewRecord, setIsNewRecord] = useState(false)
   const [openUserResetModal, setOpenUserResetModal] = useState(false)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [userId, setUserId] = useState(null);
 
   const columns = [
     {
@@ -38,7 +38,8 @@ const UserList = () => {
     },
     {
       id: '', label: '', filter: false,
-      render: ((value) => {
+      render: ((row) => {
+        if(!isSuperAdmin && row.id != userId) return
         return (
           <>
             <Space size="small">
@@ -49,7 +50,7 @@ const UserList = () => {
                   onClick={() => {
                     setOpenUserResetModal(false)
                     setOpenUserModal(true)
-                    setSelectedUser(value)
+                    setSelectedUser(row)
                     setIsNewRecord(false)
 
 
@@ -63,7 +64,7 @@ const UserList = () => {
                   type={'link'}
                   style={{color: Palette.MAIN_THEME}}
                   onClick={() => {
-                    setSelectedUser(value)
+                    setSelectedUser(row)
                     setOpenUserResetModal(true)
                     setOpenUserModal(false)
                   }}
@@ -71,17 +72,21 @@ const UserList = () => {
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:lock"}/>}/>
               </Tooltip>
-              <Tooltip title="Delete">
-                <AntButton
-                  type={'link'}
-                  style={{color: Palette.MAIN_THEME}}
-                  onClick={() => {
-                    onDelete(value.id)
-                  }}
-                  className={"d-flex align-items-center justify-content-center"}
-                  shape="circle"
-                  icon={<Iconify icon={"material-symbols:delete-outline"}/>}/>
-              </Tooltip>
+              {isSuperAdmin && row.role != "SUPERADMIN" ? (
+                <Tooltip title="Delete">
+                  <AntButton
+                    type={'link'}
+                    style={{color: Palette.MAIN_THEME}}
+                    onClick={() => {
+                      onDelete(row.id)
+                    }}
+                    className={"d-flex align-items-center justify-content-center"}
+                    shape="circle"
+                    icon={<Iconify icon={"material-symbols:delete-outline"}/>}/>
+                </Tooltip>
+              ) : ( 
+                <></>
+              )}
             </Space>
           </>
         )
@@ -103,7 +108,7 @@ const UserList = () => {
 
   const deleteItem = async (id) => {
     try {
-      await User.delete(id)
+      await Admin.delete(id)
       message.success('User deleted')
       initializeData();
     } catch (e) {
@@ -126,7 +131,7 @@ const UserList = () => {
   const initializeData = async () => {
     setLoading(true)
     try {
-      let result = await User.getAll()
+      let result = await Admin.getAll()
       console.log(result)
       setDataSource(result)
       setLoading(false)
@@ -136,7 +141,13 @@ const UserList = () => {
   }
 
   useEffect(() => {
-    initializeData()
+    initializeData();
+
+    (async () => {
+      const result = await Admin.getSelf();
+      setIsSuperAdmin(result.role == "SUPERADMIN")
+      setUserId(result.id)
+    })()
   }, [])
 
   return (
@@ -150,13 +161,17 @@ const UserList = () => {
               <Col className='mb-3' md={6}>
                 <div style={{fontWeight: "bold", fontSize: "1.1em"}}>User</div>
               </Col>
-              <Col className='mb-3 text-right' md={6}>
-                <AntButton onClick={() => {
-                  setIsNewRecord(true)
-                  setOpenUserModal(true)
-                  setOpenUserResetModal(false)
-                }} size={'middle'} type={'primary'}>Tambah User</AntButton>
-              </Col>
+              {isSuperAdmin ? (
+                <Col className='mb-3 text-right' md={6}>
+                  <AntButton onClick={() => {
+                    setIsNewRecord(true)
+                    setOpenUserModal(true)
+                    setOpenUserResetModal(false)
+                  }} size={'middle'} type={'primary'}>Tambah User</AntButton>
+                </Col>
+              ) : (
+                <></>
+              )}
             </Row>
             <Row>
 
@@ -175,6 +190,7 @@ const UserList = () => {
       <UserResetPasswordModal
         isOpen={openUserResetModal}
         userData={selectedUser}
+        isSuperAdmin={isSuperAdmin}
         onClose={async (refresh) => {
           if (refresh) {
             await initializeData()
@@ -188,6 +204,7 @@ const UserList = () => {
         isOpen={openUserModal}
         isNewRecord={isNewRecord}
         userData={selectedUser}
+        isSuperAdmin={isSuperAdmin}
         close={async (refresh) => {
           if (refresh) {
             await initializeData()

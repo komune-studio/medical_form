@@ -2,34 +2,36 @@ import Modal from "react-bootstrap/Modal";
 import LoadingButton from "../../reusable/LoadingButton";
 import { useEffect, useState } from "react";
 import { message, Form, Button, Input } from "antd";
-import Admin from "../../../models/AdminModel";
 import swal from "../../reusable/CustomSweetAlert";
 import User from "../../../models/UserModel";
 import PropTypes from "prop-types";
+import Admin from "models/AdminModel";
 
 UserResetPasswordModal.propTypes = {
     onClose: PropTypes.func,
     isOpen: PropTypes.bool,
-    userData: PropTypes.object
+    userData: PropTypes.object,
+    isSuperAdmin: PropTypes.bool
 };
-export default function UserResetPasswordModal({ isOpen, onClose, userData }) {
+export default function UserResetPasswordModal({ isOpen, onClose, userData, isSuperAdmin }) {
     const [form] = Form.useForm();
 
     const onSubmit = async () => {
 
         try {
             let body = {
-                username: userData?.username,
-                new_password: form.getFieldValue("password"),
+                newPassword: form.getFieldValue("new_password"),
             }
-            // let result2 = await User.edit_password(userData?.id, body)
-            console.log(body);
-            if (true) {
-                message.success('Successfully reset password')
+            if (isSuperAdmin) {
+                await Admin.resetPassword(userData.id, body)
             } else {
-                message.error('Unable to reset password')
+                Object.assign(body, {
+                    currentPassword: form.getFieldValue("current_password"),
+                })
+                await Admin.resetPasswordSelf(body);
             }
-            onClose(true)
+            message.success('Successfully reset password')
+            handleClose(true)
         } catch (e) {
             console.log(e)
             let errorMessage = "An Error Occured"
@@ -41,6 +43,11 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData }) {
             })
         }
 
+    }
+
+    const handleClose = (refresh) => {
+        onClose(refresh);
+        form.resetFields();
     }
 
     useEffect(() => {
@@ -65,9 +72,22 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData }) {
                         validateTrigger="onSubmit"
                         autoComplete="off"
                     >
+                        {!isSuperAdmin ? (
+                            <Form.Item
+                                label={"Current Password"}
+                                name={"current_password"}
+                                rules={[{
+                                    required: true,
+                                }]}
+                            >
+                                <Input.Password variant='filled' />
+                            </Form.Item>
+                        ) : (
+                            <></>
+                        )}
                         <Form.Item
-                            label={"Password"}
-                            name={"password"}
+                            label={"New Password"}
+                            name={"new_password"}
                             rules={[{
                                 required: true,
                             }]}
@@ -84,9 +104,10 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData }) {
                                 },
                                 {
                                     validator: async (_, value) => {
-                                        if (!form.getFieldValue("password")) return Promise.reject("Please enter Password");
+                                        if (!isSuperAdmin && !form.getFieldValue("current_password")) return Promise.reject("Please enter Current Password");
+                                        if (!form.getFieldValue("new_password")) return Promise.reject("Please enter your New Password");
                                         if (!value) return Promise.reject("Please confirm your password");
-                                        if (value !== form.getFieldValue("password")) {
+                                        if (value !== form.getFieldValue("new_password")) {
                                             return Promise.reject("Password confirmation does not match")
                                         }
                                     }
@@ -99,7 +120,7 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData }) {
                         <div className={"d-flex flex-row justify-content-end"}>
                             <Form.Item>
                                 <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
-                                    onClick={() => onClose()} style={{ marginRight: '5px' }}>
+                                    onClick={() => handleClose()} style={{ marginRight: '5px' }}>
                                     Cancel
                                 </Button>
                             </Form.Item>

@@ -5,27 +5,20 @@ import UserModel from "../../../models/UserModel";
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
-import moment from "moment/moment";
-import UploadModel from "../../../models/UploadModel"
+import Admin from 'models/AdminModel';
+import { useHistory } from "react-router-dom";
 
 UserFormModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
     isNewRecord: PropTypes.bool,
     userData: PropTypes.object,
+    isSuperAdmin: PropTypes.bool,
 };
 
 
-export default function UserFormModal({ isOpen, close, isNewRecord, userData }) {
-    const [username, setUsername] = useState(null)
-    const [password, setPassword] = useState(null)
-    const [email, setEmail] = useState(null)
-    const [birthDate, setBirthDate] = useState(null)
-    const [fullName, setFullName] = useState("")
-    const [gender, setGender] = useState()
-    const [phoneNumber, setPhoneNumber] = useState(null)
-    const [confirmPassword, setConfirmPassword] = useState("")
-    const [avatarImage, setAvatarImage] = useState(null)
+export default function UserFormModal({ isOpen, close, isNewRecord, userData, isSuperAdmin }) {
+    const history = useHistory()
     const [form] = Form.useForm()
 
     const userRoles = [
@@ -36,36 +29,25 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData }) 
     const [loadingUpload, setLoadingUpload] = useState(false)
 
 
-    const handleUpload = async (file) => {
-        try {
-            setLoadingUpload(true)
-            let result = await UploadModel.uploadPicutre(file.file?.originFileObj)
-
-            if (result?.location) {
-                setAvatarImage(result?.location)
-                message.success('Successfully upload user')
-            }
-            setLoadingUpload(false)
-        } catch (e) {
-            console.log('isi e', e)
-            message.error("Failed to upload user")
-            setLoadingUpload(false)
-        }
-    }
     const onSubmit = async () => {
         try {
             let result;
             let body = form.getFieldsValue();
             let msg = ''
-                console.log(body)
+            console.log(body)
             if (isNewRecord) {
-                // Object.assign(body, {
-                //     password: password
-                // })
-                // await UserModel.create(body)
+                if(body.role == "ADMIN") {
+                    await Admin.createAdmin(body);
+                } else {
+                    await Admin.createSuperAdmin(body);
+                }
                 msg = "Successfully created User"
             } else {
-                // await UserModel.edit(userData?.id, body)
+                if (isSuperAdmin) {
+                    await Admin.edit(userData?.id, body)
+                } else {
+                    await Admin.editSelf(body);
+                }
                 msg = "Successfully updated User"
             }
 
@@ -143,17 +125,17 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData }) 
                 >
                     <Input variant='filled' />
                 </Form.Item>
-                <Form.Item
-                    label={"Role"}
-                    name={"role"}
-                    rules={[{
-                        required: true,
-                    }]}
-                >
-                    <Select variant='filled' options={userRoles} />
-                </Form.Item>
                 {isNewRecord ? (
                     <>
+                        <Form.Item
+                            label={"Role"}
+                            name={"role"}
+                            rules={[{
+                                required: true,
+                            }]}
+                        >
+                            <Select variant='filled' options={userRoles} />
+                        </Form.Item>
                         <Form.Item
                             label={"Password"}
                             name={"password"}
@@ -173,9 +155,9 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData }) 
                                 },
                                 {
                                     validator: async (_, value) => {
-                                        if(!form.getFieldValue("password")) return Promise.reject("Please enter Password");
-                                        if(!value) return Promise.reject("Please confirm your password");
-                                        if(value !== form.getFieldValue("password")) {
+                                        if (!form.getFieldValue("password")) return Promise.reject("Please enter Password");
+                                        if (!value) return Promise.reject("Please confirm your password");
+                                        if (value !== form.getFieldValue("password")) {
                                             return Promise.reject("Password confirmation does not match")
                                         }
                                     }
