@@ -32,20 +32,26 @@ import {
 
 const AdminNavbar = (props) => {
   const history = useHistory();
-  const adminName = localStorage.getItem('admin_name') || null
+  const adminName = localStorage.getItem('admin_name') || null;
 
+  const logout = () => {
+    localStorage.removeItem("super_token")
+    localStorage.removeItem("username")
+    localStorage.removeItem("token")
+    localStorage.removeItem("role")
+
+    sessionStorage.removeItem("super_token")
+    sessionStorage.removeItem("username")
+    sessionStorage.removeItem("role")
+    sessionStorage.removeItem("token")
+    
+    history.push('/login')
+    window.location.reload()
+  }
   return (
     <>
-      <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
-        <Container fluid>
-          <Link
-            className="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
-            to="/"
-          >
-
-          </Link>
-
-          <Nav className="align-items-center d-none d-md-flex" navbar>
+      <Navbar className="navbar-top navbar-dark justify-content-end" expand="md" id="navbar-main">
+          <Nav className="align-items-center d-none d-md-flex mx-3" navbar>
             <UncontrolledDropdown nav>
               <DropdownToggle className="pr-0" nav>
                 <Media className="align-items-center">
@@ -58,43 +64,13 @@ const AdminNavbar = (props) => {
                 </Media>
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-arrow" right>
-                <DropdownItem className="noti-title" header tag="div">
-                  <h6 className="text-overflow m-0" style={{ color: "black" }}>Welcome!</h6>
-                </DropdownItem>
-                {/* <DropdownItem to="/admin/user-profile" tag={Link}>
-                  <i className="ni ni-settings-gear-65" />
-                  <span>Settings</span>
-                </DropdownItem>
-                <DropdownItem to="/admin/user-profile" tag={Link}>
-                  <i className="ni ni-calendar-grid-58" />
-                  <span>Activity</span>
-                </DropdownItem>
-                <DropdownItem to="/admin/user-profile" tag={Link}>
-                  <i className="ni ni-support-16" />
-                  <span>Support</span>
-                </DropdownItem>
-                <DropdownItem divider /> */}
-                {/* <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}> */}
-                <DropdownItem href="#pablo" onClick={() => {
-                                    localStorage.removeItem("super_token")
-                                    localStorage.removeItem("username")
-                                    localStorage.removeItem("token")
-                                    localStorage.removeItem("role")
-
-                                    sessionStorage.removeItem("super_token")
-                                    sessionStorage.removeItem("username")
-                                    sessionStorage.removeItem("role")
-                                    sessionStorage.removeItem("token")
-                                    history.push('/login')
-                                    window.location.reload()
-                                }}>
+                <DropdownItem href="#pablo" onClick={logout}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>
-        </Container>
       </Navbar>
     </>
   );
