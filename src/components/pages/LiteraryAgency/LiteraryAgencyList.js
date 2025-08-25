@@ -41,7 +41,7 @@ const LiteraryAgencyList = () => {
                 return (
                     <>
                         <Space size="small">
-                            <Tooltip title="Detail">
+                            <Tooltip title="Edit">
                                 <AntButton
                                     onClick={() => {
                                         setselectedLiteraryAgency(value)
@@ -56,7 +56,7 @@ const LiteraryAgencyList = () => {
                                     </AntButton>
 
                             </Tooltip>
-                            <Tooltip title="Hapus">
+                            <Tooltip title="Delete">
                                 <AntButton
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}

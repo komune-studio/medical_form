@@ -93,7 +93,7 @@ const BookList = () => {
                     icon={<Iconify icon={"material-symbols:edit"} />} />
                 </Link>
               </Tooltip>
-              <Tooltip title="Hapus">
+              <Tooltip title="Delete">
                 <AntButton
                   type={'link'}
                   style={{ color: Palette.MAIN_THEME }}

@@ -39,7 +39,7 @@ const IlustratorList = () => {
                 return (
                     <>
                         <Space size="small">
-                            <Tooltip title="Detail">
+                            <Tooltip title="Edit">
                                 <AntButton
                                     onClick={() => {
                                         setSelectedIlustrator(value)
@@ -53,7 +53,7 @@ const IlustratorList = () => {
                                 >
                                 </AntButton>   
                             </Tooltip>
-                            {/* <Tooltip title="Hapus">
+                            <Tooltip title="Delete">
                                 <AntButton
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}
@@ -65,7 +65,7 @@ const IlustratorList = () => {
                                     icon={<Iconify icon={"material-symbols:delete-outline"}/>}
                                 >
                                 </AntButton> 
-                            </Tooltip> */}
+                            </Tooltip>
                         </Space>
                     </>
                 )
@@ -73,27 +73,27 @@ const IlustratorList = () => {
         },
     ]
 
-    // const deleteItem = async (id) => {
-    //     try {
-    //         await Admin.delete(id)
-    //         message.success('Admin telah dihapus')
-    //         initializeData();
-    //     } catch (e) {
-    //         message.error('There was error from server')
-    //         setLoading(true)
-    //     }
-    // }
+    const deleteItem = async (id) => {
+        try {
+            await Ilustrator.delete(id);
+            message.success('Admin telah dihapus')
+            initializeData();
+        } catch (e) {
+            message.error('There was error from server')
+            setLoading(true)
+        }
+    }
 
-    // const onDelete = (record) => {
-    //     Modal.confirm({
-    //         title: "Apakah Anda yakin ingin menghapus akun admin ini?",
-    //         okText: "Yes",
-    //         okType: "danger",
-    //         onOk: () => {
-    //             deleteItem(record)
-    //         }
-    //     });
-    // };
+    const onDelete = (record) => {
+        Modal.confirm({
+            title: "Are you sure you want to delete this illustrator data?",
+            okText: "Yes",
+            okType: "danger",
+            onOk: () => {
+                deleteItem(record)
+            }
+        });
+    };
 
     const initializeData = async () => {
         setLoading(true)

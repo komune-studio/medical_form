@@ -43,7 +43,7 @@ const TranslatorList = () => {
                 return (
                     <>
                         <Space size="small">
-                            <Tooltip title="Detail">
+                            <Tooltip title="Edit">
                                 <AntButton
                                     onClick={() => {
                                         setselectedTranslator(value)
@@ -58,7 +58,7 @@ const TranslatorList = () => {
                                     </AntButton>
 
                             </Tooltip>
-                            <Tooltip title="Hapus">
+                            <Tooltip title="Delete">
                                 <AntButton
                                     type={'link'}
                                     style={{color: Palette.MAIN_THEME}}
