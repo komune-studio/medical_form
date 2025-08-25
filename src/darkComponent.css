@@ -64,7 +64,7 @@ input.form-control::placeholder, textarea.form-control::placeholder {
 }
 
 .ant-btn-primary {
-    background: #ef6024 !important;
+    background: #bb3b3a !important;
     border: none;
 }
 
@@ -83,7 +83,7 @@ input.form-control::placeholder, textarea.form-control::placeholder {
 }
 
 .ant-switch-handle::before {
-    background: #ef6024 !important;
+    background: #bb3b3a !important;
     top: -6px !important;
     left: -5px !important;
     right: -3px !important;
@@ -96,7 +96,7 @@ input.form-control::placeholder, textarea.form-control::placeholder {
 }
 
 .modal-backdrop {
-    background-color: rgb(221 123 46) !important;
+    background-color: rgba(187, 58, 58, 0.5) !important;
 }
 
 .ant-modal-content {

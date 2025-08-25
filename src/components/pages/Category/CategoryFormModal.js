@@ -81,7 +81,7 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
         backdrop="static"
         keyboard={false}
     >
-        <Modal.Header>
+        <Modal.Header style={{ paddingBottom: "0" }}>
             <div className={'d-flex w-100 justify-content-between'}>
                 <Modal.Title>{isNewRecord ? 'Add Category' : `Update Category`}</Modal.Title>
                 <Button onClick={() => {
@@ -90,7 +90,7 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
                     icon={<CloseOutlined />} />
             </div>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ paddingTop: "0" }}>
             <Form
                 layout='vertical'
                 form={form}

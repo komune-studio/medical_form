@@ -51,7 +51,7 @@ export default function CreateTranslatorModal({ isOpen, close }) {
         backdrop="static"
         keyboard={false}
     >
-        <Modal.Header>
+        <Modal.Header style={{ paddingBottom: "0" }}>
             <Modal.Title>Create Translator</Modal.Title>
             <Button 
                 onClick={handleClose} 
@@ -59,7 +59,7 @@ export default function CreateTranslatorModal({ isOpen, close }) {
                 icon={<CloseOutlined />} 
             />
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ paddingTop: "0" }}>
             <Form
                 form={form}
                 name="basic"

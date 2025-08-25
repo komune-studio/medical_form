@@ -60,7 +60,7 @@ export default function EditliteraryAgencyModal({ isOpen, close, literaryAgencyD
         backdrop="static"
         keyboard={false}
     >
-        <Modal.Header>
+        <Modal.Header style={{ paddingBottom: "0" }}>
             <Modal.Title>Update Literary Agency</Modal.Title>
             <Button 
                 onClick={() => {
@@ -70,7 +70,7 @@ export default function EditliteraryAgencyModal({ isOpen, close, literaryAgencyD
                 icon={<CloseOutlined />} 
             />
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ paddingTop: "0" }}>
             <Form
                 form={form}
                 name="basic"

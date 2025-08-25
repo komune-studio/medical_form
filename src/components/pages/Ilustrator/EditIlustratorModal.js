@@ -60,7 +60,7 @@ export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
         backdrop="static"
         keyboard={false}
     >
-        <Modal.Header>
+        <Modal.Header style={{ paddingBottom: "0" }}>
             <Modal.Title>Perbarui Nama</Modal.Title>
             <Button 
                 onClick={() => {
@@ -70,7 +70,7 @@ export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
                 icon={<CloseOutlined />} 
             />
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ paddingTop: "0" }}>
         <Form
             form={form}
             name="basic"

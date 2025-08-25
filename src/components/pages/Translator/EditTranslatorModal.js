@@ -71,7 +71,7 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
         backdrop="static"
         keyboard={false}
     >
-        <Modal.Header>
+        <Modal.Header style={{ paddingBottom: "0" }}>
             <Modal.Title>Update Translator</Modal.Title>
             <Button 
                 onClick={() => {
@@ -81,7 +81,7 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
                 icon={<CloseOutlined />} 
             />
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ paddingTop: "0" }}>
                 <Form
                     form={form}
                     name="basic"

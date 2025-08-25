@@ -83,7 +83,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
         backdrop="static"
         keyboard={false}
     >
-        <Modal.Header>
+        <Modal.Header style={{ paddingBottom: "0" }}>
             <div className={'d-flex w-100 justify-content-between'}>
                 <Modal.Title>{isNewRecord ? 'Create Publisher' : `Update Publisher`}</Modal.Title>
                 <Button onClick={() => {
@@ -92,7 +92,7 @@ export default function PublisherFormModal({ isOpen, close, isNewRecord, publish
                     icon={<CloseOutlined />} />
             </div>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ paddingTop: "0" }}>
             <Form
                 layout='vertical'
                 form={form}
