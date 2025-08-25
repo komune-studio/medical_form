@@ -167,7 +167,7 @@ const UserList = () => {
                     setIsNewRecord(true)
                     setOpenUserModal(true)
                     setOpenUserResetModal(false)
-                  }} size={'middle'} type={'primary'}>Tambah User</AntButton>
+                  }} size={'middle'} type={'primary'}>Add User</AntButton>
                 </Col>
               ) : (
                 <></>

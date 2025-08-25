@@ -15,7 +15,7 @@ import Book from 'models/BookModel';
 import BookCategory from 'models/BookCategoryModel';
 import Upload from 'models/UploadModel';
 
-const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp", "image/gif"]
+const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
 export default function BookFormPage({
   bookData,
@@ -24,6 +24,7 @@ export default function BookFormPage({
   const history = useHistory();
 
   const [loading, setLoading] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
   const [formDisabled, setFormDisabled] = useState(false);
   const [initialBookCategories, setInitialBookCategories] = useState([]);
@@ -33,7 +34,8 @@ export default function BookFormPage({
   const [ilustrators, setIlustrators] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreviewURL, setImagePreviewURL] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   const getPublishersData = async () => {
     try {
@@ -90,43 +92,50 @@ export default function BookFormPage({
     setLoading(false);
   }
 
-  const handleUpload = async ({ fileList }) => {
-    if (fileList.length > 0) {
-      const file = fileList[fileList.length - 1].originFileObj;
-      if (file) {
-        try {
-          let result = await Upload.uploadPicutre(file);
-          console.log(result)
+  const uploadImage = async () => {
+    try {
+      let result = await Upload.uploadPicutre(imageFile);
+      console.log(result)
 
-          if (result?.location) {
-            setImagePreview(result?.location);
-            form.setFieldValue("image_cover", result?.location);
-            message.success("Image uploaded successfully");
-          }
-        } catch (e) {
-          console.log("isi e", e);
-          message.error("Failed to upload image");
-        }
-      }
-    } else {
-      setImagePreview(null);
+      form.setFieldValue("image_cover", result?.location);
+      setImagePreviewURL(result?.location)
+      message.success("Image uploaded successfully");
+    } catch (e) {
+      console.log("isi e", e);
+      message.error("Failed to upload image");
     }
   }
 
-  const onImageBeforeUpload = (file) => {
-    const isJpgOrPng = allowedImageType.includes(file.type);
-    if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!');
+  const onUploadChange = ({ file }) => {
+    const isImage = allowedImageType.includes(file.type);
+    if (!isImage) {
+      message.error("File must be image type " + 
+        allowedImageType.map((type) => type.slice(6).toUpperCase()).join(", "))
       return Upload.LIST_IGNORE;
     }
-    return false;
+    const lessThan5MB = file.size / 1024 / 1024 < 5;
+    if (!lessThan5MB) {
+      message.error("Image must be smaller than 5MB.")
+      return Upload.LIST_IGNORE;
+    }
+
+    setImageFile(file);
+    const url = URL.createObjectURL(file);
+    setImagePreviewURL(url);
   }
 
   const onSubmit = async () => {
+    setLoadingSubmit(true);
     try {
       let result;
-      let body = form.getFieldsValue()
+      let body;
+
+      if (imageFile) {
+        await uploadImage();
+      }
+      body = form.getFieldsValue()
       console.log(body)
+
       let msg = 'Successfully created Book'
       if (!bookData) {
         result = await Book.create(body);
@@ -135,6 +144,7 @@ export default function BookFormPage({
       }
 
       let bookCategoryUpdatePromises = [];
+      if (!body.categories) body.categories = []
       for (let bcId of body.categories) {
         if (initialBookCategories.length > 0 && initialBookCategories.includes(bcId)) continue;
         bookCategoryUpdatePromises.push(new Promise((resolve, reject) => {
@@ -174,6 +184,7 @@ export default function BookFormPage({
         confirmButtonText: 'Okay'
       })
     }
+    setLoadingSubmit(true);
   }
 
   useEffect(() => {
@@ -201,7 +212,7 @@ export default function BookFormPage({
       if (bookData.image_cover) {
         console.log(bookData.image_cover)
         form.setFieldValue("image_cover", bookData.image_cover);
-        setImagePreview(bookData.image_cover);
+        setImagePreviewURL(bookData.image_cover);
       }
     }
     if (disabled) {
@@ -315,7 +326,7 @@ export default function BookFormPage({
 
                         {!formDisabled ? (
                           <div className={"d-flex flex-row"}>
-                            <Button size="sm" type='primary' variant="primary" htmlType='submit'>
+                            <Button size="sm" type='primary' variant="primary" htmlType='submit' loading={loadingSubmit}>
                               {!bookData ? "Add Book" : "Save Book"}
                             </Button>
                           </div>
@@ -333,18 +344,32 @@ export default function BookFormPage({
                             listType="picture"
                             className="avatar-uploader"
                             showUploadList={false}
-                            onChange={handleUpload}
-                            beforeUpload={onImageBeforeUpload}
+                            multiple={false}
+                            accept={allowedImageType.join(",")}
+                            onChange={onUploadChange}
+                            beforeUpload={() => false}
                           >
                             <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px", width: "100%", ...(formDisabled && { cursor: "not-allowed" }) }} type='button'>
-                              {imagePreview ? (
-                                <img src={imagePreview} style={{ width: "100%", height: "auto" }} />
-                              ) : (
-                                <Flex vertical align='center'>
-                                  <Iconify icon={"mdi:tray-upload"} style={{ fontSize: "48px" }} />
-                                  Click or drag here to upload file.
-                                </Flex>
-                              )}
+                              <Flex vertical align='center'>
+                                {imagePreviewURL ? (
+                                  <>
+                                    <img src={imagePreviewURL} style={{ width: "100%", height: "auto" }} />
+                                    <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block", marginTop: "12px" }}>
+                                      Max image size 5MB.
+                                    </Typography.Text>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Iconify icon={"mdi:tray-upload"} style={{ fontSize: "48px" }} />
+                                    <Typography.Text style={{ display: "inline-block", marginTop: "8px" }}>
+                                      Click or drag here to upload image. <br />
+                                      <Typography.Text type='secondary' style={{ fontSize: "12px", display: "inline-block", marginTop: "8px" }}>
+                                        Max image size 5MB.
+                                      </Typography.Text>
+                                    </Typography.Text>
+                                  </>
+                                )}
+                              </Flex>
                             </button>
                           </AntUpload.Dragger>
                         </Form.Item>
