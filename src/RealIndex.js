@@ -48,7 +48,7 @@ export default function (props) {
                 cssVar: true,
                 algorithm: theme.darkAlgorithm,
                 token: {
-                    colorPrimary: Palette.CATALYST_PINK,
+                    colorPrimary: Palette.MAIN_THEME,
                     fontFamily: 'Open Sans, sans-serif',
                     colorBgContainer: "#282828",
                     zIndexPopupBase: 1073 // Z-Index modal react-bootstrap = 1072

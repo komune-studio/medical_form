@@ -56,48 +56,50 @@ import {
 import Iconify from "../reusable/Iconify";
 import Palette from "../../utils/Palette";
 
+const SIDEBAR_COLOR = Palette.MAIN_THEME;
+
 const SIDEBAR = [
     {
         path: "/users",
         name: "User",
         icon: "mdi:user",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
     {
         path: "/publishers",
         name: "Publisher",
         icon: "mdi:public",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
     {
         path: "/books",
         name: "Book",
         icon: "mdi:book",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
     {
         path: "/categories",
         name: "Category",
         icon: "mdi:category",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
     {
         path: "/translator",
         name: "Translator",
         icon: "ic:round-translate",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
     {
         path: "/ilustrator",
         name: "Ilustrator",
         icon: "fluent:draw-image-20-filled",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
     {
         path: "/literaryAgency",
         name: "Literary Agency",
         icon: "famicons:people",
-        color: Palette.BARCODE_ORANGE
+        color: SIDEBAR_COLOR
     },
 ]
 
@@ -123,20 +125,16 @@ const Sidebar = (props) => {
             let tint = Palette.INACTIVE_GRAY
 
             if(activeRoute(prop.path)){
-                tint = Palette.BARCODE_ORANGE
+                tint = SIDEBAR_COLOR
             }
             return (
                 <NavItem
-                    // style={{
-                    //   borderLeft: `15px solid ${Palette.CATALYST_BLUE}`
-                    // }}
                     key={key}>
                     <NavLink
                         to={prop.path}
                         tag={NavLinkRRD}
                         onClick={closeCollapse}
-                        color={prop.color}
-                    // className={"active"}
+                    //  className={"active"}
                     >
                         <Iconify
                             style={{

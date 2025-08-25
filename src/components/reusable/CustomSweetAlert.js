@@ -5,7 +5,7 @@ const swal = {
     fire: (options) => {
         return sweetalert.fire({
             ...options,
-            confirmButtonColor: Palette.BARCODE_ORANGE,
+            confirmButtonColor: Palette.MAIN_THEME,
             customClass: {
                 container: 'swal-fonts',
                 ...options.customClass,
@@ -17,7 +17,7 @@ const swal = {
             title: 'Error',
             icon: 'error',
             confirmButtonText: 'Okay',
-            confirmButtonColor: Palette.BARCODE_ORANGE,
+            confirmButtonColor: Palette.MAIN_THEME,
             customClass: {
                 container: 'swal-fonts',
                 ...options.customClass,
