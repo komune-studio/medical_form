@@ -52,7 +52,7 @@ export default function CreateTranslatorModal({ isOpen, close }) {
         keyboard={false}
     >
         <Modal.Header style={{ paddingBottom: "0" }}>
-            <Modal.Title>Create Translator</Modal.Title>
+            <Modal.Title>Add Translator</Modal.Title>
             <Button 
                 onClick={handleClose} 
                 style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"

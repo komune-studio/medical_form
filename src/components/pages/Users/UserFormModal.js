@@ -103,7 +103,7 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData, is
         <Modal.Header style={{ paddingBottom: "0" }}>
             <div className={'d-flex w-100 justify-content-between'}>
                 {/* <Modal.Title>{isNewRecord ? 'Create User' : `Update User`}</Modal.Title> */}
-                <Modal.Title>Create User</Modal.Title>
+                <Modal.Title>Add User</Modal.Title>
                 <Button onClick={() => {
                     close()
                 }} style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"

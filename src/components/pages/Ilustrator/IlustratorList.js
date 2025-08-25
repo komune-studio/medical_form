@@ -76,7 +76,7 @@ const IlustratorList = () => {
     const deleteItem = async (id) => {
         try {
             await Ilustrator.delete(id);
-            message.success('Admin telah dihapus')
+            message.success('Illustrator deleted')
             initializeData();
         } catch (e) {
             message.error('There was error from server')

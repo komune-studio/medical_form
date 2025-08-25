@@ -61,7 +61,7 @@ export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
         keyboard={false}
     >
         <Modal.Header style={{ paddingBottom: "0" }}>
-            <Modal.Title>Perbarui Nama</Modal.Title>
+            <Modal.Title>Update Illustrator</Modal.Title>
             <Button 
                 onClick={() => {
                     close()

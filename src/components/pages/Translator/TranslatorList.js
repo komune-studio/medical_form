@@ -82,7 +82,7 @@ const TranslatorList = () => {
     const deleteItem = async (id) => {
         try {
             await Translator.delete(id)
-            message.success('Translator telah dihapus')
+            message.success('Translator deleted')
             initializeData();
         } catch (e) {
             message.error('There was error from server')
@@ -92,7 +92,7 @@ const TranslatorList = () => {
 
     const onDelete = (record) => {
         Modal.confirm({
-            title: "Apakah Anda yakin ingin menghapus akun translator ini?",
+            title: "Are you sure you want to delete this translator data?",
             okText: "Yes",
             okType: "danger",
             onOk: () => {

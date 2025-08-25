@@ -240,7 +240,7 @@ export default function BookFormPage({
             </Row>
             <Row>
               <Col className='mb-3' md={12} style={{ marginTop: "40px" }}>
-                <Typography.Title level={3}>{!bookData ? "Create" : "Edit"} Book</Typography.Title>
+                <Typography.Title level={3}>{!bookData ? "Add" : "Update"} Book</Typography.Title>
               </Col>
             </Row>
             <Row>

@@ -50,7 +50,7 @@ export default function CreateLiteraryAgencyModal({ isOpen, close }) {
         keyboard={false}
     >
         <Modal.Header style={{ paddingBottom: "0" }}>
-            <Modal.Title>Create Literary Agency</Modal.Title>
+            <Modal.Title>Add Literary Agency</Modal.Title>
             <Button 
                 onClick={handleClose} 
                 style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"
