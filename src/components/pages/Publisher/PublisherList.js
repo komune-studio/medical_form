@@ -159,7 +159,7 @@ const PublisherList = () => {
 
             <Row>
               <Col className='mb-3' md={6}>
-                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Publisher</div>
+                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Publishers</div>
               </Col>
               <Col className='mb-3 text-right' md={6}>
                 <Link to="/publishers/create">

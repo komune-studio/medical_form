@@ -29,6 +29,7 @@ import CategoryList from "components/pages/Category/CategoryList";
 import BookDetails from "components/pages/Book/BookDetails";
 import PublisherCreate from "components/pages/Publisher/PublisherCreate";
 import PublisherEdit from "components/pages/Publisher/PublisherEdit";
+import AuthorList from "components/pages/Author/AuthorList";
 
 var routes = [
     {
@@ -39,19 +40,19 @@ var routes = [
     },
     {
         path: "/publishers/create",
-        name: "Publisher",
+        name: "Publisher Create",
         component: PublisherCreate,
         layout: "/admin",
     },
     {
         path: "/publishers/:id/edit",
-        name: "Publisher",
+        name: "Publisher Edit",
         component: PublisherEdit,
         layout: "/admin",
     },
     {
         path: "/publishers",
-        name: "Publisher",
+        name: "Publishers",
         component: PublisherList,
         layout: "/admin",
     },
@@ -63,43 +64,43 @@ var routes = [
     },
     {
         path: "/books/:id/edit",
-        name: "Book",
+        name: "Book Edit",
         component: BookEdit,
         layout: "/admin",
     },
     {
         path: "/books/:id",
-        name: "Book",
+        name: "Book Details",
         component: BookDetails,
         layout: "/admin",
     },
     {
         path: "/books",
-        name: "Book",
+        name: "Books",
         component: BookList,
         layout: "/admin",
     },
     {
         path: "/categories",
-        name: "Category",
+        name: "Categories",
         component: CategoryList,
         layout: "/admin",
     },
     {
-        path: "/translator",
-        name: "Translator",
+        path: "/translators",
+        name: "Translators",
         component: TranslatorList,
         layout: "/admin",
     },
     {
-        path: "/illustrator",
-        name: "Illustrator",
+        path: "/illustrators",
+        name: "Illustrators",
         component: IlustratorList,
         layout: "/admin",
     },
     {
-        path: "/literaryAgency",
-        name: "Literary Agency",
+        path: "/literary-agencies",
+        name: "Literary Agencies",
         component: LiteraryAgencyList,
         layout: "/admin",
     },

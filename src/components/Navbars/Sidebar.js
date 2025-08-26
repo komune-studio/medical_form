@@ -61,19 +61,19 @@ const SIDEBAR_COLOR = Palette.MAIN_THEME;
 const SIDEBAR = [
     {
         path: "/users",
-        name: "User",
+        name: "Users",
         icon: "mdi:user",
         color: SIDEBAR_COLOR
     },
     {
         path: "/publishers",
-        name: "Publisher",
+        name: "Publishers",
         icon: "mdi:public",
         color: SIDEBAR_COLOR
     },
     {
         path: "/books",
-        name: "Book",
+        name: "Books",
         icon: "mdi:book",
         color: SIDEBAR_COLOR
     },
@@ -84,20 +84,20 @@ const SIDEBAR = [
         color: SIDEBAR_COLOR
     },
     {
-        path: "/translator",
-        name: "Translator",
+        path: "/translators",
+        name: "Translators",
         icon: "ic:round-translate",
         color: SIDEBAR_COLOR
     },
     {
-        path: "/illustrator",
-        name: "Illustrator",
+        path: "/illustrators",
+        name: "Illustrators",
         icon: "fluent:draw-image-20-filled",
         color: SIDEBAR_COLOR
     },
     {
-        path: "/literaryAgency",
-        name: "Literary Agency",
+        path: "/literary-agencies",
+        name: "Literary Agencies",
         icon: "famicons:people",
         color: SIDEBAR_COLOR
     },

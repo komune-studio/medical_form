@@ -125,7 +125,7 @@ const TranslatorList = () => {
 
                         <Row>
                             <Col className='mb-3' md={6}>
-                                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Translator</div>
+                                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Translators</div>
                             </Col>
                             <Col className='mb-3 text-right' md={6}>
                                 <AntButton 
