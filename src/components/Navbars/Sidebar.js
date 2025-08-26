@@ -78,6 +78,12 @@ const SIDEBAR = [
         color: SIDEBAR_COLOR
     },
     {
+        path: "/authors",
+        name: "Authors",
+        icon: "fluent:calligraphy-pen-20-filled",
+        color: SIDEBAR_COLOR
+    },
+    {
         path: "/categories",
         name: "Category",
         icon: "mdi:category",

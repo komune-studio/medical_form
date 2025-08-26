@@ -6,13 +6,13 @@ import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
-import Publisher from 'models/PublisherModel';
+import Author from 'models/AuthorModel';
 import Upload from 'models/UploadModel';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
-export default function PublisherFormPage({
-  publisherData,
+export default function AuthorFormPage({
+  authorData,
   disabled,
 }) {
   const history = useHistory();
@@ -30,7 +30,7 @@ export default function PublisherFormPage({
       let result = await Upload.uploadPicutre(imageFile);
       console.log(result)
 
-      form.setFieldValue("publisher_logo", result?.location);
+      form.setFieldValue("profile_picture", result?.location);
       setImagePreviewURL(result?.location)
       message.success("Image uploaded successfully");
     } catch (e) {
@@ -70,15 +70,15 @@ export default function PublisherFormPage({
       body = form.getFieldsValue()
       console.log(body)
 
-      let msg = 'Successfully created Publishers'
-      if (!publisherData) {
-      result = await Publisher.create(body);
+      let msg = 'Successfully created Authors'
+      if (!authorData) {
+        result = await Author.create(body);
       } else {
-        result = await Publisher.edit(publisherData.id, body);
+        result = await Author.edit(authorData.id, body);
       }
 
       message.success(msg)
-      history.push("/publishers")
+      history.push("/authors")
     } catch (e) {
       console.log(e)
       let errorMessage = "An Error Occured"
@@ -93,26 +93,23 @@ export default function PublisherFormPage({
   }
 
   useEffect(() => {
-    if (publisherData) {
+    if (authorData) {
       form.setFieldsValue({
-        name: publisherData.name,
-        description: publisherData.description,
-        description_tl: publisherData.description_tl,
-        address: publisherData?.address,
-        phone: publisherData?.phone,
-        email: publisherData?.email,
+        name: authorData.name,
+        biography: authorData.biography,
+        biography_tl: authorData.biography_tl,
       })
 
-      if (publisherData.publisher_logo) {
-        console.log(publisherData.publisher_logo)
-        form.setFieldValue("publisher_logo", publisherData.publisher_logo);
-        setImagePreviewURL(publisherData.publisher_logo);
+      if (authorData.profile_picture) {
+        console.log(authorData.profile_picture)
+        form.setFieldValue("profile_picture", authorData.profile_picture);
+        setImagePreviewURL(authorData.profile_picture);
       }
     }
     if (disabled) {
       setFormDisabled(disabled);
     }
-  }, [publisherData])
+  }, [authorData])
 
   return (
     <>
@@ -123,18 +120,18 @@ export default function PublisherFormPage({
             <Row>
               <Col className='mb-3' md={6}>
                 <Space align='center'>
-                  <Link to={'/publishers'}>
+                  <Link to={'/authors'}>
                     <Space align='center'>
                       <Iconify icon={'material-symbols:arrow-back-rounded'} style={{ fontSize: "16px", color: "white" }}></Iconify>
                     </Space>
                   </Link>
-                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Publishers</span>
+                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Authors</span>
                 </Space>
               </Col>
             </Row>
             <Row>
               <Col className='mb-3' md={12} style={{ marginTop: "40px" }}>
-                <Typography.Title level={3}>{!publisherData ? "Add" : "Update"} Publisher</Typography.Title>
+                <Typography.Title level={3}>{!authorData ? "Add" : "Update"} Author</Typography.Title>
               </Col>
             </Row>
             <Row>
@@ -164,8 +161,8 @@ export default function PublisherFormPage({
                           <Input variant='filled' />
                         </Form.Item>
                         <Form.Item
-                          label={"Description"}
-                          name={"description"}
+                          label={"Biography"}
+                          name={"biography"}
                         >
                           <Input.TextArea variant='filled' rows={4} />
                         </Form.Item>
@@ -175,41 +172,11 @@ export default function PublisherFormPage({
                         >
                           <Input.TextArea variant='filled' rows={4} />
                         </Form.Item> */}
-                        <Form.Item
-                          label={"Address"}
-                          name={"address"}
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label={"Phone Number"}
-                          name={"phone"}
-                          rules={[
-                            {
-                              pattern: /^[0-9-]+$/g,
-                              message: "Phone Number can only include numbers"
-                            }
-                          ]}
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label={"Email"}
-                          name={"email"}
-                          rules={[
-                            {
-                              type: "email",
-                              message: "Please enter a valid email"
-                            }
-                          ]}
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
 
                         {!formDisabled ? (
                           <div className={"d-flex flex-row"}>
                             <Button size="sm" type='primary' variant="primary" htmlType='submit' loading={loadingSubmit}>
-                              {!publisherData ? "Add Publishers" : "Save Publishers"}
+                              {!authorData ? "Add Authors" : "Save Authors"}
                             </Button>
                           </div>
                         ) : (
@@ -218,8 +185,8 @@ export default function PublisherFormPage({
                       </Flex>
                       <Flex vertical style={{ width: "30%" }} className='text-white'>
                         <Form.Item
-                          label={"Publisher Logo"}
-                          name={"publisher_logo"}
+                          label={"Profile Picture"}
+                          name={"profile_picture"}
                         >
                           <AntUpload.Dragger
                             name="avatar"

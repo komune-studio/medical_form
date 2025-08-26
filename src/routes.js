@@ -30,6 +30,8 @@ import BookDetails from "components/pages/Book/BookDetails";
 import PublisherCreate from "components/pages/Publisher/PublisherCreate";
 import PublisherEdit from "components/pages/Publisher/PublisherEdit";
 import AuthorList from "components/pages/Author/AuthorList";
+import AuthorCreate from "components/pages/Author/AuthorCreate";
+import AuthorEdit from "components/pages/Author/AuthorEdit";
 
 var routes = [
     {
@@ -78,6 +80,24 @@ var routes = [
         path: "/books",
         name: "Books",
         component: BookList,
+        layout: "/admin",
+    },
+    {
+        path: "/authors/create",
+        name: "authors",
+        component: AuthorCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/authors/:id/edit",
+        name: "authors",
+        component: AuthorEdit,
+        layout: "/admin",
+    },
+    {
+        path: "/authors",
+        name: "authors",
+        component: AuthorList,
         layout: "/admin",
     },
     {

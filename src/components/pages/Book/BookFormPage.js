@@ -234,7 +234,7 @@ export default function BookFormPage({
                       <Iconify icon={'material-symbols:arrow-back-rounded'} style={{ fontSize: "16px", color: "white" }}></Iconify>
                     </Space>
                   </Link>
-                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Book</span>
+                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Books</span>
                 </Space>
               </Col>
             </Row>
