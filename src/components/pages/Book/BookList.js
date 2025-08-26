@@ -9,6 +9,17 @@ import Palette from "../../../utils/Palette";
 import Book from 'models/BookModel';
 import BookCategory from 'models/BookCategoryModel';
 
+const textToUppercase = (text) => {
+  let textToFormat = String(text);
+  let words = textToFormat.split(" ");
+  let formattedText = '';
+  words.forEach((word, index) => {
+    formattedText += `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
+    if (index < words.length - 1) formattedText += " "
+  })
+  return formattedText;
+}
+
 const BookList = () => {
 
   const [loading, setLoading] = useState(false);
@@ -39,6 +50,23 @@ const BookList = () => {
     },
     {
       id: 'title', label: 'Title', filter: true,
+      // render: (row) => (
+      //   textToUppercase(row.title)
+      // )
+    },
+    {
+      id: 'authors', label: 'Authors', filter: false,
+      render: (row) => (
+        <Space wrap size={4} style={{ maxWidth: "200px" }}>
+          {!row?.book_authors ? (
+            <></>
+          ) : (
+            row?.book_authors?.map((ba) => (
+              `- ${ba.authors.name}`
+            ))
+          )}
+        </Space>
+      )
     },
     {
       id: 'publisher', label: 'Publisher', filter: true,
@@ -50,11 +78,11 @@ const BookList = () => {
       id: 'categories', label: 'Categories', filter: false,
       render: (row) => (
         <Space wrap size={4} style={{ maxWidth: "200px" }}>
-          {!row?.categories ? (
+          {!row?.book_categories ? (
             <></>
           ) : (
-            row?.categories?.map((category) => (
-              <Tag>{category.name}</Tag>
+            row?.book_categories?.map((bc) => (
+              <Tag>{bc.categories.name}</Tag>
             ))
           )}
         </Space>
@@ -148,20 +176,9 @@ const BookList = () => {
   const initializeData = async () => {
     setLoading(true)
     try {
-      let result = await Book.getAll();
+      let result = await Book.getAllWithCategoriesAndAuthors();
       console.log(result);
-      let resultWithCategories = []
-      for (let book of result) {
-        let bookCategories = await BookCategory.getByBookId(book.id)
-        let categories = bookCategories.map((bookCategory) => ({
-          ...bookCategory.categories
-        }))
-        resultWithCategories.push({
-          ...book,
-          categories,
-        });
-      }
-      setDataSource(resultWithCategories)
+      setDataSource(result)
       setLoading(false)
     } catch (e) {
       setLoading(false)

@@ -5,6 +5,10 @@ export default class Book {
     return await ApiRequest.set("v1/books/getall-books", "GET");
   } 
 
+  static getAllWithCategoriesAndAuthors = async () => {
+    return await ApiRequest.set("v1/books/getall-books-with-categories", "GET");
+  } 
+
   static getById = async (id) => {
     return await ApiRequest.set(`v1/books/getbyid/${id}`, "GET");
   }
