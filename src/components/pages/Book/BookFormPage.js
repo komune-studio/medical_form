@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Segmented, Divider } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
@@ -28,6 +28,7 @@ export default function BookFormPage({
   const [form] = Form.useForm();
   const [formDisabled, setFormDisabled] = useState(false);
   const [initialBookCategories, setInitialBookCategories] = useState([]);
+  const [language, setLanguage] = useState("ID");
 
   const [publishers, setPublishers] = useState([]);
   const [translators, setTranslators] = useState([]);
@@ -134,7 +135,7 @@ export default function BookFormPage({
         await uploadImage();
       }
       body = form.getFieldsValue()
-      console.log(body)
+      // console.log("Body: ", body)
 
       let msg = 'Successfully created Book'
       if (!bookData) {
@@ -258,35 +259,61 @@ export default function BookFormPage({
                     disabled={formDisabled}
                     autoComplete='off'
                   >
-                    <Flex gap={"48px"} >
-                      <Flex vertical style={{ width: "60%" }}>
+                    <Flex gap={"48px"}>
+                      <Flex vertical style={{ width: "60%" }}> 
+                        <Flex justify="space-between"> 
+                          <Typography.Text style={{ fontSize: "16px" }}>
+                            Multi-Language Part
+                          </Typography.Text> 
+                          <Segmented
+                            value={language}
+                            style={{ marginBottom: 8 }}
+                            onChange={setLanguage}
+                            options={['ID', 'EN']}
+                          />
+                        </Flex>
                         <Form.Item
-                          label={"Title"}
-                          name={"title"}
-                          rules={[{
+                          label="Title"
+                          name="title"
+                          rules={[{ 
                             required: true,
                           }]}
+                          hidden={language !== "ID"} // 
                         >
                           <Input variant='filled' />
                         </Form.Item>
+
                         <Form.Item
-                          label={"Title (Translated)"}
-                          name={"title_tl"}
+                          label="Description"
+                          name="description"
+                          hidden={language !== "ID"}
+                        >
+                          <Input.TextArea variant='filled' rows={4} />
+                        </Form.Item>
+
+                        <Form.Item
+                          label="Title (Translated)"
+                          name="title_tl"
+                          hidden={language === "ID"}
                         >
                           <Input variant='filled' />
                         </Form.Item>
+
                         <Form.Item
-                          label={"Description"}
-                          name={"description"}
+                          label="Description (Translated)"
+                          name="description_tl"
+                          hidden={language === "ID"}
                         >
                           <Input.TextArea variant='filled' rows={4} />
                         </Form.Item>
-                        <Form.Item
-                          label={"Description (Translated)"}
-                          name={"description_tl"}
-                        >
-                          <Input.TextArea variant='filled' rows={4} />
-                        </Form.Item>
+                        <Divider 
+                          dashed 
+                          style={{ 
+                            borderWidth: '0.5px', 
+                            borderColor: '#424242',
+                            margin: '20px 0',
+                          }}
+                          />
                         <Form.Item
                           label={"Publisher"}
                           name={"publisher_id"}
@@ -332,7 +359,7 @@ export default function BookFormPage({
                           </div>
                         ) : (
                           <></>
-                        )}
+                        )}                        
                       </Flex>
                       <Flex vertical style={{ width: "30%" }} className='text-white'>
                         <Form.Item

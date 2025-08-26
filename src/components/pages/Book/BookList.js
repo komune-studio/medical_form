@@ -66,7 +66,7 @@ const BookList = () => {
         return (
           <>
             <Space size="small">
-              {/* <Tooltip title="Detail">
+              <Tooltip title="Detail">
                 <Link to={`/books/${row.id}`}>
                   <AntButton
                     type={'link'}
@@ -80,7 +80,7 @@ const BookList = () => {
                     shape="circle"
                     icon={<Iconify icon={"material-symbols:search-rounded"} />} />
                 </Link>
-              </Tooltip> */}
+              </Tooltip>
               <Tooltip title="Edit">
                 <Link to={`/books/${row.id}/edit`}>
                   <AntButton

@@ -29,7 +29,7 @@ import CategoryList from "components/pages/Category/CategoryList";
 import BookDetails from "components/pages/Book/BookDetails";
 import PublisherCreate from "components/pages/Publisher/PublisherCreate";
 import PublisherEdit from "components/pages/Publisher/PublisherEdit";
-import AuthorList from "components/pages/Author/AuthorList";
+// import AuthorList from "components/pages/Author/AuthorList";
 
 var routes = [
     {

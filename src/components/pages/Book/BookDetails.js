@@ -95,7 +95,6 @@ const BookDetails = () => {
                       <Space direction='vertical' size={8} className='mb-3'>
                         <Typography.Text style={{ fontSize: "40px", fontWeight: "600" }}>{bookData.title}</Typography.Text>
                         <Typography.Text style={{ fontSize: "24px" }}>{bookData.title_tl}</Typography.Text>
-                        {/* <Typography.Text>{bookData.title_tl}</Typography.Text> */}
                       </Space>
                       <Space size={0} className='mb-4'>
                         <>
@@ -120,7 +119,6 @@ const BookDetails = () => {
                           <Typography.Text type="secondary" style={{ fontSize: "20px" }}>Description (Translated)</Typography.Text>
                           <Typography.Text style={{ fontSize: "20px" }}>{bookData.description_tl}</Typography.Text>
                         </Space>
-                        {/* <Typography.Text style={{ fontSize: "20px" }}>{bookData.description_tl}</Typography.Text> */}
                       </Space>
                       <Space direction='vertical' size={0}>
                         <Divider style={{ margin: "16px 0" }}></Divider>
