@@ -27,12 +27,26 @@ import BookCreate from "components/pages/Book/BookCreate";
 import BookEdit from "components/pages/Book/BookEdit";
 import CategoryList from "components/pages/Category/CategoryList";
 import BookDetails from "components/pages/Book/BookDetails";
+import PublisherCreate from "components/pages/Publisher/PublisherCreate";
+import PublisherEdit from "components/pages/Publisher/PublisherEdit";
 
 var routes = [
     {
         path: "/users",
         name: "Users",
         component: UserList,
+        layout: "/admin",
+    },
+    {
+        path: "/publishers/create",
+        name: "Publisher",
+        component: PublisherCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/publishers/:id/edit",
+        name: "Publisher",
+        component: PublisherEdit,
         layout: "/admin",
     },
     {

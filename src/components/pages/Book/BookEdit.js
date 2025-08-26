@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom";
 import BookFormPage from "./BookFormPage";
-import moment from "moment";
 import Book from "models/BookModel";
 
 const BookEdit = () => {

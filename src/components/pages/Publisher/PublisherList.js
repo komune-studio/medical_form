@@ -1,4 +1,4 @@
-import { Space, Button as AntButton, Tooltip, Modal, message } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message, Flex, Image } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Card, Row, CardBody, Container, Button } from "reactstrap";
 import Iconify from "../../reusable/Iconify";
@@ -7,6 +7,7 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import PublisherFormModal from './PublisherFormModal';
 import Publisher from 'models/PublisherModel';
+import { Link } from 'react-router-dom';
 
 const PublisherList = () => {
 
@@ -18,7 +19,23 @@ const PublisherList = () => {
 
   const columns = [
     {
-      id: 'id', label: 'ID', filter: false,
+      id: 'publisher_logo', label: 'Logo', filter: false,
+      render: ((row) => {
+        return (
+          <Flex style={{ height: "100px", width: "auto", aspectRatio: "3/4", alignItems: "center", justifyContent: "center" }}>
+            {!row?.publisher_logo ? (
+              <Iconify
+                icon={"material-symbols:hide-image-outline"}
+                style={{
+                  fontSize: "48px"
+                }}
+              />
+            ) : (
+              <Image height={"100%"} width={"100%"} style={{ objectFit: "contain" }} src={row?.publisher_logo}></Image>
+            )}
+          </Flex>
+        )
+      })
     },
     {
       id: 'name', label: 'Name', filter: true,
@@ -39,6 +56,18 @@ const PublisherList = () => {
           <>
             <Space size="small">
               <Tooltip title="Edit">
+                <Link to={`/publishers/${row.id}/edit`}>
+                  <AntButton
+                    type={'link'}
+                    style={{ color: Palette.MAIN_THEME }}
+                    onClick={() => {
+                    }}
+                    className={"d-flex align-items-center justify-content-center"}
+                    shape="circle"
+                    icon={<Iconify icon={"material-symbols:edit"} />} />
+                </Link>
+              </Tooltip>
+              {/* <Tooltip title="Edit">
                 <AntButton
                   type={'link'}
                   style={{ color: Palette.MAIN_THEME }}
@@ -52,7 +81,7 @@ const PublisherList = () => {
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:edit"} />} />
-              </Tooltip>
+              </Tooltip> */}
               <Tooltip title="Delete">
                 <AntButton
                   type={'link'}
@@ -133,10 +162,15 @@ const PublisherList = () => {
                 <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Publisher</div>
               </Col>
               <Col className='mb-3 text-right' md={6}>
-                <AntButton onClick={() => {
+                <Link to="/publishers/create">
+                  <AntButton
+                    onClick={() => { }}
+                    size={'middle'} type={'primary'}>Add Publisher</AntButton>
+                </Link>
+                {/* <AntButton onClick={() => {
                   setIsNewRecord(true)
                   setOpenPublisherModal(true)
-                }} size={'middle'} type={'primary'}>Add Publisher</AntButton>
+                }} size={'middle'} type={'primary'}>Add Publisher</AntButton> */}
               </Col>
             </Row>
             <Row>
