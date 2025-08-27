@@ -5,6 +5,7 @@ import Ilustrator from '../../../models/IlustratorModel'
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
+import Helper from 'utils/Helper';
 
 
 CreateIlustratorModal.propTypes = {
@@ -102,7 +103,7 @@ export default function CreateIlustratorModal({ isOpen, itemId, close }) {
                             required: true,
                         },
                         {
-                            pattern: /^[0-9]+$/,
+                            pattern: Helper.phoneRegEx,
                             message: 'Phone Number can only include numbers',
                         },
                     ]}

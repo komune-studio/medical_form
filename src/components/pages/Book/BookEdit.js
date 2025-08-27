@@ -15,9 +15,15 @@ const BookEdit = () => {
         ...bc.categories
       }
     })
+    let authors = result.book_authors.map((ba) => {
+      return {
+        ...ba.authors
+      }
+    })
     let formattedResult = {
       ...result,
       categories,
+      authors
     }
     return formattedResult;
   }

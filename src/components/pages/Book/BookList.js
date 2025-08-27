@@ -9,17 +9,6 @@ import Palette from "../../../utils/Palette";
 import Book from 'models/BookModel';
 import BookCategory from 'models/BookCategoryModel';
 
-const textToUppercase = (text) => {
-  let textToFormat = String(text);
-  let words = textToFormat.split(" ");
-  let formattedText = '';
-  words.forEach((word, index) => {
-    formattedText += `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
-    if (index < words.length - 1) formattedText += " "
-  })
-  return formattedText;
-}
-
 const BookList = () => {
 
   const [loading, setLoading] = useState(false);

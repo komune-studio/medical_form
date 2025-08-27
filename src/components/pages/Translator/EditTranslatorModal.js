@@ -5,6 +5,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
+import Helper from 'utils/Helper';
 EditTranslatorModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
@@ -127,7 +128,7 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
                                 // message: 'Mohon memasukkan Nomor HP.',
                             },
                             {
-                                pattern: /^[0-9]+$/,
+                                pattern: Helper.phoneRegEx,
                                 message: 'Phone Number can only include numbers',
                             },
                         ]}

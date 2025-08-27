@@ -8,6 +8,7 @@ import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import Publisher from 'models/PublisherModel';
 import Upload from 'models/UploadModel';
+import Helper from 'utils/Helper';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -186,8 +187,8 @@ export default function PublisherFormPage({
                           name={"phone"}
                           rules={[
                             {
-                              pattern: /^[0-9-]+$/g,
-                              message: "Phone Number can only include numbers"
+                              pattern: Helper.phoneRegEx,
+                              message: "Phone Number must include country code and phone number"
                             }
                           ]}
                         >
