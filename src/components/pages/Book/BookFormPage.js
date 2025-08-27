@@ -14,6 +14,8 @@ import Translator from 'models/TranslatorModel';
 import Book from 'models/BookModel';
 import BookCategory from 'models/BookCategoryModel';
 import Upload from 'models/UploadModel';
+import Author from 'models/AuthorModel';
+import BookAuthor from 'models/BookAuthorModel';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -28,12 +30,14 @@ export default function BookFormPage({
   const [form] = Form.useForm();
   const [formDisabled, setFormDisabled] = useState(false);
   const [initialBookCategories, setInitialBookCategories] = useState([]);
+  const [initialBookAuthors, setInitialBookAuthors] = useState([]);
   const [language, setLanguage] = useState("ID");
 
   const [publishers, setPublishers] = useState([]);
   const [translators, setTranslators] = useState([]);
   const [ilustrators, setIlustrators] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [authors, setAuthors] = useState([]);
 
   const [imagePreviewURL, setImagePreviewURL] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -82,6 +86,17 @@ export default function BookFormPage({
     }
   }
 
+  const getAuthorsData = async () => {
+    try {
+      let result = await Author.getAll();
+      setAuthors(result.map((r) => ({
+        value: r.id,
+        label: r.name,
+      })))
+    } catch (e) {
+    }
+  }
+
   const initializeData = async () => {
     setLoading(true);
     await Promise.all([
@@ -89,8 +104,13 @@ export default function BookFormPage({
       getTranslatorsData(),
       getIlustratorsData(),
       getCategoriesData(),
+      getAuthorsData(),
     ])
     setLoading(false);
+  }
+
+  const selectFilterFunction = (input, option) => {
+    return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
   }
 
   const uploadImage = async () => {
@@ -110,7 +130,7 @@ export default function BookFormPage({
   const onUploadChange = ({ file }) => {
     const isImage = allowedImageType.includes(file.type);
     if (!isImage) {
-      message.error("File must be image type " + 
+      message.error("File must be image type " +
         allowedImageType.map((type) => type.slice(6).toUpperCase()).join(", "))
       return Upload.LIST_IGNORE;
     }
@@ -171,7 +191,36 @@ export default function BookFormPage({
           }
         }))
       }
-      await Promise.all(bookCategoryUpdatePromises);
+
+      let bookAuthorUpdatePromises = [];
+      if (!body.authors) body.authors = []
+      for (let baId of body.authors) {
+        if (initialBookAuthors.length > 0 && initialBookAuthors.includes(baId)) continue;
+        bookAuthorUpdatePromises.push(new Promise((resolve, reject) => {
+          try {
+            let res = BookAuthor.create({
+              book_id: result.id,
+              author_id: baId,
+            });
+            resolve(res)
+          } catch (err) {
+            reject(err)
+          }
+        }))
+      }
+      for (let ibaId of initialBookAuthors) {
+        if (body.authors && body.authors.includes(ibaId)) continue;
+        bookAuthorUpdatePromises.push(new Promise((resolve, reject) => {
+          try {
+            let res = BookAuthor.delete(parseInt(result.id), parseInt(ibaId));
+            resolve(res);
+          } catch (err) {
+            reject(err)
+          }
+        }))
+      }
+
+      await Promise.all([...bookCategoryUpdatePromises, ...bookAuthorUpdatePromises]);
 
       message.success(msg)
       history.push("/books")
@@ -184,8 +233,9 @@ export default function BookFormPage({
         icon: 'error',
         confirmButtonText: 'Okay'
       })
+    } finally {
+      setLoadingSubmit(true);
     }
-    setLoadingSubmit(true);
   }
 
   useEffect(() => {
@@ -205,11 +255,19 @@ export default function BookFormPage({
         illustrator_id: bookData.illustrator_id,
         translator_id: bookData.translator_id,
       })
+
       let categoryIds = bookData.categories?.map((c) => {
         return c.id
       })
       setInitialBookCategories(categoryIds);
       form.setFieldValue("categories", categoryIds);
+
+      let authorIds = bookData.authors?.map((a) => {
+        return a.id
+      })
+      setInitialBookAuthors(authorIds);
+      form.setFieldValue("authors", authorIds);
+
       if (bookData.image_cover) {
         console.log(bookData.image_cover)
         form.setFieldValue("image_cover", bookData.image_cover);
@@ -260,11 +318,11 @@ export default function BookFormPage({
                     autoComplete='off'
                   >
                     <Flex gap={"48px"}>
-                      <Flex vertical style={{ width: "60%" }}> 
-                        <Flex justify="space-between"> 
+                      <Flex vertical style={{ width: "60%" }}>
+                        <Flex justify="space-between">
                           <Typography.Text style={{ fontSize: "16px" }}>
                             Multi-Language Part
-                          </Typography.Text> 
+                          </Typography.Text>
                           <Segmented
                             value={language}
                             style={{ marginBottom: 8 }}
@@ -275,7 +333,7 @@ export default function BookFormPage({
                         <Form.Item
                           label="Title"
                           name="title"
-                          rules={[{ 
+                          rules={[{
                             required: true,
                           }]}
                           hidden={language !== "ID"} // 
@@ -306,14 +364,23 @@ export default function BookFormPage({
                         >
                           <Input.TextArea variant='filled' rows={4} />
                         </Form.Item>
-                        <Divider 
-                          dashed 
-                          style={{ 
-                            borderWidth: '0.5px', 
+                        <Divider
+                          dashed
+                          style={{
+                            borderWidth: '0.5px',
                             borderColor: '#424242',
                             margin: '20px 0',
                           }}
-                          />
+                        />
+                        <Form.Item
+                          label={"Authors"}
+                          name={"authors"}
+                          rules={[{
+                            required: true,
+                          }]}
+                        >
+                          <Select mode='multiple' options={authors} variant='filled' filterOption={selectFilterFunction} />
+                        </Form.Item>
                         <Form.Item
                           label={"Publisher"}
                           name={"publisher_id"}
@@ -321,7 +388,7 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select options={publishers} variant='filled' />
+                          <Select showSearch={true} options={publishers} variant='filled' filterOption={selectFilterFunction} />
                         </Form.Item>
                         <Form.Item
                           label={"Illustrator"}
@@ -330,7 +397,7 @@ export default function BookFormPage({
                             required: true,
                           }]}
                         >
-                          <Select options={ilustrators} variant='filled' />
+                          <Select showSearch={true} options={ilustrators} variant='filled' filterOption={selectFilterFunction} />
                         </Form.Item>
                         <Form.Item
                           label={"Translator"}
@@ -339,7 +406,7 @@ export default function BookFormPage({
                         //   required: true,
                         // }]}
                         >
-                          <Select options={translators} variant='filled' />
+                          <Select showSearch={true} options={translators} variant='filled' filterOption={selectFilterFunction} />
                         </Form.Item>
                         <Form.Item
                           label={"Categories"}
@@ -348,7 +415,7 @@ export default function BookFormPage({
                         //   required: true,
                         // }]}
                         >
-                          <Select mode='multiple' options={categories} variant='filled' />
+                          <Select mode='multiple' options={categories} variant='filled' filterOption={selectFilterFunction} />
                         </Form.Item>
 
                         {!formDisabled ? (
@@ -359,7 +426,7 @@ export default function BookFormPage({
                           </div>
                         ) : (
                           <></>
-                        )}                        
+                        )}
                       </Flex>
                       <Flex vertical style={{ width: "30%" }} className='text-white'>
                         <Form.Item
