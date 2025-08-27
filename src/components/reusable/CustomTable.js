@@ -222,6 +222,11 @@ const CustomTable = ({
 										active={orderBy === headCell.id}
 										direction={orderBy === headCell.id ? order : 'asc'}
 										onClick={createSortHandler(headCell.id)}
+										sx={{
+											'& .MuiTableSortLabel-icon': {
+												color: `${Palette.MAIN_THEME} !important`
+											}
+										}}
 									>
 										{headCell.label}
 										{orderBy === headCell.id ? (
