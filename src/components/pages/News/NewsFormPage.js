@@ -8,6 +8,8 @@ import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import News from 'models/NewsModel';
 import Upload from 'models/UploadModel';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; 
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -20,6 +22,7 @@ export default function NewsFormPage({
   const [loading, setLoading] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
+  // const bodyTest = Form.useWatch('body', form);
   const [formDisabled, setFormDisabled] = useState(false);
   const [language, setLanguage] = useState("ID");
 
@@ -101,6 +104,27 @@ export default function NewsFormPage({
       </Tag>
     </span>
   );
+
+  const FormQuill = ({ value, onChange, placeholder, ...props }) => {
+    return (
+        <ReactQuill
+          theme="snow"
+          value={value || ''}
+          onChange={onChange}
+          placeholder={placeholder}
+          style={{ 
+            height: '480px',
+            marginBottom: '84px'
+          }}
+          {...props}
+        />
+      );
+    };
+
+  // To watch form real update
+  // useEffect(() => {
+  //   console.log("body real update: ", bodyTest)
+  // }, [bodyTest])
 
   useEffect(() => {
     if (newsData) {
@@ -222,14 +246,14 @@ export default function NewsFormPage({
                           name={"body"}
                           hidden={language !== "ID"}
                         >
-                          <Input.TextArea variant='filled' rows={4} />
+                          <FormQuill placeholder="Write something here..." />
                         </Form.Item>
                         <Form.Item
                           label={languageTag("Body")}
                           name={"body_tl"}
                           hidden={language === "ID"}
                         >
-                          <Input.TextArea variant='filled' rows={4} />
+                          <FormQuill placeholder="Write something here..." />
                         </Form.Item>
 
                         {!formDisabled ? (
