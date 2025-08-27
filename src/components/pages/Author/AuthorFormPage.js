@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Tag, Segmented } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
@@ -21,6 +21,7 @@ export default function AuthorFormPage({
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [form] = Form.useForm();
   const [formDisabled, setFormDisabled] = useState(false);
+  const [language, setLanguage] = useState("ID");
 
   const [imagePreviewURL, setImagePreviewURL] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -92,6 +93,15 @@ export default function AuthorFormPage({
     setLoadingSubmit(false);
   }
 
+  const languageTag = (text, tagColor = Palette.MAIN_THEME) => (
+    <span>
+      {text} | {language}{" "}
+      <Tag color={tagColor} style={{ fontSize: '10px', marginLeft: '8px' }}>
+        Multi-Language
+      </Tag>
+    </span>
+  );
+
   useEffect(() => {
     if (authorData) {
       form.setFieldsValue({
@@ -151,6 +161,14 @@ export default function AuthorFormPage({
                   >
                     <Flex gap={"48px"} >
                       <Flex vertical style={{ width: "60%" }}>
+                        <Flex justify="flex-end">
+                          <Segmented
+                            value={language}
+                            style={{ marginBottom: 8 }}
+                            onChange={setLanguage}
+                            options={['ID', 'EN']}
+                          />
+                        </Flex>
                         <Form.Item
                           label={"Name"}
                           name={"name"}
@@ -161,17 +179,19 @@ export default function AuthorFormPage({
                           <Input variant='filled' />
                         </Form.Item>
                         <Form.Item
-                          label={"Biography"}
+                          label={languageTag("Biography")}
                           name={"biography"}
+                          hidden={language !== "ID"}
                         >
                           <Input.TextArea variant='filled' rows={4} />
                         </Form.Item>
-                        {/* <Form.Item
-                          label={"Description Translated"}
-                          name={"description_tl"}
+                        <Form.Item
+                          label={languageTag("Biography")}
+                          name={"biography_tl"}
+                          hidden={language === "ID"}
                         >
                           <Input.TextArea variant='filled' rows={4} />
-                        </Form.Item> */}
+                        </Form.Item>
 
                         {!formDisabled ? (
                           <div className={"d-flex flex-row"}>

@@ -240,7 +240,7 @@ export default function BookFormPage({
 
   const languageTag = (text, tagColor = Palette.MAIN_THEME) => (
     <span>
-      {text}{" "}
+      {text} | {language}{" "}
       <Tag color={tagColor} style={{ fontSize: '10px', marginLeft: '8px' }}>
         Multi-Language
       </Tag>
@@ -344,7 +344,7 @@ export default function BookFormPage({
                           }]}
                           hidden={language !== "ID"} 
                         >
-                          <Input variant='filled' placeholder='Title in Indonesian'/>
+                          <Input variant='filled' />
                         </Form.Item>
 
                         <Form.Item
@@ -352,7 +352,7 @@ export default function BookFormPage({
                           name="description"
                           hidden={language !== "ID"}
                         >
-                          <Input.TextArea variant='filled' rows={4} placeholder='Description in Indonesian'/>
+                          <Input.TextArea variant='filled' rows={4} />
                         </Form.Item >
 
                         <Form.Item
@@ -360,7 +360,7 @@ export default function BookFormPage({
                           name="title_tl"
                           hidden={language === "ID"}
                         >
-                          <Input variant='filled' placeholder='Title in English'/>
+                          <Input variant='filled' />
                         </Form.Item>
 
                         <Form.Item
@@ -368,7 +368,7 @@ export default function BookFormPage({
                           name="description_tl"
                           hidden={language === "ID"}
                         >
-                          <Input.TextArea variant='filled' rows={4} placeholder='Description in English'/>
+                          <Input.TextArea variant='filled' rows={4} />
                         </Form.Item>
                         <Form.Item
                           label={"Authors"}
