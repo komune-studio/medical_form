@@ -32,6 +32,9 @@ import PublisherEdit from "components/pages/Publisher/PublisherEdit";
 import AuthorList from "components/pages/Author/AuthorList";
 import AuthorCreate from "components/pages/Author/AuthorCreate";
 import AuthorEdit from "components/pages/Author/AuthorEdit";
+import NewsList from "components/pages/News/NewsList";
+import NewsCreate from "components/pages/News/NewsCreate";
+import NewsEdit from "components/pages/News/NewsEdit";
 
 var routes = [
     {
@@ -104,6 +107,24 @@ var routes = [
         path: "/categories",
         name: "Categories",
         component: CategoryList,
+        layout: "/admin",
+    },
+    {
+        path: "/news/create",
+        name: "News",
+        component: NewsCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/news/:id/edit",
+        name: "News",
+        component: NewsEdit,
+        layout: "/admin",
+    },
+    {
+        path: "/news",
+        name: "News",
+        component: NewsList,
         layout: "/admin",
     },
     {
