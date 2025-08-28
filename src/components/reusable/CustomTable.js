@@ -221,7 +221,11 @@ const CustomTable = ({
 										hideSortIcon
 										active={orderBy === headCell.id}
 										direction={orderBy === headCell.id ? order : 'asc'}
-										onClick={createSortHandler(headCell.id)}
+										onClick={(e) => {
+											if (headCell.allowSort || headCell.allowSort == undefined) {
+												createSortHandler(headCell.id)(e)
+											}
+										}}
 										sx={{
 											'& .MuiTableSortLabel-icon': {
 												color: `${Palette.MAIN_THEME} !important`
@@ -274,8 +278,8 @@ const CustomTable = ({
 													{columnSetting.render
 														? columnSetting.render(row)
 														: row[columnSetting.id]
-														? row[columnSetting.id]
-														: '-'}
+															? row[columnSetting.id]
+															: '-'}
 												</TableCell>
 											</>
 										);
