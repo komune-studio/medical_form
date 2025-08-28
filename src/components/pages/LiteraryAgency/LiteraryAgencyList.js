@@ -21,7 +21,7 @@ const LiteraryAgencyList = () => {
 
     const columns = [
         {
-            id: 'id', label: 'ID', filter: false,
+            id: 'id', label: 'ID', filter: false, allowSort: false,
         },
         {
             id: 'name', label: 'Name', filter: true,

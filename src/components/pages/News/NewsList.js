@@ -19,7 +19,7 @@ const NewsList = () => {
 
   const columns = [
     {
-      id: 'image_cover', label: 'Cover Image', filter: false,
+      id: 'image_cover', label: 'Cover Image', filter: false, allowSort: false,
       render: (row) => {
         return (
           <Flex style={{ height: "100px", width: "auto", aspectRatio: "3/4", alignItems: "center", justifyContent: "center" }}>

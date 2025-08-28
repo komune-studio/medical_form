@@ -23,7 +23,7 @@ const TranslatorList = () => {
 
     const columns = [
         {
-            id: 'id', label: 'ID', filter: false,
+            id: 'id', label: 'ID', filter: false, allowSort: false,
         },
         {
             id: 'name', label: 'Name', filter: true,
@@ -32,7 +32,7 @@ const TranslatorList = () => {
             id: 'email', label: 'Email', filter: false,
         },
         {
-            id: 'phone', label: 'Phone', filter: false,
+            id: 'phone', label: 'Phone', filter: false, allowSort: false,
         },
         {
             id: 'languages', label: 'Languages', filter: false,
