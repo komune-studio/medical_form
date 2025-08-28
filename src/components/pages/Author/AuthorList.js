@@ -18,7 +18,7 @@ const AuthorList = () => {
 
   const columns = [
     {
-      id: 'profile_picture', label: 'Profile Picture', filter: false,
+      id: 'profile_picture', label: 'Profile Picture', filter: false, allowSort: false,
       render: (row) => {
         return (
           <Flex style={{ height: "100px", width: "auto", aspectRatio: "3/4", alignItems: "center", justifyContent: "center" }}>
@@ -40,7 +40,7 @@ const AuthorList = () => {
       id: 'name', label: 'Name', filter: true,
     },
     {
-      id: 'biography', label: 'Biography', filter: true,
+      id: 'biography', label: 'Biography', filter: false, allowSort: false,
     },
     {
       id: '', label: '', filter: false,

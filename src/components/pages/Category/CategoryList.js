@@ -18,13 +18,13 @@ const CategoryList = () => {
 
   const columns = [
     {
-      id: 'id', label: 'ID', filter: false,
+      id: 'id', label: 'ID', filter: false, allowSort: false,
     },
     {
       id: 'name', label: 'Name', filter: true,
     },
     {
-      id: 'description', label: 'Description', filter: true,
+      id: 'description', label: 'Description', filter: false, allowSort: false,
     },
     {
       id: '', label: '', filter: false,

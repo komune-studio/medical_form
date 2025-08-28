@@ -19,7 +19,7 @@ const NewsList = () => {
 
   const columns = [
     {
-      id: 'image_cover', label: 'Cover Image', filter: false,
+      id: 'image_cover', label: 'Cover Image', filter: false, allowSort: false,
       render: (row) => {
         return (
           <Flex style={{ height: "100px", width: "auto", aspectRatio: "3/4", alignItems: "center", justifyContent: "center" }}>
@@ -41,7 +41,7 @@ const NewsList = () => {
       id: 'title', label: 'Title', filter: true,
     },
     {
-      id: 'created_at', label: 'Created At', filter: true,
+      id: 'created_at', label: 'Created At', filter: false,
       render: (row) => {
         return (
           moment(row.created_at).format("DD MMM YYYY HH:mm")
@@ -49,7 +49,7 @@ const NewsList = () => {
       }
     },
     {
-      id: 'modified_at', label: 'Modified At', filter: true,
+      id: 'modified_at', label: 'Modified At', filter: false,
       render: (row) => {
         return (
           moment(row.modified_at).format("DD MMM YYYY HH:mm")

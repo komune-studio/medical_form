@@ -23,19 +23,19 @@ const TranslatorList = () => {
 
     const columns = [
         {
-            id: 'id', label: 'ID', filter: false,
+            id: 'id', label: 'ID', filter: false, allowSort: false,
         },
         {
             id: 'name', label: 'Name', filter: true,
         },
         {
-            id: 'email', label: 'Email', filter: false,
+            id: 'email', label: 'Email', filter: true,
         },
         {
-            id: 'phone', label: 'Phone', filter: false,
+            id: 'phone', label: 'Phone', filter: false, allowSort: false,
         },
         {
-            id: 'languages', label: 'Languages', filter: false,
+            id: 'languages', label: 'Languages', filter: true,
         },
         {
             id: '', label: '', filter: false,

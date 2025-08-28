@@ -19,7 +19,7 @@ const PublisherList = () => {
 
   const columns = [
     {
-      id: 'publisher_logo', label: 'Logo', filter: false,
+      id: 'publisher_logo', label: 'Logo', filter: false, allowSort: false,
       render: ((row) => {
         return (
           <Flex style={{ height: "100px", width: "auto", aspectRatio: "3/4", alignItems: "center", justifyContent: "center" }}>
@@ -44,10 +44,10 @@ const PublisherList = () => {
     //   id: 'address', label: 'Address', filter: true,
     // },
     {
-      id: 'email', label: 'Email', filter: false,
+      id: 'email', label: 'Email', filter: true,
     },
     {
-      id: 'phone', label: 'Phone', filter: false,
+      id: 'phone', label: 'Phone', filter: false, allowSort: false,
     },
     {
       id: '', label: '', filter: false,
