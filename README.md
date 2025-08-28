@@ -15,6 +15,9 @@ Argon is An user-friendly, open source and beautiful design system based on Boot
 
 - Argon: https://demos.creative-tim.com/argon-dashboard-react/#/documentation/overview
 - Ant-Design: https://antdv.com/components/overview/
+- Iconify-Icon (Search for Icon): https://icon-sets.iconify.design/
+- React-Quill: https://www.npmjs.com/package/react-quill
+
 
 ## File Structure
 
