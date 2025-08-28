@@ -74,7 +74,7 @@ export default function PublisherFormPage({
 
       let msg = 'Successfully created Publishers'
       if (!publisherData) {
-      result = await Publisher.create(body);
+        result = await Publisher.create(body);
       } else {
         result = await Publisher.edit(publisherData.id, body);
       }
@@ -165,7 +165,7 @@ export default function PublisherFormPage({
                   >
                     <Flex gap={"48px"} >
                       <Flex vertical style={{ width: "60%" }}>
-                        <Flex justify="flex-end"> 
+                        <Flex justify="flex-end">
                           <Segmented
                             value={language}
                             style={{ marginBottom: 8 }}
@@ -257,24 +257,31 @@ export default function PublisherFormPage({
                                 {imagePreviewURL ? (
                                   <>
                                     <img src={imagePreviewURL} style={{ width: "100%", height: "auto" }} />
-                                    <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block", marginTop: "12px" }}>
-                                      Max image size 5MB.
-                                    </Typography.Text>
                                   </>
                                 ) : (
                                   <>
                                     <Iconify icon={"mdi:tray-upload"} style={{ fontSize: "48px" }} />
                                     <Typography.Text style={{ display: "inline-block", marginTop: "8px" }}>
-                                      Click or drag here to upload image. <br />
-                                      <Typography.Text type='secondary' style={{ fontSize: "12px", display: "inline-block", marginTop: "8px" }}>
-                                        Max image size 5MB.
-                                      </Typography.Text>
+                                      Click or drag here to upload image.
                                     </Typography.Text>
                                   </>
                                 )}
                               </Flex>
                             </button>
                           </AntUpload.Dragger>
+                          <Flex justify='start' style={{ marginTop: "4px" }}>
+                            <Space wrap size={8}>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
+                                Max image size 5MB
+                              </Typography.Text>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
+                                -
+                              </Typography.Text>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
+                                JPG, JPEG, PNG, WEBP supported
+                              </Typography.Text>
+                            </Space>
+                          </Flex>
                         </Form.Item>
                       </Flex>
                     </Flex>

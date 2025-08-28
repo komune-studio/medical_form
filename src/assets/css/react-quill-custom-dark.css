@@ -2,7 +2,7 @@
   --ant-color-text-description-dark-background-full-rgb: #838383;
   --main-theme: #bb3b3a;
 }
-.ql-container {
+/* .ql-container {
   box-sizing: border-box;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 13px;
@@ -383,7 +383,7 @@
 }
 .ql-editor .ql-align-right {
   text-align: right;
-}
+} */
 .ql-editor.ql-blank::before {
   color: var(--ant-color-text-description) !important;
   content: attr(data-placeholder);
@@ -392,8 +392,9 @@
   pointer-events: none;
   position: absolute;
   right: 15px;
+  top: 16px;
 }
-.ql-snow.ql-toolbar:after,
+/* .ql-snow.ql-toolbar:after,
 .ql-snow .ql-toolbar:after {
   clear: both;
   content: '';
@@ -422,7 +423,7 @@
 .ql-snow.ql-toolbar input.ql-image[type=file],
 .ql-snow .ql-toolbar input.ql-image[type=file] {
   display: none;
-}
+} */
 .ql-snow.ql-toolbar button:hover,
 .ql-snow .ql-toolbar button:hover,
 .ql-snow.ql-toolbar .ql-picker-label:hover,
@@ -499,7 +500,7 @@
     stroke: var(--ant-color-white) !important;
   }
 }
-.ql-snow {
+/* .ql-snow {
   box-sizing: border-box;
 }
 .ql-snow * {
@@ -531,7 +532,7 @@
   clear: both;
   content: '';
   display: table;
-}
+} */
 .ql-snow .ql-stroke {
   fill: none;
   stroke: var(--ant-color-text) !important;
@@ -552,7 +553,7 @@
   fill: var(--ant-color-text) !important;
   transition: fill var(--ant-motion-duration-fast);
 }
-.ql-snow .ql-empty {
+/* .ql-snow .ql-empty {
   fill: none;
 }
 .ql-snow .ql-even {
@@ -623,7 +624,7 @@
 }
 .ql-snow .ql-editor img {
   max-width: 100%;
-}
+} */
 .ql-snow .ql-picker {
   color: var(--ant-color-text) !important;
   display: inline-block;
@@ -634,7 +635,7 @@
   position: relative;
   vertical-align: middle;
 }
-.ql-snow .ql-picker-label {
+/* .ql-snow .ql-picker-label {
   cursor: pointer;
   display: inline-block;
   height: 100%;
@@ -642,7 +643,7 @@
   padding-right: 2px;
   position: relative;
   width: 100%;
-}
+} */
 .ql-snow .ql-picker-label::before {
   display: inline-block;
   line-height: 22px;
@@ -656,12 +657,12 @@
   position: absolute;
   white-space: nowrap;
 }
-.ql-snow .ql-picker-options .ql-picker-item {
+/* .ql-snow .ql-picker-options .ql-picker-item {
   cursor: pointer;
   display: block;
   padding-bottom: 5px;
   padding-top: 5px;
-}
+} */
 .ql-snow .ql-picker-options .ql-picker-item:hover {
   color: var(--main-theme) !important;
 }
@@ -673,7 +674,7 @@
   color: var(--ant-color-text) !important;
   z-index: 2;
 }
-.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-fill {
+/* .ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-fill {
   fill: #ccc;
 }
 .ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke {
@@ -731,11 +732,11 @@
 .ql-snow .ql-picker.ql-font .ql-picker-item[data-label]:not([data-label=''])::before,
 .ql-snow .ql-picker.ql-size .ql-picker-item[data-label]:not([data-label=''])::before {
   content: attr(data-label);
-}
+} */
 .ql-header .ql-picker-label .ql-stroke {
   stroke: var(--ant-color-white) !important;
 }
-.ql-snow .ql-picker.ql-header {
+/* .ql-snow .ql-picker.ql-header {
   width: 98px;
 }
 .ql-snow .ql-picker.ql-header .ql-picker-label::before,
@@ -838,7 +839,7 @@
 }
 .ql-snow .ql-color-picker.ql-color .ql-picker-item {
   background-color: #000;
-}
+} */
 .ql-toolbar.ql-snow {
   border: 1px solid var(--ant-color-border) !important;
   border-radius: var(--ant-border-radius-lg) var(--ant-border-radius-lg) 0 0 !important;
@@ -847,7 +848,7 @@
   font-family: var(--ant-font-family) !important;
   padding: 8px;
 }
-.ql-toolbar.ql-snow .ql-formats {
+/* .ql-toolbar.ql-snow .ql-formats {
   margin-right: 15px;
 }
 .ql-toolbar.ql-snow .ql-picker-label {
@@ -856,29 +857,29 @@
 .ql-toolbar.ql-snow .ql-picker-options {
   border: 1px solid transparent;
   box-shadow: rgba(0,0,0,0.2) 0 2px 8px;
-}
+} */
 .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
   border-color: var(--ant-color-border) !important;
 }
 .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
   border-color: var(--ant-color-border) !important;
 }
-.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item.ql-selected,
+/* .ql-toolbar.ql-snow .ql-color-picker .ql-picker-item.ql-selected,
 .ql-toolbar.ql-snow .ql-color-picker .ql-picker-item:hover {
   border-color: #000;
 }
 .ql-toolbar.ql-snow + .ql-container.ql-snow {
   border-top: 0px;
-}
+} */
 .ql-snow .ql-tooltip {
   background-color: #fff;
   border: 1px solid #ccc;
   box-shadow: 0px 0px 5px #ddd;
-  color: var(--ant-color-white);;
+  color: var(--ant-color-white) !important;
   padding: 5px 12px;
   white-space: nowrap;
 }
-.ql-snow .ql-tooltip::before {
+/* .ql-snow .ql-tooltip::before {
   content: "Visit URL:";
   line-height: 26px;
   margin-right: 8px;
@@ -935,7 +936,7 @@
 }
 .ql-snow a {
   color: #06c;
-}
+} */
 .ql-container.ql-snow {
   border: 1px solid var(--ant-color-border) !important;
   border-top: none !important;

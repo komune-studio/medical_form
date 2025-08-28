@@ -9,7 +9,7 @@ import swal from '../../reusable/CustomSweetAlert';
 import News from 'models/NewsModel';
 import Upload from 'models/UploadModel';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; 
+import 'react-quill/dist/quill.snow.css';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -107,19 +107,19 @@ export default function NewsFormPage({
 
   const FormQuill = ({ value, onChange, placeholder, ...props }) => {
     return (
-        <ReactQuill
-          theme="snow"
-          value={value || ''}
-          onChange={onChange}
-          placeholder={placeholder}
-          style={{ 
-            height: '480px',
-            marginBottom: '84px'
-          }}
-          {...props}
-        />
-      );
-    };
+      <ReactQuill
+        theme="snow"
+        value={value || ''}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          height: '480px',
+          marginBottom: '84px'
+        }}
+        {...props}
+      />
+    );
+  };
 
   // To watch form real update
   // useEffect(() => {
@@ -194,11 +194,19 @@ export default function NewsFormPage({
                           />
                         </Flex>
                         <Form.Item
-                          label={"Title"}
+                          label={languageTag("Title")}
                           name={"title"}
                           rules={[{
                             required: true,
                           }]}
+                          hidden={language !== "ID"}
+                        >
+                          <Input variant='filled' />
+                        </Form.Item>
+                        <Form.Item
+                          label={languageTag("Title")}
+                          name={"title_tl"}
+                          hidden={language === "ID"}
                         >
                           <Input variant='filled' />
                         </Form.Item>
@@ -217,29 +225,36 @@ export default function NewsFormPage({
                             onChange={onUploadChange}
                             beforeUpload={() => false}
                           >
-                            <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px", width: "100%", ...(formDisabled && { cursor: "not-allowed" }) }} type='button'>
+                            <button style={{ border: "none", background: "none", padding: "24px", minHeight: "200px", width: "100%", aspectRatio: 4/1, ...(formDisabled && { cursor: "not-allowed" }) }} type='button'>
                               <Flex vertical align='center'>
                                 {imagePreviewURL ? (
                                   <>
                                     <img src={imagePreviewURL} style={{ width: "100%", height: "auto" }} />
-                                    <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block", marginTop: "12px" }}>
-                                      Max image size 5MB.
-                                    </Typography.Text>
                                   </>
                                 ) : (
                                   <>
                                     <Iconify icon={"mdi:tray-upload"} style={{ fontSize: "48px" }} />
                                     <Typography.Text style={{ display: "inline-block", marginTop: "8px" }}>
-                                      Click or drag here to upload image. <br />
-                                      <Typography.Text type='secondary' style={{ fontSize: "12px", display: "inline-block", marginTop: "8px" }}>
-                                        Max image size 5MB.
-                                      </Typography.Text>
+                                      Click or drag here to upload image.
                                     </Typography.Text>
                                   </>
                                 )}
                               </Flex>
                             </button>
                           </AntUpload.Dragger>
+                          <Flex justify='start' style={{ marginTop: "4px" }}>
+                            <Space size={8}>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block"}}>
+                                Max image size 5MB
+                              </Typography.Text>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block"}}>
+                                -
+                              </Typography.Text>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block"}}>
+                                JPG, JPEG, PNG, WEBP supported
+                              </Typography.Text>
+                            </Space>
+                          </Flex>
                         </Form.Item>
                         <Form.Item
                           label={languageTag("Body")}
