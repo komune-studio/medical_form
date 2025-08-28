@@ -44,7 +44,7 @@ const BookList = () => {
       // )
     },
     {
-      id: 'authors', label: 'Authors', filter: false,
+      id: 'authors', label: 'Authors', filter: true,
       render: (row) => (
         <Space wrap size={4} style={{ maxWidth: "200px" }}>
           {!row?.book_authors ? (
@@ -59,12 +59,10 @@ const BookList = () => {
     },
     {
       id: 'publisher', label: 'Publisher', filter: true,
-      render: (row) => {
-        return row.publishers.name;
-      }
+      render: (row) => row.publishers.name
     },
     {
-      id: 'categories', label: 'Categories', filter: false, allowSort: false,
+      id: 'categories', label: 'Categories', filter: true, allowSort: false,
       render: (row) => (
         <Space wrap size={4} style={{ maxWidth: "200px" }}>
           {!row?.book_categories ? (
@@ -166,8 +164,18 @@ const BookList = () => {
     setLoading(true)
     try {
       let result = await Book.getAllWithCategoriesAndAuthors();
-      console.log(result);
-      setDataSource(result)
+      let formattedResult = result.map((value) => {
+        let bookAuthorsJoined = value.book_authors.map((book_author) => book_author.authors.name).join(",");
+        let bookCategoriesJoined = value.book_categories.map((book_category) => book_category.categories.name).join(",");
+        return {
+          ...value,
+          authors: bookAuthorsJoined,
+          publisher: value.publishers.name,
+          categories: bookCategoriesJoined,
+        }
+      })
+      console.log(formattedResult);
+      setDataSource(formattedResult)
       setLoading(false)
     } catch (e) {
       setLoading(false)
