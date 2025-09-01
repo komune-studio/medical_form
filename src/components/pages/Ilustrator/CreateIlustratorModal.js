@@ -85,9 +85,6 @@ export default function CreateIlustratorModal({ isOpen, itemId, close }) {
                     name="email"
                     rules={[
                         {
-                            required: true,
-                        },
-                        {
                             type: 'email',
                             message: 'Please enter a valid email',
                         },
@@ -99,9 +96,6 @@ export default function CreateIlustratorModal({ isOpen, itemId, close }) {
                     label="Phone Number"
                     name="phoneNumber"
                     rules={[
-                        {
-                            required: true,
-                        },
                         {
                             pattern: Helper.phoneRegEx,
                             message: 'Phone Number can only include numbers',

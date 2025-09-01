@@ -97,10 +97,6 @@ export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
                 name="email"
                 rules={[
                     {
-                        required: true,
-                        // message: 'Mohon memasukkan email!',
-                    },
-                    {
                         type: 'email',
                         message: 'Please enter a valid email.',
                     },
@@ -112,10 +108,6 @@ export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
                 label="Phone Number"
                 name="phoneNumber"
                 rules={[
-                    {
-                        required: true,
-                        // message: 'Mohon memasukkan Nomor HP!',
-                    },
                     {
                         pattern: Helper.phoneRegEx,
                         message: 'Phone Number can only include numbers',

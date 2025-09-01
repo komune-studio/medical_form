@@ -86,10 +86,6 @@ export default function CreateTranslatorModal({ isOpen, close }) {
                     name="email"
                     rules={[
                         {
-                            required: true,
-                            // message: 'Mohon memasukkan email!',
-                        },
-                        {
                             type: 'email',
                             message: 'Please enter a valid email',
                         },
@@ -102,10 +98,6 @@ export default function CreateTranslatorModal({ isOpen, close }) {
                     name="phoneNumber"
                     rules={[
                         {
-                            required: true,
-                            // message: 'Mohon memasukkan Nomor HP.',
-                        },
-                        {
                             pattern: Helper.phoneRegEx,
                             message: 'Phone Number can only include numbers',
                         },
@@ -117,10 +109,6 @@ export default function CreateTranslatorModal({ isOpen, close }) {
                     label="Languages"
                     name="languages"
                     rules={[
-                        {
-                            required: true,
-                            // message: 'Mohon memasukkan bahasa.',
-                        },
                     ]}
                 >
                     <Input />

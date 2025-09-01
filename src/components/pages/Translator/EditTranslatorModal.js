@@ -108,10 +108,6 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
                         name="email"
                         rules={[
                             {
-                                required: true,
-                                // message: 'Mohon memasukkan email!',
-                            },
-                            {
                                 type: 'email',
                                 message: 'Please enter a valid email',
                             },
@@ -124,10 +120,6 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
                         name="phoneNumber"
                         rules={[
                             {
-                                required: true,
-                                // message: 'Mohon memasukkan Nomor HP.',
-                            },
-                            {
                                 pattern: Helper.phoneRegEx,
                                 message: 'Phone Number can only include numbers',
                             },
@@ -139,10 +131,6 @@ export default function EditTranslatorModal({ isOpen, close, translatorData }) {
                         label="Languages"
                         name="languages"
                         rules={[
-                            {
-                                required: true,
-                                message: 'Mohon memasukkan bahasa.',
-                            },
                         ]}
                     >
                         <Input />
