@@ -8,13 +8,13 @@ import swal from "../../reusable/CustomSweetAlert";
 import Helper from 'utils/Helper';
 
 
-CreateIlustratorModal.propTypes = {
+CreateIllustratorModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
 };
 
 
-export default function CreateIlustratorModal({ isOpen, itemId, close }) {
+export default function CreateIllustratorModal({ isOpen, itemId, close }) {
     const [form] = Form.useForm();
 
     const onSubmit = async (values) => {

@@ -18,7 +18,7 @@
 import Logout from "./components/pages/Logout";
 import Login from "./components/pages/Login";
 import UserList from "./components/pages/Users/UserList";
-import IlustratorList from "components/pages/Ilustrator/IlustratorList";
+import IllustratorList from "components/pages/Illustrator/IllustratorList";
 import LiteraryAgencyList from "components/pages/LiteraryAgency/LiteraryAgencyList";
 import TranslatorList from "components/pages/Translator/TranslatorList";
 import PublisherList from "components/pages/Publisher/PublisherList";
@@ -130,7 +130,7 @@ var routes = [
     {
         path: "/illustrators",
         name: "Illustrators",
-        component: IlustratorList,
+        component: IllustratorList,
         layout: "/admin",
     },
     {

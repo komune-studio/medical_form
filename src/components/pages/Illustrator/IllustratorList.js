@@ -9,10 +9,10 @@ import Palette from 'utils/Palette';
 import {InputGroup, Form, Col,} from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import swal from "../../reusable/CustomSweetAlert";
-import CreateIlustratorModal from './CreateIlustratorModal';
-import EditIlustratorModal from './EditIlustratorModal';
+import CreateIllustratorModal from './CreateIllustratorModal';
+import EditIllustratorModal from './EditIllustratorModal';
 
-const IlustratorList = () => {
+const IllustratorList = () => {
     const history = useHistory();
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
@@ -145,7 +145,7 @@ const IlustratorList = () => {
                 </Card>
 
             </Container>
-            <CreateIlustratorModal
+            <CreateIllustratorModal
                 isOpen={isCreateOpen}
                 close={async (refresh) => {
                     if (refresh) {
@@ -154,7 +154,7 @@ const IlustratorList = () => {
                     setIsCreateOpen(false)
                 }}
             />
-            {isEditModalOpen ? <EditIlustratorModal
+            {isEditModalOpen ? <EditIllustratorModal
                 isOpen={isEditModalOpen}
                 ilustratorData={selectedIlustrator}
                 close={(refresh) => {
@@ -169,7 +169,7 @@ const IlustratorList = () => {
     )
 }
 
-export default IlustratorList;
+export default IllustratorList;
 
 
 

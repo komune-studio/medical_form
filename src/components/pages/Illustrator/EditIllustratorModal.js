@@ -7,13 +7,13 @@ import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
 import Helper from 'utils/Helper';
 
-EditIlustratorModal.propTypes = {
+EditIllustratorModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
     ilustratorData: PropTypes.object
 };
 
-export default function EditIlustratorModal({ isOpen, close, ilustratorData }) {
+export default function EditIllustratorModal({ isOpen, close, ilustratorData }) {
     const [form] = Form.useForm();
     const onSubmit = async (values) => {
         try {
