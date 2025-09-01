@@ -121,6 +121,10 @@ export default function NewsFormPage({
     );
   };
 
+  const FormLabelSecondaryText = (label) => {
+    return <Typography.Text type='secondary'>{label}</Typography.Text>
+  }
+
   // To watch form real update
   // useEffect(() => {
   //   console.log("body real update: ", bodyTest)
@@ -244,22 +248,68 @@ export default function NewsFormPage({
                           </AntUpload.Dragger>
                           <Flex justify='start' style={{ marginTop: "4px" }}>
                             <Space size={8}>
-                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block"}}>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
                                 Max image size 5MB
                               </Typography.Text>
-                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block"}}>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
                                 -
                               </Typography.Text>
-                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block"}}>
+                              <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
                                 JPG, JPEG, PNG, WEBP supported
                               </Typography.Text>
                             </Space>
                           </Flex>
                         </Form.Item>
                         <Form.Item
+                          label={FormLabelSecondaryText("Additional Content")}
+                          style={{
+                            marginBottom: 0
+                          }}
+                        >
+                          <Flex style={{ columnGap: "12px" }}>
+                            <Flex style={{ flexGrow: 1 }}>
+                              <Form.Item
+                                label={"Youtube Link"}
+                                name={"youtube_url"}
+                                style={{
+                                  width: "100%"
+                                }}
+                                rules={[
+                                  {
+                                    type: "url",
+                                  }
+                                ]}
+                              >
+                                <Input variant='filled' />
+                              </Form.Item>
+                            </Flex>
+                            <Flex style={{ flexGrow: 1 }}>
+                              <Form.Item
+                                label={"Spotify Link"}
+                                name={"spotify_url"}
+                                style={{
+                                  width: "100%"
+                                }}
+                                rules={[
+                                  {
+                                    type: "url",
+                                  }
+                                ]}
+                              >
+                                <Input variant='filled' />
+                              </Form.Item>
+                            </Flex>
+                          </Flex>
+                        </Form.Item>
+                        <Form.Item
                           label={languageTag("Body")}
                           name={"body"}
                           hidden={language !== "ID"}
+                          rules={[
+                            {
+                              required: true
+                            }
+                          ]}
                         >
                           <FormQuill placeholder="Write something here..." />
                         </Form.Item>
