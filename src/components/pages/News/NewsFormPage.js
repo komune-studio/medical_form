@@ -136,6 +136,7 @@ export default function NewsFormPage({
         title: newsData.title,
         body: newsData.body,
         body_tl: newsData.body_tl,
+        video_url: newsData.video_url,
       })
 
       if (newsData.image_cover) {
@@ -261,45 +262,15 @@ export default function NewsFormPage({
                           </Flex>
                         </Form.Item>
                         <Form.Item
-                          label={FormLabelSecondaryText("Additional Content")}
-                          style={{
-                            marginBottom: 0
-                          }}
+                          label={"Video Embed Link"}
+                          name={"video_url"}
+                          rules={[
+                            {
+                              type: "url",
+                            }
+                          ]}
                         >
-                          <Flex style={{ columnGap: "12px" }}>
-                            <Flex style={{ flexGrow: 1 }}>
-                              <Form.Item
-                                label={"Youtube Link"}
-                                name={"youtube_url"}
-                                style={{
-                                  width: "100%"
-                                }}
-                                rules={[
-                                  {
-                                    type: "url",
-                                  }
-                                ]}
-                              >
-                                <Input variant='filled' />
-                              </Form.Item>
-                            </Flex>
-                            <Flex style={{ flexGrow: 1 }}>
-                              <Form.Item
-                                label={"Spotify Link"}
-                                name={"spotify_url"}
-                                style={{
-                                  width: "100%"
-                                }}
-                                rules={[
-                                  {
-                                    type: "url",
-                                  }
-                                ]}
-                              >
-                                <Input variant='filled' />
-                              </Form.Item>
-                            </Flex>
-                          </Flex>
+                          <Input variant='filled' />
                         </Form.Item>
                         <Form.Item
                           label={languageTag("Body")}
