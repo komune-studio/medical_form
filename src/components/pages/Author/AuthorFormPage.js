@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Tag, Segmented } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Tag, Segmented, Divider } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
@@ -8,6 +8,7 @@ import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import Author from 'models/AuthorModel';
 import Upload from 'models/UploadModel';
+import Helper from 'utils/Helper';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -106,6 +107,13 @@ export default function AuthorFormPage({
     if (authorData) {
       form.setFieldsValue({
         name: authorData.name,
+        email: authorData.email,
+        phone: authorData.phone,
+        facebook: authorData.facebook,
+        instagram: authorData.instagram,
+        tiktok: authorData.tiktok,
+        twitter: authorData.twitter,
+        youtube: authorData.youtube,
         biography: authorData.biography,
         biography_tl: authorData.biography_tl,
       })
@@ -178,6 +186,79 @@ export default function AuthorFormPage({
                         >
                           <Input variant='filled' />
                         </Form.Item>
+
+                        <Form.Item
+                          label={"Email"}
+                          name={"email"}
+                          rules={[{
+                            type: 'email',
+                            message: 'Please enter a valid email address!',
+                          }]}
+                        >
+                          <Input variant='filled' />
+                        </Form.Item>
+
+                        <Form.Item
+                          label={"Phone Number"}
+                          name={"phone"}
+                          rules={[{
+                            pattern: Helper.phoneRegEx,
+                            message: 'Please enter a valid phone number!',
+                          }]}
+                        >
+                          <Input variant='filled' placeholder="+62 12345678"/>
+                        </Form.Item>
+
+                        <Divider>Social Media Profiles</Divider>
+
+                        <Row gutter={16}>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="Facebook"
+                              name="facebook"
+                            >
+                              <Input placeholder="Facebook username" />
+                            </Form.Item>
+                          </Col>
+                          
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="Instagram"
+                              name="instagram"
+                            >
+                              <Input placeholder="Instagram username" prefix="@" />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16}>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="TikTok"
+                              name="tiktok"
+                            >
+                              <Input placeholder="TikTok username" prefix="@" />
+                            </Form.Item>
+                          </Col>
+                          
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="Twitter"
+                              name="twitter"
+                            >
+                              <Input placeholder="Twitter username" prefix="@" />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                        <Form.Item
+                          label="YouTube"
+                          name="youtube"
+                        >
+                          <Input placeholder="YouTube channel name" />
+                        </Form.Item>
+                        
+                        <Divider>Biography</Divider>
+                          
                         <Form.Item
                           label={languageTag("Biography")}
                           name={"biography"}
