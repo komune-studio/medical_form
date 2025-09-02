@@ -5,6 +5,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
+import Placeholder from 'utils/Placeholder';
 EditliteraryAgencyModal.propTypes = {
     close: PropTypes.func,
     isOpen: PropTypes.bool,
@@ -89,7 +90,7 @@ export default function EditliteraryAgencyModal({ isOpen, close, literaryAgencyD
                         },
                     ]}
                 >
-                    <Input />
+                    <Input variant='filled' placeholder={Placeholder.name_publisher} />
                 </Form.Item>
                 {/* <Form.Item
                     label="Email"

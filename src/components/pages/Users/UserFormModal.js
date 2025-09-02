@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
 import Admin from 'models/AdminModel';
 import { useHistory } from "react-router-dom";
+import Placeholder from 'utils/Placeholder';
 
 UserFormModal.propTypes = {
     close: PropTypes.func,
@@ -125,7 +126,7 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData, is
                         required: true,
                     }]}
                 >
-                    <Input variant='filled' />
+                    <Input variant='filled' placeholder={Placeholder.name_person} />
                 </Form.Item>
                 {isNewRecord ? (
                     <>
@@ -136,7 +137,7 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData, is
                                 required: true,
                             }]}
                         >
-                            <Select variant='filled' options={userRoles} />
+                            <Select variant='filled' options={userRoles} placeholder={Placeholder.admin_role} />
                         </Form.Item>
                         <Form.Item
                             label={"Password"}
@@ -145,7 +146,7 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData, is
                                 required: true,
                             }]}
                         >
-                            <Input.Password variant='filled' />
+                            <Input.Password variant='filled' placeholder={Placeholder.password} />
                         </Form.Item>
                         <Form.Item
                             label={"Confirm Password"}
@@ -166,7 +167,7 @@ export default function UserFormModal({ isOpen, close, isNewRecord, userData, is
                                 }
                             ]}
                         >
-                            <Input.Password variant='filled' />
+                            <Input.Password variant='filled' placeholder={Placeholder.password_confirm} />
                         </Form.Item>
                     </>
                 ) : (

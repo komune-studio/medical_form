@@ -6,6 +6,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
 import Category from 'models/CategoryModel';
+import Placeholder from 'utils/Placeholder';
 
 CategoryFormModal.propTypes = {
     close: PropTypes.func,
@@ -127,7 +128,7 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
                     }]}
                     hidden={language !== "ID"}
                 >
-                    <Input variant='filled' />
+                    <Input variant='filled' placeholder={Placeholder.name_category} />
                 </Form.Item>
                 <Form.Item
                     label={languageTag("Description")}
@@ -137,21 +138,21 @@ export default function CategoryFormModal({ isOpen, close, isNewRecord, category
                     }]}
                     hidden={language !== "ID"}
                 >
-                    <Input.TextArea variant='filled' />
+                    <Input.TextArea variant='filled' placeholder={Placeholder.description} />
                 </Form.Item>
                 <Form.Item
                     label={languageTag("Name")}
                     name={"name_tl"}
                     hidden={language === "ID"}
                 >
-                    <Input variant='filled' />
+                    <Input variant='filled' placeholder={Placeholder.translated.name_category} />
                 </Form.Item>
                 <Form.Item
                     label={languageTag("Description")}
                     name={"description_tl"}
                     hidden={language === "ID"}
                 >
-                    <Input.TextArea variant='filled' />
+                    <Input.TextArea variant='filled' placeholder={Placeholder.translated.description} />
                 </Form.Item>
 
                 <div className={"d-flex flex-row justify-content-end"}>

@@ -6,6 +6,7 @@ import swal from "../../reusable/CustomSweetAlert";
 import User from "../../../models/UserModel";
 import PropTypes from "prop-types";
 import Admin from "models/AdminModel";
+import Placeholder from "utils/Placeholder";
 
 UserResetPasswordModal.propTypes = {
     onClose: PropTypes.func,
@@ -80,7 +81,7 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData, isSu
                                     required: true,
                                 }]}
                             >
-                                <Input.Password variant='filled' />
+                                <Input.Password variant='filled' placeholder={Placeholder.password_old} />
                             </Form.Item>
                         ) : (
                             <></>
@@ -92,7 +93,7 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData, isSu
                                 required: true,
                             }]}
                         >
-                            <Input.Password variant='filled' />
+                            <Input.Password variant='filled' placeholder={Placeholder.password_new} />
                         </Form.Item>
                         <Form.Item
                             label={"Confirm Password"}
@@ -114,7 +115,7 @@ export default function UserResetPasswordModal({ isOpen, onClose, userData, isSu
                                 }
                             ]}
                         >
-                            <Input.Password variant='filled' />
+                            <Input.Password variant='filled' placeholder={Placeholder.password_confirm} />
                         </Form.Item>
 
                         <div className={"d-flex flex-row justify-content-end"}>

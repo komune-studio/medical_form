@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import AdminModel from "../../../models/AdminModel";
 import PropTypes from "prop-types";
 import swal from "../../reusable/CustomSweetAlert";
+import Placeholder from 'utils/Placeholder';
 
 CreateLiteraryAgencyModal.propTypes = {
     close: PropTypes.func,
@@ -76,7 +77,7 @@ export default function CreateLiteraryAgencyModal({ isOpen, close }) {
                         },
                     ]}
                 >
-                    <Input />
+                    <Input variant='filled' placeholder={Placeholder.name_publisher} />
                 </Form.Item>
                 {/* <Form.Item
                     label="Email"

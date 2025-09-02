@@ -9,6 +9,7 @@ import swal from '../../reusable/CustomSweetAlert';
 import Translator from 'models/TranslatorModel';
 import Upload from 'models/UploadModel';
 import Helper from 'utils/Helper';
+import Placeholder from 'utils/Placeholder';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -190,7 +191,7 @@ export default function TranslatorFormPage({
                             required: true,
                           }]}
                         >
-                          <Input variant='filled' />
+                          <Input variant='filled' placeholder={Placeholder.name_person} />
                         </Form.Item>
 
                         <Form.Item
@@ -201,7 +202,7 @@ export default function TranslatorFormPage({
                             message: 'Please enter a valid email address!',
                           }]}
                         >
-                          <Input variant='filled' />
+                          <Input variant='filled' placeholder={Placeholder.email} />
                         </Form.Item>
 
                         <Form.Item
@@ -212,7 +213,7 @@ export default function TranslatorFormPage({
                             message: 'Please enter a valid phone number!',
                           }]}
                         >
-                          <Input variant='filled' />
+                          <Input variant='filled' placeholder={Placeholder.phone} />
                         </Form.Item>
 
                         <Form.Item
@@ -220,14 +221,14 @@ export default function TranslatorFormPage({
                           name={"biography"}
                           hidden={language !== "ID"}
                         >
-                          <Input.TextArea variant='filled' rows={4} />
+                          <Input.TextArea variant='filled' rows={4} placeholder={Placeholder.biography} />
                         </Form.Item>
                         <Form.Item
                           label={languageTag("Biography")}
                           name={"biography_tl"}
                           hidden={language === "ID"}
                         >
-                          <Input.TextArea variant='filled' rows={4} />
+                          <Input.TextArea variant='filled' rows={4} placeholder={Placeholder.translated.biography} />
                         </Form.Item>
 
                          <Form.Item
@@ -238,7 +239,7 @@ export default function TranslatorFormPage({
                             message: 'Please enter languages!',
                           }]}
                         >
-                          <Input variant='filled' placeholder="e.g., English, Spanish, French" />
+                          <Input variant='filled' placeholder={Placeholder.language} />
                         </Form.Item>
 
                         <Divider>Social Media Profiles</Divider>
@@ -249,7 +250,7 @@ export default function TranslatorFormPage({
                               label="Facebook"
                               name="facebook"
                             >
-                              <Input variant='filled' placeholder="Facebook username" />
+                              <Input variant='filled' placeholder={Placeholder.facebook} />
                             </Form.Item>
                           </Col>
                           
@@ -258,7 +259,7 @@ export default function TranslatorFormPage({
                               label="Instagram"
                               name="instagram"
                             >
-                              <Input variant='filled' placeholder="Instagram username" prefix="@" />
+                              <Input variant='filled' prefix="@" placeholder={Placeholder.instagram} />
                             </Form.Item>
                           </Col>
                         </Row>
@@ -269,7 +270,7 @@ export default function TranslatorFormPage({
                               label="TikTok"
                               name="tiktok"
                             >
-                              <Input variant='filled' placeholder="TikTok username" prefix="@" />
+                              <Input variant='filled' prefix="@" placeholder={Placeholder.tiktok} />
                             </Form.Item>
                           </Col>
                           
@@ -278,7 +279,7 @@ export default function TranslatorFormPage({
                               label="Twitter"
                               name="twitter"
                             >
-                              <Input variant='filled' placeholder="Twitter username" prefix="@" />
+                              <Input variant='filled' prefix="@" placeholder={Placeholder.twitter} />
                             </Form.Item>
                           </Col>
                         </Row>
@@ -287,7 +288,7 @@ export default function TranslatorFormPage({
                           label="YouTube"
                           name="youtube"
                         >
-                          <Input variant='filled' placeholder="YouTube channel name" />
+                          <Input variant='filled' placeholder={Placeholder.youtube} />
                         </Form.Item>
 
                         {!formDisabled ? (
