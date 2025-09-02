@@ -14,7 +14,7 @@ export default class Placeholder {
   static select_illustrator = "Select an illustrator"
   static select_translator = "Select a translator"
   static select_categories = "Select category(s)"
-  static phone = "e.g. +62 081233445566"
+  static phone = "e.g. +621111222233"
   static email = "e.g. example@email.com"
   static website = "www.example.com"
   static address = "e.g. Jl. Mawar No. 15, RT 005/RW 002, Kel. Mekar, Kec. Kencana, Kota Agung, 12345 or other shorter version"
