@@ -4,7 +4,7 @@ import IllustratorFormPage from "./IllustratorFormPage";
 import Illustrator from "models/IllustratorModel";
 
 const IllustratorEdit = () => {
-  const [illustratorData, setillustratorData] = useState({})
+  const [illustratorData, setIllustratorData] = useState({})
 
   const params = useParams();
 
@@ -15,10 +15,9 @@ const IllustratorEdit = () => {
   useEffect(() => {
     (async () => {
       let result = await getIllustratorData(params.id)
-      setillustratorData(result)
+      setIllustratorData(result)
     })()
   }, [params])
-
 
   return (
     <IllustratorFormPage illustratorData={illustratorData}></IllustratorFormPage>

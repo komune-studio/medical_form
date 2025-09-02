@@ -18,14 +18,13 @@
 import Logout from "./components/pages/Logout";
 import Login from "./components/pages/Login";
 import UserList from "./components/pages/Users/UserList";
-import IllustratorList from "components/pages/Illustrator/IllustratorList";
 import IllustratorCreate from "components/pages/Illustrator/IllustratorCreate";
 import IllustratorEdit from "components/pages/Illustrator/IllustratorEdit";
+import IllustratorList from "components/pages/Illustrator/IllustratorList";
 import LiteraryAgencyList from "components/pages/LiteraryAgency/LiteraryAgencyList";
 import TranslatorEdit from "components/pages/Translator/TranslatorEdit";
 import TranslatorCreate from "components/pages/Translator/TranslatorCreate";
 import TranslatorList from "components/pages/Translator/TranslatorList";
-
 import PublisherList from "components/pages/Publisher/PublisherList";
 import BookList from "components/pages/Book/BookList";
 import BookCreate from "components/pages/Book/BookCreate";
@@ -144,13 +143,6 @@ var routes = [
         component: TranslatorList,
         layout: "/admin",
     },
-   
-    {
-        path: "/illustrators",
-        name: "Illustrators",
-        component: IllustratorList,
-        layout: "/admin",
-    },
     {
         path: "/illustrators/create",
         name: "Illustrators",
@@ -163,6 +155,13 @@ var routes = [
         component: IllustratorEdit,
         layout: "/admin",
     },
+    {
+        path: "/illustrators",
+        name: "Illustrators",
+        component: IllustratorList,
+        layout: "/admin",
+    },
+    
     {
         path: "/literary-agencies",
         name: "Literary Agencies",

@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Tag, Segmented } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Tag, Segmented, Divider } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
@@ -8,6 +8,7 @@ import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
 import Illustrator from 'models/IllustratorModel';
 import Upload from 'models/UploadModel';
+import Helper from 'utils/Helper';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -22,6 +23,7 @@ export default function IllustratorFormPage({
   const [form] = Form.useForm();
   const [formDisabled, setFormDisabled] = useState(false);
   const [language, setLanguage] = useState("ID");
+
   const [imagePreviewURL, setImagePreviewURL] = useState(null);
   const [imageFile, setImageFile] = useState(null);
 
@@ -78,7 +80,7 @@ export default function IllustratorFormPage({
       }
 
       message.success(msg)
-      history.push("/authors")
+      history.push("/illustrators")
     } catch (e) {
       console.log(e)
       let errorMessage = "An Error Occured"
@@ -105,15 +107,15 @@ export default function IllustratorFormPage({
     if (illustratorData) {
       form.setFieldsValue({
         name: illustratorData.name,
-        biography: illustratorData.biography,
-        biography_tl: illustratorData.biography_tl,
         email: illustratorData.email,
-        phone_number: illustratorData.phone_number,
+        phone: illustratorData.phone,
         facebook: illustratorData.facebook,
         instagram: illustratorData.instagram,
-        youtube: illustratorData.youtube,
         tiktok: illustratorData.tiktok,
         twitter: illustratorData.twitter,
+        youtube: illustratorData.youtube,
+        biography: illustratorData.biography,
+        biography_tl: illustratorData.biography_tl,
       })
 
       if (illustratorData.profile_picture) {
@@ -141,13 +143,13 @@ export default function IllustratorFormPage({
                       <Iconify icon={'material-symbols:arrow-back-rounded'} style={{ fontSize: "16px", color: "white" }}></Iconify>
                     </Space>
                   </Link>
-                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Authors</span>
+                  <span style={{ fontWeight: "bold", fontSize: "1.1em" }}>Illustrators</span>
                 </Space>
               </Col>
             </Row>
             <Row>
               <Col className='mb-3' md={12} style={{ marginTop: "40px" }}>
-                <Typography.Title level={3}>{!illustratorData ? "Add" : "Update"} Author</Typography.Title>
+                <Typography.Title level={3}>{!illustratorData ? "Add" : "Update"} Illustrator</Typography.Title>
               </Col>
             </Row>
             <Row>
@@ -175,6 +177,7 @@ export default function IllustratorFormPage({
                             options={['ID', 'EN']}
                           />
                         </Flex>
+                        
                         <Form.Item
                           label={"Name"}
                           name={"name"}
@@ -184,6 +187,80 @@ export default function IllustratorFormPage({
                         >
                           <Input variant='filled' />
                         </Form.Item>
+
+                        <Form.Item
+                          label={"Email"}
+                          name={"email"}
+                          rules={[{
+                            type: 'email',
+                            message: 'Please enter a valid email address!',
+                          }]}
+                        >
+                          <Input variant='filled' />
+                        </Form.Item>
+
+                        <Form.Item
+                          label={"Phone Number"}
+                          name={"phone"}
+                          rules={[{
+                            pattern: Helper.phoneRegEx,
+                            message: 'Please enter a valid phone number!',
+                          }]}
+                        >
+                          <Input variant='filled' />
+                        </Form.Item>
+
+                        <Divider>Social Media Profiles</Divider>
+
+                        <Row gutter={16}>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="Facebook"
+                              name="facebook"
+                            >
+                              <Input placeholder="Facebook username" />
+                            </Form.Item>
+                          </Col>
+                          
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="Instagram"
+                              name="instagram"
+                            >
+                              <Input placeholder="Instagram username" prefix="@" />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+
+                        <Row gutter={16}>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="TikTok"
+                              name="tiktok"
+                            >
+                              <Input placeholder="TikTok username" prefix="@" />
+                            </Form.Item>
+                          </Col>
+                          
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              label="Twitter"
+                              name="twitter"
+                            >
+                              <Input placeholder="Twitter username" prefix="@" />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+
+                        <Form.Item
+                          label="YouTube"
+                          name="youtube"
+                        >
+                          <Input placeholder="YouTube channel name" />
+                        </Form.Item>
+
+                        <Divider>Biography</Divider>
+
                         <Form.Item
                           label={languageTag("Biography")}
                           name={"biography"}
@@ -197,48 +274,6 @@ export default function IllustratorFormPage({
                           hidden={language === "ID"}
                         >
                           <Input.TextArea variant='filled' rows={4} />
-                        </Form.Item>
-                        <Form.Item
-                          label="Email"
-                          name="email"
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label="Phone"
-                          name="phone_number"
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label="Instagram"
-                          name="instagram"
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label="Facebook"
-                          name="facebook"
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label="Youtube"
-                          name="youtube"
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label="Tiktok"
-                          name="tiktok"
-                        >
-                          <Input variant='filled' />
-                        </Form.Item>
-                        <Form.Item
-                          label="Twitter"
-                          name="twitter"
-                        >
-                          <Input variant='filled' />
                         </Form.Item>
 
                         {!formDisabled ? (
@@ -309,4 +344,3 @@ export default function IllustratorFormPage({
     </>
   );
 }
-
