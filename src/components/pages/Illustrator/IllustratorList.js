@@ -9,10 +9,13 @@ import Palette from 'utils/Palette';
 import { InputGroup, Form, Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import swal from "../../reusable/CustomSweetAlert";
+import IllustratorDetailModal from './IllustratorDetailModal'; // Import modal detail
 
 const IllustratorList = () => {
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
+  const [selectedIllustrator, setSelectedIllustrator] = useState(null); // State untuk illustrator yang dipilih
+  const [openIllustratorModal, setOpenIllustratorModal] = useState(false); // State untuk modal detail
 
   const columns = [
     {
@@ -60,7 +63,7 @@ const IllustratorList = () => {
         </Tooltip>
       )
     },
-    { id: 'phone', label: 'Phone', filter: false, allowSort: false },
+    { id: 'phone_number', label: 'Phone', filter: false, allowSort: false },
     { id: 'email', label: 'Email', filter: true },
     {
       id: '', 
@@ -70,13 +73,25 @@ const IllustratorList = () => {
         return (
           <>
             <Space size="small">
+              {/* Tombol Detail */}
+              <Tooltip title="Detail">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    setOpenIllustratorModal(true);
+                    setSelectedIllustrator(row);
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"material-symbols:search-rounded"} />} />
+              </Tooltip>
+              
               <Tooltip title="Edit">
                 <Link to={`/illustrators/${row.id}/edit`}>
                   <AntButton
                     type={'link'}
                     style={{ color: Palette.MAIN_THEME }}
-                    onClick={() => {
-                    }}
                     className={"d-flex align-items-center justify-content-center"}
                     shape="circle"
                     icon={<Iconify icon={"material-symbols:edit"} />} />
@@ -169,6 +184,13 @@ const IllustratorList = () => {
           </CardBody>
         </Card>
       </Container>
+
+      {/* Modal untuk Detail Illustrator */}
+      <IllustratorDetailModal
+        open={openIllustratorModal}
+        illustrator={selectedIllustrator}
+        onClose={() => setOpenIllustratorModal(false)}
+      />
     </>
   )
 }

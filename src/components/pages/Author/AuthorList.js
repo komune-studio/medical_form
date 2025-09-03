@@ -1,12 +1,13 @@
-import { Space, Button as AntButton, Tooltip, Modal, message, Image, Flex, Tag } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message, Image, Flex } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Card, Row, CardBody, Container } from "reactstrap";
 import { Link } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
-import { Col, } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import Author from 'models/AuthorModel';
+import AuthorDetailModal from './AuthorDetailModal';
 
 const AuthorList = () => {
 
@@ -14,7 +15,6 @@ const AuthorList = () => {
   const [dataSource, setDataSource] = useState([]);
   const [selectedAuthor, setSelectedAuthor] = useState(null)
   const [openAuthorModal, setOpenAuthorModal] = useState(false)
-  const [isNewRecord, setIsNewRecord] = useState(false)
 
   const columns = [
     {
@@ -41,6 +41,33 @@ const AuthorList = () => {
     },
     {
       id: 'biography', label: 'Biography', filter: false, allowSort: false,
+      render: (row) => {
+        return (
+          <div style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {row.biography || '-'}
+          </div>
+        )
+      }
+    },
+    {
+      id: 'phone', label: 'Phone', filter: true,
+      render: (row) => {
+        return (
+          <div>
+            {row.phone || '-'}
+          </div>
+        )
+      }
+    },
+    {
+      id: 'email', label: 'Email', filter: true,
+      render: (row) => {
+        return (
+          <div>
+            {row.email || '-'}
+          </div>
+        )
+      }
     },
     {
       id: '', label: '', filter: false,
@@ -48,28 +75,25 @@ const AuthorList = () => {
         return (
           <>
             <Space size="small">
-              {/* <Tooltip title="Detail">
-                <Link to={`/books/${row.id}`}>
-                  <AntButton
-                    type={'link'}
-                    style={{ color: Palette.MAIN_THEME }}
-                    onClick={() => {
-                      setOpenAuthorModal(true)
-                      setSelectedAuthor(row)
-                      setIsNewRecord(false)
-                    }}
-                    className={"d-flex align-items-center justify-content-center"}
-                    shape="circle"
-                    icon={<Iconify icon={"material-symbols:search-rounded"} />} />
-                </Link>
-              </Tooltip> */}
+              {/* Tombol Detail */}
+              <Tooltip title="Detail">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    setOpenAuthorModal(true)
+                    setSelectedAuthor(row)
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"material-symbols:search-rounded"} />} />
+              </Tooltip>
+              
               <Tooltip title="Edit">
                 <Link to={`/authors/${row.id}/edit`}>
                   <AntButton
                     type={'link'}
                     style={{ color: Palette.MAIN_THEME }}
-                    onClick={() => {
-                    }}
                     className={"d-flex align-items-center justify-content-center"}
                     shape="circle"
                     icon={<Iconify icon={"material-symbols:edit"} />} />
@@ -92,17 +116,6 @@ const AuthorList = () => {
 
       })
     },
-    /* {
-      id: '', label: '', filter: false,
-      render: ((row) => {
-        return (
-          <>
-            <Button variant={'text'}>Lihat Detail</Button>
-          </>
-          )
-
-      })
-    }, */
   ]
 
   const deleteItem = async (id) => {
@@ -176,18 +189,12 @@ const AuthorList = () => {
 
       </Container>
 
-      {/* <AuthorFormModal
-        isOpen={openAuthorModal}
-        isNewRecord={isNewRecord}
-        bookData={selectedAuthor}
-        close={async (refresh) => {
-          if (refresh) {
-            await initializeData()
-          }
-          setOpenAuthorModal(false)
-        }}
-      /> */}
-
+      {/* Modal untuk Detail Author */}
+      <AuthorDetailModal
+        open={openAuthorModal}
+        author={selectedAuthor}
+        onClose={() => setOpenAuthorModal(false)}
+      />
     </>
   )
 }

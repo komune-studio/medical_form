@@ -11,13 +11,15 @@ import CustomTable from "../../reusable/CustomTable";
 import swal from "../../reusable/CustomSweetAlert";
 import EditTranslatorModal from './EditTranslatorModal';
 import CreateTranslatorModal from './CreateTranslatorModal';
+import TranslatorDetailModal from './TranslatorDetailModal'; // Import modal detail
 
 const TranslatorList = () => {
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [selectedTranslator, setselectedTranslator] = useState(null);
+  const [selectedTranslator, setSelectedTranslator] = useState(null);
+  const [openTranslatorModal, setOpenTranslatorModal] = useState(false); // State untuk modal detail
 
   const columns = [
     {
@@ -66,6 +68,21 @@ const TranslatorList = () => {
       id: '', label: '', filter: false,
       render: (row) => (
         <Space size="small">
+          {/* Tombol Detail */}
+          <Tooltip title="Detail">
+            <AntButton
+              type="link"
+              style={{ color: Palette.MAIN_THEME }}
+              onClick={() => {
+                setOpenTranslatorModal(true);
+                setSelectedTranslator(row);
+              }}
+              className="d-flex align-items-center justify-content-center"
+              shape="circle"
+              icon={<Iconify icon="material-symbols:search-rounded" />}
+            />
+          </Tooltip>
+          
           <Tooltip title="Edit">
             <Link to={`/translators/${row.id}/edit`}>
               <AntButton
@@ -160,6 +177,13 @@ const TranslatorList = () => {
         </Card>
       </Container>
 
+      {/* Modal untuk Detail Translator */}
+      <TranslatorDetailModal
+        open={openTranslatorModal}
+        translator={selectedTranslator}
+        onClose={() => setOpenTranslatorModal(false)}
+      />
+
       {/* Optional modals, kalau masih dipakai */}
       <CreateTranslatorModal
         isOpen={isCreateOpen}
@@ -175,7 +199,7 @@ const TranslatorList = () => {
           close={(refresh) => {
             if (refresh) initializeData();
             setIsEditModalOpen(false);
-            setselectedTranslator(null);
+            setSelectedTranslator(null);
           }}
         />
       )}

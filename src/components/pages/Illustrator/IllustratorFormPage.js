@@ -109,7 +109,7 @@ export default function IllustratorFormPage({
       form.setFieldsValue({
         name: illustratorData.name,
         email: illustratorData.email,
-        phone: illustratorData.phone,
+        phone_number: illustratorData.phone_number,
         facebook: illustratorData.facebook,
         instagram: illustratorData.instagram,
         tiktok: illustratorData.tiktok,
@@ -204,7 +204,7 @@ export default function IllustratorFormPage({
 
                         <Form.Item
                           label={"Phone Number"}
-                          name={"phone"}
+                          name={"phone_number"}
                           rules={[{
                             pattern: Helper.phoneRegEx,
                             message: 'Please enter a valid phone number!',
