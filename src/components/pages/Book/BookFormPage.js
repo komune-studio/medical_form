@@ -391,7 +391,7 @@ export default function BookFormPage({
                             options={authors} 
                             variant='filled' 
                             filterOption={selectFilterFunction} 
-                            placeholder={Placeholder.admin_role}
+                            placeholder={Placeholder.select_author}
                           />
                         </Form.Item>
                         <Form.Item
@@ -406,15 +406,12 @@ export default function BookFormPage({
                             options={publishers} 
                             variant='filled' 
                             filterOption={selectFilterFunction}
-                            placeholder={Placeholder.select_author}
+                            placeholder={Placeholder.select_publisher}
                            />
                         </Form.Item>
                         <Form.Item
                           label={"Illustrator"}
                           name={"illustrator_id"}
-                          rules={[{
-                            required: true,
-                          }]}
                         >
                           <Select 
                             showSearch={true} 
@@ -447,6 +444,7 @@ export default function BookFormPage({
                         // }]}
                         >
                           <Select 
+                            mode='multiple'
                             showSearch={true} 
                             options={categories} 
                             variant='filled' 
