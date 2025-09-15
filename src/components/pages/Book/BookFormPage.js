@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useHistory, Link } from 'react-router-dom';
-import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Segmented, Tag } from 'antd';
+import { Button, Flex, message, Spin, Typography, Form, Input, Select, Upload as AntUpload, Space, Segmented, Tag, DatePicker } from 'antd';
 import { Card, CardBody, Container } from 'reactstrap';
 import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
@@ -17,6 +17,7 @@ import Upload from 'models/UploadModel';
 import Author from 'models/AuthorModel';
 import BookAuthor from 'models/BookAuthorModel';
 import Placeholder from 'utils/Placeholder';
+import moment from 'moment';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -266,6 +267,10 @@ export default function BookFormPage({
         translator_id: bookData.translator_id,
       })
 
+      if(bookData.release_date) {
+        form.setFieldValue("release_date", moment(bookData.release_date))
+      }
+
       let categoryIds = bookData.categories?.map((c) => {
         return c.id
       })
@@ -379,6 +384,14 @@ export default function BookFormPage({
                             placeholder={Placeholder.translated.description}
                           />
                         </Form.Item>
+
+                        <Form.Item
+                          label={"Released Date"}
+                          name="release_date"
+                        >
+                          <DatePicker picker='date' style={{ width: "100%" }} />
+                        </Form.Item >
+                        
                         <Form.Item
                           label={"Authors"}
                           name={"authors"}
