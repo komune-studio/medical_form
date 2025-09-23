@@ -38,6 +38,7 @@ export default class Placeholder {
     name_book: "e.g. The Rainbow Troops (Translated Version)",
     name_category: "e.g. Fiction (Translated Version)",
     name_news: "e.g. Weekly Announcement (Translated version)",
+    name_media: "e.g. Ink & Ideas: From Drafts to Published Works (Translated Version)",
     biography: "Insert biography here (Translated Version)",
     description: "Insert description here (Translated Version)",
   }
