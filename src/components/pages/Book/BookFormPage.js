@@ -17,7 +17,7 @@ import Upload from 'models/UploadModel';
 import Author from 'models/AuthorModel';
 import BookAuthor from 'models/BookAuthorModel';
 import Placeholder from 'utils/Placeholder';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
@@ -276,7 +276,7 @@ export default function BookFormPage({
       })
 
       if (bookData.release_date) {
-        form.setFieldValue("release_date", moment(bookData.release_date))
+        form.setFieldValue("release_date", dayjs(bookData.release_date))
       }
 
       let categoryIds = bookData.categories?.map((c) => {
