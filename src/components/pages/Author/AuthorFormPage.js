@@ -238,7 +238,7 @@ export default function AuthorFormPage({
                           />
                         </Form.Item>
 
-                        <Divider>Social Media Profiles</Divider>
+                        <Divider>Social Media Accounts (URL)</Divider>
 
                         <Row>
                           <Col xs={4}>
@@ -261,7 +261,7 @@ export default function AuthorFormPage({
                                 width: "100%",
                               }}
                             >
-                              <Input variant='filled' prefix="@" placeholder={Placeholder.instagram} />
+                              <Input variant='filled' placeholder={Placeholder.instagram} />
                             </Form.Item>
                           </Col>
 
@@ -273,7 +273,7 @@ export default function AuthorFormPage({
                                 width: "100%"
                               }}
                             >
-                              <Input variant='filled' prefix="@" placeholder={Placeholder.tiktok} />
+                              <Input variant='filled' placeholder={Placeholder.tiktok} />
                             </Form.Item>
                           </Col>
                         </Row>
@@ -286,7 +286,7 @@ export default function AuthorFormPage({
                                 width: "100%",
                               }}
                             >
-                              <Input variant='filled' prefix="@" placeholder={Placeholder.twitter} />
+                              <Input variant='filled' placeholder={Placeholder.twitter} />
                             </Form.Item>
                           </Col>
 
