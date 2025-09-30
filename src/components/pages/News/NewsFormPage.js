@@ -14,6 +14,25 @@ import 'react-quill/dist/quill.snow.css';
 
 const allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
+const modules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    [{ 'size': ['small', false, 'large'] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ 'align': [false, 'center', 'right', 'justify'] }, { 'list': 'bullet' }, { 'list': 'ordered' }, { 'indent': '-1' }, { 'indent': '+1' }],
+    ['link', 'image'],
+    ['clean']
+  ],
+}
+
+const formats = [
+  'header',
+  'size',
+  'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'align', 'list', 'bullet', 'indent',
+  'link', 'image'
+]
+
 export default function NewsFormPage({
   newsData,
   disabled,
@@ -119,6 +138,8 @@ export default function NewsFormPage({
           height: '480px',
           marginBottom: '84px'
         }}
+        modules={modules}
+        formats={formats}
         {...props}
       />
     );

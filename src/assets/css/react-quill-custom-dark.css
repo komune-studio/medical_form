@@ -657,12 +657,13 @@
   position: absolute;
   white-space: nowrap;
 }
-/* .ql-snow .ql-picker-options .ql-picker-item {
+.ql-snow .ql-picker-options .ql-picker-item {
   cursor: pointer;
   display: block;
   padding-bottom: 5px;
   padding-top: 5px;
-} */
+  margin: auto
+}
 .ql-snow .ql-picker-options .ql-picker-item:hover {
   color: var(--main-theme) !important;
 }
@@ -693,12 +694,14 @@
 .ql-snow .ql-color-picker .ql-picker-label,
 .ql-snow .ql-icon-picker .ql-picker-label {
   padding: 2px 4px;
-}
+} */
 .ql-snow .ql-color-picker .ql-picker-label svg,
 .ql-snow .ql-icon-picker .ql-picker-label svg {
-  right: 4px;
+  right: 0 !important;
+  top: -2.4px !important;
+  position: relative;
 }
-.ql-snow .ql-icon-picker .ql-picker-options {
+/* .ql-snow .ql-icon-picker .ql-picker-options {
   padding: 4px 0px;
 }
 .ql-snow .ql-icon-picker .ql-picker-item {
