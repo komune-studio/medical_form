@@ -16,7 +16,7 @@ export default function CropperUpload({
   const [originalImagePreviewURL, setOriginalImagePreviewURL] = useState(initialPreview)
   const [imagePreviewURL, setImagePreviewURL] = useState(initialPreview);
 
-  const onUploadChange = ({ file }) => {
+  const onUploadChange = async ({ file }) => {
     const isImage = Helper.allowedImageType.includes(file.type);
     if (!isImage) {
       message.error("File must be image type " +
@@ -29,9 +29,12 @@ export default function CropperUpload({
       return Upload.LIST_IGNORE;
     }
 
-    const url = URL.createObjectURL(file);
-    setOriginalImagePreviewURL(url);
-    handleOpen()
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      setOriginalImagePreviewURL(reader.result?.toString() || '');
+      handleOpen()
+    });
+    reader.readAsDataURL(file);
   }
 
   const handleImageCropped = async (croppedImage) => {
@@ -93,7 +96,7 @@ export default function CropperUpload({
       </Upload.Dragger>
 
       <CropperModal
-        key={[initialPreview, imageAspect]}
+        key={originalImagePreviewURL}
         imgSrc={originalImagePreviewURL}
         onImageCropped={handleImageCropped}
         isOpen={isOpen}

@@ -20,19 +20,19 @@ export default function CropperUploadForm({ label, name, imageAspect, onImageCha
   }
 
   return (
-    <Form.Item
-      label={""}
-      name={name}
-      noStyle
-    >
-      <Flex vertical style={{marginBottom: "24px"}}>
-        <Flex style={{ width: "100%", paddingBottom: "8px", justifyContent: "space-between", alignItems: "end" }}>
-          {label}
+    <Flex vertical style={{ marginBottom: "24px" }}>
+      <Flex style={{ width: "100%", paddingBottom: "8px", justifyContent: "space-between", alignItems: "end" }}>
+        {label}
 
-          {/* <span className='label-link' onClick={handleEditCropper}>
+        {/* <span className='label-link' onClick={handleEditCropper}>
           Edit
         </span> */}
-        </Flex>
+      </Flex>
+      <Form.Item
+        label={""}
+        name={name}
+        noStyle
+      >
         <CropperUpload
           key={initialPreview}
           uploadRef={uploadRef}
@@ -43,20 +43,20 @@ export default function CropperUploadForm({ label, name, imageAspect, onImageCha
           handleClose={() => setIsOpenCropper(false)}
           imageAspect={imageAspect}
         />
-        <Flex justify='start' style={{ marginTop: "4px" }}>
-          <Space wrap size={[8, 1]}>
-            <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
-              Max image size 5MB
-            </Typography.Text>
-            <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
-              -
-            </Typography.Text>
-            <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
-              JPG, JPEG, PNG, WEBP supported
-            </Typography.Text>
-          </Space>
-        </Flex>
+      </Form.Item>
+      <Flex justify='start' style={{ marginTop: "4px" }}>
+        <Space wrap size={[8, 1]}>
+          <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
+            Max image size 5MB
+          </Typography.Text>
+          <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
+            -
+          </Typography.Text>
+          <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
+            JPG, JPEG, PNG, WEBP supported
+          </Typography.Text>
+        </Space>
       </Flex>
-    </Form.Item>
+    </Flex>
   )
 }
