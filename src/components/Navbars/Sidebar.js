@@ -60,6 +60,12 @@ const SIDEBAR_COLOR = Palette.MAIN_THEME;
 
 const SIDEBAR = [
     {
+        path: "/grants",
+        name: "Grants",
+        icon: "mdi:file-document",
+        color: SIDEBAR_COLOR
+    },
+    {
         path: "/books",
         name: "Books",
         icon: "mdi:book",
