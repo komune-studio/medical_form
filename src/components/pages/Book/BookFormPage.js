@@ -391,9 +391,9 @@ export default function BookFormPage({
                         <Form.Item
                           label={"Authors"}
                           name={"authors"}
-                          rules={[{
-                            required: true,
-                          }]}
+                          // rules={[{
+                          //   required: true,
+                          // }]}
                         >
                           <Select
                             mode='multiple'
@@ -407,9 +407,9 @@ export default function BookFormPage({
                         <Form.Item
                           label={"Publisher"}
                           name={"publisher_id"}
-                          rules={[{
-                            required: true,
-                          }]}
+                          // rules={[{
+                          //   required: true,
+                          // }]}
                         >
                           <Select
                             showSearch={true}

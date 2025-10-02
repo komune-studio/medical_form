@@ -47,30 +47,30 @@ const BookList = () => {
       id: 'authors', label: 'Authors', filter: true,
       render: (row) => (
         <Space wrap size={4} style={{ maxWidth: "200px" }}>
-          {!row?.book_authors ? (
-            <></>
-          ) : (
+          {row?.book_authors && row?.book_authors?.length > 0 ? (
             row?.book_authors?.map((ba) => (
               `- ${ba.authors.name}`
             ))
+          ) : ( 
+            '-'
           )}
         </Space>
       )
     },
     {
       id: 'publisher', label: 'Publisher', filter: true,
-      render: (row) => row.publishers.name
+      render: (row) => row?.publishers ? row?.publishers.name : '-'
     },
     {
       id: 'categories', label: 'Categories', filter: true, allowSort: false,
       render: (row) => (
         <Space wrap size={4} style={{ maxWidth: "200px" }}>
-          {!row?.book_categories ? (
-            <></>
-          ) : (
+          {row?.book_categories && row?.book_categories?.length > 0 ? (
             row?.book_categories?.map((bc) => (
               <Tag>{bc.categories.name}</Tag>
             ))
+          ) : ( 
+            '-'
           )}
         </Space>
       )
@@ -170,11 +170,10 @@ const BookList = () => {
         return {
           ...value,
           authors: bookAuthorsJoined,
-          publisher: value.publishers.name,
           categories: bookCategoriesJoined,
         }
       })
-      console.log(formattedResult);
+      console.log(formattedResult[0]?.book_authors?.length)
       setDataSource(formattedResult)
       setLoading(false)
     } catch (e) {
