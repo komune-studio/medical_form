@@ -301,7 +301,8 @@ export default function IllustratorFormPage({
                         <CropperUploadForm
                           label={"Profile Picture"}
                           name={"profile_picture"}
-                          onImageChange={(file) => setImageFile(file)} />
+                          onImageChange={(file) => setImageFile(file)} 
+                          imageAspect={9/16}/>
                       </Flex>
                     </Flex>
                   </Form>

@@ -2,7 +2,7 @@ import { Flex, Form, Space, Typography } from "antd";
 import CropperUpload from "./CropperUpload";
 import { useEffect, useRef, useState } from "react";
 
-export default function CropperUploadForm({ label, name, onImageChange, ...props }) {
+export default function CropperUploadForm({ label, name, imageAspect, onImageChange, ...props }) {
   const [isOpenCropper, setIsOpenCropper] = useState(false);
 
   const uploadRef = useRef(null);
@@ -40,8 +40,9 @@ export default function CropperUploadForm({ label, name, onImageChange, ...props
         isOpen={isOpenCropper}
         handleOpen={() => setIsOpenCropper(true)}
         handleClose={() => setIsOpenCropper(false)}
+        imageAspect={imageAspect}
       />
-      <Flex justify='start' style={{ marginTop: "4px" }}>
+      <Flex justify='start' style={{ marginTop: "4px", marginBottom: "24px" }}>
         <Space wrap size={[8, 1]}>
           <Typography.Text type="secondary" style={{ fontSize: "12px", display: "inline-block" }}>
             Max image size 5MB

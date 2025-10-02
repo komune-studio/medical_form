@@ -316,7 +316,8 @@ export default function LiteraryAgencyFormPage({
                         <CropperUploadForm 
                           label={"Literary Agency Logo"}
                           name={"agency_logo"}
-                          onImageChange={(file) => setImageFile(file)}/>
+                          onImageChange={(file) => setImageFile(file)}
+                          imageAspect={[9/16, 16/9]}/>
                       </Flex>
                     </Flex>
                   </Form>

@@ -231,7 +231,7 @@ export default function BookFormPage({
         confirmButtonText: 'Okay'
       })
     } finally {
-      setLoadingSubmit(true);
+      setLoadingSubmit(false);
     }
   }
 

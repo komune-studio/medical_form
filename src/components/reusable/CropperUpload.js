@@ -4,7 +4,15 @@ import Iconify from "./Iconify";
 import Helper from "utils/Helper";
 import CropperModal from "./CropperModal";
 
-export default function CropperUpload({ uploadRef, initialPreview, onImageChange, isOpen = false, handleOpen, handleClose }) {
+export default function CropperUpload({
+  uploadRef,
+  initialPreview,
+  onImageChange,
+  isOpen = false,
+  handleOpen,
+  handleClose,
+  imageAspect,
+}) {
   const [originalImagePreviewURL, setOriginalImagePreviewURL] = useState(initialPreview)
   const [imagePreviewURL, setImagePreviewURL] = useState(initialPreview);
 
@@ -29,7 +37,7 @@ export default function CropperUpload({ uploadRef, initialPreview, onImageChange
   const handleImageCropped = async (croppedImage) => {
     setImagePreviewURL(croppedImage);
     try {
-      if(!onImageChange) message.error("Image file setter function is not defined!", 1)
+      if (!onImageChange) message.error("Image file setter function is not defined!", 1)
 
       await fetch(croppedImage)
         .then((res) => res.blob())
@@ -85,12 +93,13 @@ export default function CropperUpload({ uploadRef, initialPreview, onImageChange
       </Upload.Dragger>
 
       <CropperModal
-        key={initialPreview}
+        key={[initialPreview, imageAspect]}
         imgSrc={originalImagePreviewURL}
         onImageCropped={handleImageCropped}
         isOpen={isOpen}
         handleOpen={handleOpen}
         handleClose={handleClose}
+        imageAspect={imageAspect}
       />
     </>
   )

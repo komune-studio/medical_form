@@ -315,7 +315,8 @@ export default function PublisherFormPage({
                         <CropperUploadForm 
                           label={"Publisher Logo"}
                           name={"publisher_logo"}
-                          onImageChange={(file) => setImageFile(file)}/>
+                          onImageChange={(file) => setImageFile(file)}
+                          imageAspect={[9/16, 16/9]}/>
                       </Flex>
                     </Flex>
                   </Form>

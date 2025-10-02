@@ -28,6 +28,7 @@ export default function CropperModal({
   handleOpen,
   handleClose,
   modalProps,
+  imageAspect,
   ...props
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,6 +40,8 @@ export default function CropperModal({
     height: 50
   });
   const [loading, setLoading] = useState(false);
+  const [aspectCount, setAspectCount] = useState(0)
+  const [currentAspect, setCurrentAspect] = useState(imageAspect ? imageAspect[aspectCount] : undefined);
 
   const imgRef = useRef(null)
 
@@ -47,6 +50,21 @@ export default function CropperModal({
   const handleCancel = () => {
     handleModalClose();
   };
+
+  const onChangeAspect = () => {
+    let nextAspect = aspectCount + 1
+    if (nextAspect == imageAspect.length) nextAspect = 0
+    setAspectCount(nextAspect);
+    setCurrentAspect(imageAspect[nextAspect]);
+
+    setCrop(c => ({
+      ...c,
+      x: c.y,
+      y: c.x,
+      width: c.height,
+      height: c.width,
+    }))
+  }
 
   async function onFinalizeCrop() {
     setLoading(true);
@@ -107,7 +125,7 @@ export default function CropperModal({
   const onImageLoad = (e) => {
     const { width, height } = e.currentTarget;
 
-    setCrop(centerAspectCrop(width, height, 9 / 14))
+    setCrop(centerAspectCrop(width, height, Array.isArray(imageAspect) ? currentAspect: imageAspect ?? 1))
   }
 
   return (
@@ -117,18 +135,26 @@ export default function CropperModal({
         onCancel={handleCancel}
         open={isOpen ? isOpen : isModalOpen}
         footer={[
-          <Button key="back" onClick={handleCancel}>
+          <Button key="back"  onClick={handleCancel}>
             Cancel
           </Button>,
-          <Button key="submit" type="primary" loading={loading} onClick={onFinalizeCrop}>
+          {...(Array.isArray(imageAspect) ?
+            (<Button key="aspect" loading={loading} onClick={onChangeAspect}>
+              Change Aspect
+            </Button>
+            ) : (
+              <></>
+            ))},
+          < Button key="submit" type="primary" loading={loading} onClick={onFinalizeCrop} >
             Crop
-          </Button>,
-        ]}
+          </Button >,
+        ]
+        }
         {...modalProps}
       >
         <ReactCrop
           crop={crop}
-          keepSelection={true}
+          aspect={(Array.isArray(imageAspect)) ? imageAspect[aspectCount] : imageAspect}
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           style={{
             marginInline: "auto",
@@ -143,7 +169,7 @@ export default function CropperModal({
             style={{ maxHeight: '480px', width: 'auto', marginInline: "auto" }}
           />
         </ReactCrop>
-      </Modal>
+      </Modal >
     </>
   )
 }
