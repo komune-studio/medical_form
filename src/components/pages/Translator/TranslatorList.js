@@ -12,6 +12,7 @@ import swal from "../../reusable/CustomSweetAlert";
 import EditTranslatorModal from './EditTranslatorModal';
 import CreateTranslatorModal from './CreateTranslatorModal';
 import TranslatorDetailModal from './TranslatorDetailModal'; // Import modal detail
+import Helper from 'utils/Helper';
 
 const TranslatorList = () => {
   const [loading, setLoading] = useState(false);
@@ -68,6 +69,18 @@ const TranslatorList = () => {
       id: '', label: '', filter: false,
       render: (row) => (
         <Space size="small">
+          <Tooltip title="Open on Landing Page">
+            <AntButton
+              type={'link'}
+              style={{ color: Palette.MAIN_THEME }}
+              onClick={() => {
+                window.open(`${Helper.redirectURL}/translators/${row?.id}`)
+              }}
+              className={"d-flex align-items-center justify-content-center"}
+              shape="circle"
+              icon={<Iconify icon={"mdi:external-link"} />} />
+          </Tooltip>
+
           {/* Tombol Detail */}
           <Tooltip title="Detail">
             <AntButton
@@ -82,7 +95,7 @@ const TranslatorList = () => {
               icon={<Iconify icon="material-symbols:search-rounded" />}
             />
           </Tooltip>
-          
+
           <Tooltip title="Edit">
             <Link to={`/translators/${row.id}/edit`}>
               <AntButton

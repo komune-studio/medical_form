@@ -8,6 +8,7 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import Book from 'models/BookModel';
 import BookCategory from 'models/BookCategoryModel';
+import Helper from 'utils/Helper';
 
 const BookList = () => {
 
@@ -51,7 +52,7 @@ const BookList = () => {
             row?.book_authors?.map((ba) => (
               `- ${ba.authors.name}`
             ))
-          ) : ( 
+          ) : (
             '-'
           )}
         </Space>
@@ -69,7 +70,7 @@ const BookList = () => {
             row?.book_categories?.map((bc) => (
               <Tag>{bc.categories.name}</Tag>
             ))
-          ) : ( 
+          ) : (
             '-'
           )}
         </Space>
@@ -81,6 +82,18 @@ const BookList = () => {
         return (
           <>
             <Space size="small">
+              <Tooltip title="Open on Landing Page">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    window.open(`${Helper.redirectURL}/books/details/${row?.id}`)
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"mdi:external-link"} />} />
+              </Tooltip>
+
               <Tooltip title="Detail">
                 <Link to={`/books/${row.id}`}>
                   <AntButton

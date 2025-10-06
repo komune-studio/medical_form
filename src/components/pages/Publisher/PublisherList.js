@@ -8,6 +8,7 @@ import Palette from "../../../utils/Palette";
 import PublisherFormModal from './PublisherFormModal';
 import Publisher from 'models/PublisherModel';
 import { Link } from 'react-router-dom';
+import Helper from 'utils/Helper';
 
 const PublisherList = () => {
 
@@ -55,6 +56,18 @@ const PublisherList = () => {
         return (
           <>
             <Space size="small">
+              <Tooltip title="Open on Landing Page">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    window.open(`${Helper.redirectURL}/publishers/${row?.id}`)
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"mdi:external-link"} />} />
+              </Tooltip>
+
               <Tooltip title="Edit">
                 <Link to={`/publishers/${row.id}/edit`}>
                   <AntButton

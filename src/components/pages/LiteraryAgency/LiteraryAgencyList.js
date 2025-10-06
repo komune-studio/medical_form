@@ -9,6 +9,7 @@ import { InputGroup, Form, Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import EditliteraryAgencyModal from './EditLiteraryAgency';
 import CreateLiteraryAgencyModal from './CreateLiteraryAgencyModal';
+import Helper from 'utils/Helper';
 
 const LiteraryAgencyList = () => {
 
@@ -57,6 +58,18 @@ const LiteraryAgencyList = () => {
                 return (
                     <>
                         <Space size="small">
+                            <Tooltip title="Open on Landing Page">
+                                <AntButton
+                                    type={'link'}
+                                    style={{ color: Palette.MAIN_THEME }}
+                                    onClick={() => {
+                                        window.open(`${Helper.redirectURL}/literary-agencies/${row?.id}`)
+                                    }}
+                                    className={"d-flex align-items-center justify-content-center"}
+                                    shape="circle"
+                                    icon={<Iconify icon={"mdi:external-link"} />} />
+                            </Tooltip>
+
                             <Tooltip title="Edit">
                                 <Link to={`/literary-agencies/${row.id}/edit`}>
                                     <AntButton

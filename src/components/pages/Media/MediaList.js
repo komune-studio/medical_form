@@ -8,6 +8,7 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import moment from 'moment';
 import Media from 'models/MediaModel';
+import Helper from 'utils/Helper';
 
 const MediaList = () => {
 
@@ -65,6 +66,18 @@ const MediaList = () => {
         return (
           <>
             <Space size="small">
+              <Tooltip title="Open on Landing Page">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    window.open(`${Helper.redirectURL}/medias/${row?.id}`)
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"mdi:external-link"} />} />
+              </Tooltip>
+
               {/* <Tooltip title="Detail">
                 <Link to={`/books/${row.id}`}>
                   <AntButton

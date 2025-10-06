@@ -8,6 +8,7 @@ import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import Author from 'models/AuthorModel';
 import AuthorDetailModal from './AuthorDetailModal';
+import Helper from 'utils/Helper';
 
 const AuthorList = () => {
 
@@ -75,6 +76,18 @@ const AuthorList = () => {
         return (
           <>
             <Space size="small">
+              <Tooltip title="Open on Landing Page">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    window.open(`${Helper.redirectURL}/authors/${row?.id}`)
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"mdi:external-link"} />} />
+              </Tooltip>
+
               {/* Tombol Detail */}
               <Tooltip title="Detail">
                 <AntButton
@@ -88,7 +101,7 @@ const AuthorList = () => {
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:search-rounded"} />} />
               </Tooltip>
-              
+
               <Tooltip title="Edit">
                 <Link to={`/authors/${row.id}/edit`}>
                   <AntButton

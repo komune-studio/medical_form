@@ -10,6 +10,7 @@ import { InputGroup, Form, Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import swal from "../../reusable/CustomSweetAlert";
 import IllustratorDetailModal from './IllustratorDetailModal'; // Import modal detail
+import Helper from 'utils/Helper';
 
 const IllustratorList = () => {
   const [loading, setLoading] = useState(false);
@@ -19,9 +20,9 @@ const IllustratorList = () => {
 
   const columns = [
     {
-      id: 'profile_picture', 
-      label: 'Profile Picture', 
-      filter: false, 
+      id: 'profile_picture',
+      label: 'Profile Picture',
+      filter: false,
       allowSort: false,
       render: (row) => {
         return (
@@ -41,13 +42,13 @@ const IllustratorList = () => {
       }
     },
     {
-      id: 'name', 
-      label: 'Name', 
+      id: 'name',
+      label: 'Name',
       filter: true,
     },
     {
-      id: 'biography', 
-      label: 'Biography', 
+      id: 'biography',
+      label: 'Biography',
       filter: true,
       render: (row) => (
         <Tooltip title={row.biography || 'No biography available'}>
@@ -66,13 +67,25 @@ const IllustratorList = () => {
     { id: 'phone_number', label: 'Phone', filter: false, allowSort: false },
     { id: 'email', label: 'Email', filter: true },
     {
-      id: '', 
-      label: '', 
+      id: '',
+      label: '',
       filter: false,
       render: ((row) => {
         return (
           <>
             <Space size="small">
+              <Tooltip title="Open on Landing Page">
+                <AntButton
+                  type={'link'}
+                  style={{ color: Palette.MAIN_THEME }}
+                  onClick={() => {
+                    window.open(`${Helper.redirectURL}/illustrators/${row?.id}`)
+                  }}
+                  className={"d-flex align-items-center justify-content-center"}
+                  shape="circle"
+                  icon={<Iconify icon={"mdi:external-link"} />} />
+              </Tooltip>
+
               {/* Tombol Detail */}
               <Tooltip title="Detail">
                 <AntButton
@@ -86,7 +99,7 @@ const IllustratorList = () => {
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:search-rounded"} />} />
               </Tooltip>
-              
+
               <Tooltip title="Edit">
                 <Link to={`/illustrators/${row.id}/edit`}>
                   <AntButton
@@ -100,15 +113,15 @@ const IllustratorList = () => {
               <Tooltip title="Delete">
                 <AntButton
                   type={'link'}
-                  style={{color: Palette.MAIN_THEME}}
+                  style={{ color: Palette.MAIN_THEME }}
                   onClick={() => {
                     onDelete(row.id)
                   }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
-                  icon={<Iconify icon={"material-symbols:delete-outline"}/>}
+                  icon={<Iconify icon={"material-symbols:delete-outline"} />}
                 >
-                </AntButton> 
+                </AntButton>
               </Tooltip>
             </Space>
           </>
@@ -143,7 +156,7 @@ const IllustratorList = () => {
     setLoading(true)
     try {
       let result = await Illustrator.getAll()
-      
+
       // console.log("Result: ", result)
       setDataSource(result)
       setLoading(false)
@@ -159,18 +172,18 @@ const IllustratorList = () => {
   return (
     <>
       <Container fluid>
-        <Card style={{background: Palette.BACKGROUND_DARK_GRAY, color: "white"}}
-              className="card-stats mb-4 mb-xl-0">
+        <Card style={{ background: Palette.BACKGROUND_DARK_GRAY, color: "white" }}
+          className="card-stats mb-4 mb-xl-0">
           <CardBody>
             <Row>
               <Col className='mb-3' md={6}>
-                <div style={{fontWeight: "bold", fontSize: "1.1em"}}>Illustrators</div>
+                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Illustrators</div>
               </Col>
               <Col className='mb-3 text-right' md={6}>
                 <Link to="/illustrators/create">
                   <AntButton
-                  onClick={() => {console.log("button worked") }}
-                  size={'middle'} type={'primary'}>Add Illustrator</AntButton>
+                    onClick={() => { console.log("button worked") }}
+                    size={'middle'} type={'primary'}>Add Illustrator</AntButton>
                 </Link>
               </Col>
             </Row>
