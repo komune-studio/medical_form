@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Button, Flex, Image, Tag, Segmented, Typography, Space } from 'antd';
+import { Modal, Button, Flex, Image, Tag, Segmented, Typography, Space, message } from 'antd';
 import { Link } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
+import Grant from 'models/GrantModel';
 
-const GrantReviewModal = ({ open, grant, onClose }) => {
+const GrantReviewModal = ({ open, grant, onApprove, onReject, onClose }) => {
   if (!grant) return null;
 
   const bioBoxStyle = {
@@ -23,6 +24,14 @@ const GrantReviewModal = ({ open, grant, onClose }) => {
     gap: '12px',
     marginTop: '8px',
   };
+
+  const handleApprove = (id) => {
+    onApprove(id)
+  }
+
+  const handleReject = (id) => {
+    onReject(id);
+  }
 
   return (
     <Modal
@@ -52,10 +61,10 @@ const GrantReviewModal = ({ open, grant, onClose }) => {
         {grant?.status == "WAITING" ? (
           <Flex justify='end' className='container-fluid p-0' style={{ marginTop: "16px" }}>
             <Space size="small">
-              <Button type='text' className='bg-danger'>
+              <Button type='text' className='bg-danger' onClick={() => handleReject(grant?.id)}>
                 Reject
               </Button>
-              <Button type='text' className='bg-success'>
+              <Button type='text' className='bg-success' onClick={() => handleApprove(grant?.id)}>
                 Approve
               </Button>
             </Space>

@@ -117,6 +117,7 @@ const GrantList = () => {
       await Grant.approveGrant(id)
       message.success('Grant approved')
       initializeData();
+      setOpenGrantModal(false);
     } catch (e) {
       message.error('There was error from server')
       setLoading(true)
@@ -128,47 +129,48 @@ const GrantList = () => {
       await Grant.rejectGrant(id)
       message.success('Grant rejected')
       initializeData();
+      setOpenGrantModal(false);
     } catch (e) {
       message.error('There was error from server')
       setLoading(true)
     }
   }
 
-  const onApprove = (record) => {
-    Modal.confirm({
-      title: "Are you sure you want to approve this grant request?",
-      okText: "Yes",
-      okType: "text",
-      onOk: () => {
-        approveGrant(record.id)
-      },
-      okButtonProps: {
-        className: "bg-success"
-      },
-      cancelButtonProps: {
-        type: "text",
-        className: "bg-white"
-      }
-    });
-  }
+  // const onApprove = (record) => {
+  //   Modal.confirm({
+  //     title: "Are you sure you want to approve this grant request?",
+  //     okText: "Yes",
+  //     okType: "text",
+  //     onOk: () => {
+  //       approveGrant(record.id)
+  //     },
+  //     okButtonProps: {
+  //       className: "bg-success"
+  //     },
+  //     cancelButtonProps: {
+  //       type: "text",
+  //       className: "bg-white"
+  //     }
+  //   });
+  // }
 
-  const onDelete = (record) => {
-    Modal.confirm({
-      title: "Are you sure you want to reject this grant request?",
-      okText: "Yes",
-      okType: "text",
-      onOk: () => {
-        rejectGrant(record.id)
-      },
-      okButtonProps: {
-        className: "bg-danger"
-      },
-      cancelButtonProps: {
-        type: "text",
-        className: "bg-white"
-      }
-    });
-  };
+  // const onDelete = (record) => {
+  //   Modal.confirm({
+  //     title: "Are you sure you want to reject this grant request?",
+  //     okText: "Yes",
+  //     okType: "text",
+  //     onOk: () => {
+  //       rejectGrant(record.id)
+  //     },
+  //     okButtonProps: {
+  //       className: "bg-danger"
+  //     },
+  //     cancelButtonProps: {
+  //       type: "text",
+  //       className: "bg-white"
+  //     }
+  //   });
+  // };
 
   const initializeData = async () => {
     setLoading(true)
@@ -225,6 +227,8 @@ const GrantList = () => {
       <GrantReviewModal
         open={openGrantModal}
         grant={selectedGrant}
+        onApprove={approveGrant}
+        onReject={rejectGrant}
         onClose={() => setOpenGrantModal(false)}
       />
     </>
