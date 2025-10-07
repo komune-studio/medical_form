@@ -120,6 +120,12 @@ const SIDEBAR = [
         color: SIDEBAR_COLOR
     },
     {
+        path: "/banners",
+        name: "Banners",
+        icon: "mdi:image-area",
+        color: SIDEBAR_COLOR
+    },
+    {
         path: "/admins",
         name: "Admins",
         icon: "mdi:user",

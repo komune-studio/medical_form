@@ -81,17 +81,17 @@ input.form-control::placeholder, textarea.form-control::placeholder {
 }
 
 .ant-switch-inner {
-    background: #913e1c !important;
+    background: var(--main-theme) !important;
 }
 
-.ant-switch-handle::before {
+/* .ant-switch-handle::before {
     background: #bb3b3a !important;
     top: -6px !important;
     left: -5px !important;
     right: -3px !important;
     bottom: -2px !important;
     border-radius: 100% !important;
-}
+} */
 
 .ant-modal-mask {
     background-color: rgb(118 81 52 / 45%) !important;

@@ -2,7 +2,7 @@ import { Flex, Form, Space, Typography } from "antd";
 import CropperUpload from "./CropperUpload";
 import { useEffect, useRef, useState } from "react";
 
-export default function CropperUploadForm({ label, name, imageAspect, onImageChange, ...props }) {
+export default function CropperUploadForm({ label, name, imageAspect, onImageChange, imagePreview, ...props }) {
   const [isOpenCropper, setIsOpenCropper] = useState(false);
 
   const uploadRef = useRef(null);
@@ -34,9 +34,9 @@ export default function CropperUploadForm({ label, name, imageAspect, onImageCha
         noStyle
       >
         <CropperUpload
-          key={initialPreview}
+          key={imagePreview ? imagePreview : initialPreview}
           uploadRef={uploadRef}
-          initialPreview={initialPreview}
+          initialPreview={imagePreview ? imagePreview : initialPreview}
           onImageChange={onImageChange}
           isOpen={isOpenCropper}
           handleOpen={() => setIsOpenCropper(true)}

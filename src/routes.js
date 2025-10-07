@@ -45,6 +45,7 @@ import MediaEdit from "components/pages/Media/MediaEdit";
 import LiteraryAgencyCreate from "components/pages/LiteraryAgency/LiteraryAgencyCreate";
 import LiteraryAgencyEdit from "components/pages/LiteraryAgency/LiteraryAgencyEdit";
 import GrantList from "components/pages/Grant/GrantList";
+import BannerList from "components/pages/Banner/BannerList";
 
 var routes = [
     {
@@ -201,6 +202,12 @@ var routes = [
         path: "/literary-agencies",
         name: "Literary Agencies",
         component: LiteraryAgencyList,
+        layout: "/admin",
+    },
+    {
+        path: "/banners",
+        name: "Banners",
+        component: BannerList,
         layout: "/admin",
     },
     {
