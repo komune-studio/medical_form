@@ -85,7 +85,8 @@ export default function BannerFormModal({ isOpen, close, isNewRecord, bannerData
                 id: bannerData?.id,
                 image_url: bannerData?.image_url,
                 image_url_english: bannerData?.image_url_english,
-                show_banner: bannerData?.show_banner
+                show_banner: bannerData?.show_banner,
+                redirect_url: bannerData?.redirect_url
             })
         }
 
@@ -133,22 +134,28 @@ export default function BannerFormModal({ isOpen, close, isNewRecord, bannerData
                     name={"image_url"}
                     imagePreview={imagePreview}
                     onImageChange={(file) => setImageFile(file)}
+                    required={true}
                 />
 
                 <CropperUploadForm
                     key={imageEnglishPreview}
-                    label={"Banner Image"}
+                    label={"Banner Image (English version)"}
                     name={"image_url_english"}
                     imagePreview={imageEnglishPreview}
                     onImageChange={(file) => setImageEnglishFile(file)}
+                    required={true}
                 />
+
+                <Form.Item
+                    label="Redirect URL"
+                    name="redirect_url"
+                >
+                    <Input variant='filled' placeholder='Insert the redirect URL for this banner' />
+                </Form.Item>
 
                 <Form.Item
                     label={"Show Banner"}
                     name={"show_banner"}
-                    rules={[{
-                        required: true,
-                    }]}
                     hidden={language !== "ID"}
                 >
                     <Switch />
