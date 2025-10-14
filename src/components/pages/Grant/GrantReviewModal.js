@@ -5,9 +5,14 @@ import Iconify from "../../reusable/Iconify";
 import Grant from 'models/GrantModel';
 import moment from 'moment';
 import { useForm } from 'antd/es/form/Form';
+import swal from 'components/reusable/CustomSweetAlert';
 
 const GrantReviewModal = ({ open, grant, onApprove, onReject, onClose }) => {
   const [openRejectModal, setOpenRejectModal] = useState(false);
+  const [loadings, setLoadings] = useState({
+    approve: false,
+    reject: false,
+  });
   const [form] = useForm();
   const rejectReason = Form.useWatch("reject_reason", form)
 
@@ -31,13 +36,39 @@ const GrantReviewModal = ({ open, grant, onApprove, onReject, onClose }) => {
     marginTop: '8px',
   };
 
-  const handleApprove = (id) => {
-    onApprove(id)
+  const toggleLoading = (action) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = { ...prevLoadings }
+      newLoadings[action] = !prevLoadings[action];
+      return newLoadings;
+    })
   }
 
-  const handleReject = (id) => {
-    handleCloseRejectModal()
-    onReject(id, rejectReason);
+  const handleApprove = async (id) => {
+    toggleLoading("approve")
+    await onApprove(id)
+    form.setFieldValue("reject_reason", "")
+    toggleLoading("approve")
+    // await swal.fire({
+    //   title: 'Success',
+    //   text: "Grant approved successfully.",
+    //   icon: "success",
+    //   confirmButtonText: 'Okay'
+    // })
+  }
+
+  const handleReject = async (id) => {
+    toggleLoading("reject")
+    handleCloseRejectModal();
+    await onReject(id, rejectReason);
+    form.setFieldValue("reject_reason", "")
+    toggleLoading("reject")
+    // await swal.fire({
+    //   title: 'Success',
+    //   text: "Grant rejected successfully.",
+    //   icon: "success",
+    //   confirmButtonText: 'Okay'
+    // })
   }
 
   const handleCloseReviewModal = () => {
@@ -113,10 +144,10 @@ const GrantReviewModal = ({ open, grant, onApprove, onReject, onClose }) => {
           {grant?.status == "WAITING" ? (
             <Flex justify='end' className='container-fluid p-0' style={{ marginTop: "16px" }}>
               <Space size="small">
-                <Button type='text' className='bg-danger' onClick={() => handleOpenRejectModal(grant?.id)}>
+                <Button type='text' className='bg-danger' onClick={() => handleOpenRejectModal(grant?.id)} loading={loadings["reject"]}>
                   Reject
                 </Button>
-                <Button type='text' className='bg-success' onClick={() => handleApprove(grant?.id)}>
+                <Button type='text' className='bg-success' onClick={() => handleApprove(grant?.id)} loading={loadings["approve"]}>
                   Approve
                 </Button>
               </Space>
