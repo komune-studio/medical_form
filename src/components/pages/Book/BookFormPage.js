@@ -25,7 +25,6 @@ import ReactQuill from 'react-quill';
 const modules = {
   toolbar: [
     ['bold', 'italic', 'underline', 'clean'],
-    [{ 'font': [] }],
   ],
 }
 
