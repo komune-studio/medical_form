@@ -20,6 +20,18 @@ import Placeholder from 'utils/Placeholder';
 import dayjs from 'dayjs';
 import LiteraryAgencies from 'models/LiteraryAgenciesModel';
 import CropperUploadForm from 'components/reusable/CropperUploadForm';
+import ReactQuill from 'react-quill';
+
+const modules = {
+  toolbar: [
+    ['bold', 'italic', 'underline', 'clean'],
+    [{ 'font': [] }],
+  ],
+}
+
+const formats = [
+  'bold', 'italic', 'underline'
+]
 
 export default function BookFormPage({
   bookData,
@@ -244,6 +256,25 @@ export default function BookFormPage({
     </span>
   );
 
+  const FormQuill = ({ value, onChange, placeholder, ...props }) => {
+    return (
+      <ReactQuill
+        theme="snow"
+        value={value || ''}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          height: '160px',
+          marginBottom: '42px'
+        }}
+        modules={modules}
+        formats={formats}
+        {...props}
+      >
+      </ReactQuill>
+    );
+  };
+
   useEffect(() => {
     (async () => {
       await initializeData();
@@ -364,7 +395,7 @@ export default function BookFormPage({
                           <Input variant='filled' placeholder={Placeholder.translated.name_book} />
                         </Form.Item>
 
-                        <Form.Item
+                        {/* <Form.Item
                           label={languageTag("Description")}
                           name="description"
                           hidden={language !== "ID"}
@@ -386,14 +417,30 @@ export default function BookFormPage({
                             rows={4}
                             placeholder={Placeholder.translated.description}
                           />
+                        </Form.Item> */}
+
+                        <Form.Item
+                          label={languageTag("Description")}
+                          name={"description"}
+                          hidden={language !== "ID"}
+                        >
+                          <FormQuill placeholder={Placeholder.description} />
+                        </Form.Item>
+
+                        <Form.Item
+                          label={languageTag("Description")}
+                          name={"description_tl"}
+                          hidden={language === "ID"}
+                        >
+                          <FormQuill placeholder={Placeholder.translated.description} />
                         </Form.Item>
 
                         <Form.Item
                           label={"Authors"}
                           name={"authors"}
-                          // rules={[{
-                          //   required: true,
-                          // }]}
+                        // rules={[{
+                        //   required: true,
+                        // }]}
                         >
                           <Select
                             mode='multiple'
@@ -407,9 +454,9 @@ export default function BookFormPage({
                         <Form.Item
                           label={"Publisher"}
                           name={"publisher_id"}
-                          // rules={[{
-                          //   required: true,
-                          // }]}
+                        // rules={[{
+                        //   required: true,
+                        // }]}
                         >
                           <Select
                             showSearch={true}
@@ -553,7 +600,7 @@ export default function BookFormPage({
                         )}
                       </Flex>
                       <Flex vertical style={{ width: "30%" }} className='text-white'>
-                        <CropperUploadForm 
+                        <CropperUploadForm
                           label={"Cover Image"}
                           name={"image_cover"}
                           onImageChange={(file) => setImageFile(file)} />
