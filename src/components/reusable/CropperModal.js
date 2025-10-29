@@ -133,6 +133,7 @@ export default function CropperModal({
       <Modal
         title="Crop Image"
         onCancel={handleCancel}
+        maskClosable={false}
         open={isOpen ? isOpen : isModalOpen}
         footer={[
           <Button key="back"  onClick={handleCancel}>

@@ -49,7 +49,9 @@ export default function BannerFormModal({ isOpen, close, isNewRecord, bannerData
                 const result = await uploadImage(imageEnglishFile);
                 form.setFieldValue("image_url_english", result?.location);
             }
-            message.success("Image uploaded successfully");
+            if (imageFile || imageEnglishFile) {
+                message.success("Image uploaded successfully");
+            }
             let body = form.getFieldsValue();
             let msg = ''
             if (isNewRecord) {
@@ -104,6 +106,7 @@ export default function BannerFormModal({ isOpen, close, isNewRecord, bannerData
 
     const reset = () => {
         form.resetFields();
+        form.setFieldValue('show_banner', true)
     }
 
     return <Modal
@@ -143,7 +146,6 @@ export default function BannerFormModal({ isOpen, close, isNewRecord, bannerData
                     name={"image_url_english"}
                     imagePreview={imageEnglishPreview}
                     onImageChange={(file) => setImageEnglishFile(file)}
-                    required={true}
                 />
 
                 <Form.Item
@@ -156,7 +158,7 @@ export default function BannerFormModal({ isOpen, close, isNewRecord, bannerData
                 <Form.Item
                     label={"Show Banner"}
                     name={"show_banner"}
-                    hidden={language !== "ID"}
+                    valuePropName='checked'
                 >
                     <Switch />
                 </Form.Item>

@@ -25,9 +25,19 @@ export default function CropperUploadForm({ label, name, imageAspect, onImageCha
       name={name}
       {...(required ?
         {
+          required: true,
           rules: [
             {
-              required: required
+              validator: (rule, value) => {
+                const fileList = uploadRef.current.fileList;
+
+                if (Array.isArray(fileList) && fileList.length <= 0 && !initialPreview) {
+                  return Promise.reject(new Error(`${name} is required`));
+                }
+
+                return Promise.resolve();
+              }
+
             },
           ]
         } : {}
