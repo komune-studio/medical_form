@@ -6,11 +6,31 @@ import { Col, Row } from 'react-bootstrap';
 import Palette from '../../../utils/Palette';
 import Iconify from '../../reusable/Iconify';
 import swal from '../../reusable/CustomSweetAlert';
+import ReactQuill from 'react-quill';
 import Author from 'models/AuthorModel';
 import Upload from 'models/UploadModel';
 import Helper from 'utils/Helper';
 import Placeholder from 'utils/Placeholder';
 import CropperUploadForm from 'components/reusable/CropperUploadForm';
+
+const modules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    [{ 'size': ['small', false, 'large'] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ 'align': [false, 'center', 'right', 'justify'] }, { 'list': 'bullet' }, { 'list': 'ordered' }, { 'indent': '-1' }, { 'indent': '+1' }],
+    ['link', 'image'],
+    ['clean']
+  ],
+}
+
+const formats = [
+  'header',
+  'size',
+  'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'align', 'list', 'bullet', 'indent',
+  'link', 'image'
+]
 
 export default function AuthorFormPage({
   authorData,
@@ -85,12 +105,31 @@ export default function AuthorFormPage({
     </span>
   );
 
+  const FormQuill = ({ value, onChange, placeholder, ...props }) => {
+      return (
+        <ReactQuill
+          theme="snow"
+          value={value || ''}
+          onChange={onChange}
+          placeholder={placeholder}
+          style={{
+            height: '480px',
+            marginBottom: '84px'
+          }}
+          modules={modules}
+          formats={formats}
+          {...props}
+        />
+      );
+    };
+
   useEffect(() => {
     if (authorData) {
       form.setFieldsValue({
         name: authorData.name,
         email: authorData.email,
         phone: authorData.phone,
+        awards: authorData.awards,
         facebook: authorData.facebook,
         instagram: authorData.instagram,
         tiktok: authorData.tiktok,
@@ -214,6 +253,17 @@ export default function AuthorFormPage({
                             rows={4}
                             placeholder={Placeholder.translated.biography}
                           />
+                        </Form.Item>
+                        <Form.Item
+                          label={"Awards"}
+                          name={"awards"}
+                          rules={[
+                            {
+                              required: true
+                            }
+                          ]}
+                        >
+                          <FormQuill placeholder="Write something here..." />
                         </Form.Item>
 
                         <Divider>Social Media Accounts (URL)</Divider>

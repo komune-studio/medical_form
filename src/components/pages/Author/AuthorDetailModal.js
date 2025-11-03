@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Flex, Image, Tag, Segmented, Typography } from 'antd';
 import { Link } from 'react-router-dom';
+import HTMLReactParser from "html-react-parser";
 import Iconify from "../../reusable/Iconify";
 
 const AuthorDetailModal = ({ open, author, onClose }) => {
@@ -127,6 +128,17 @@ const AuthorDetailModal = ({ open, author, onClose }) => {
               <Typography.Text type="secondary">No biography available in English</Typography.Text>
             )
           )}
+
+          {author.awards ? (
+              <div>
+                <strong>Awards:</strong>
+                <p>
+                  {HTMLReactParser(String(author.awards))}
+                </p>
+              </div>
+            ) : (
+              <Typography.Text type="secondary">No awards</Typography.Text>
+            )}
           
           <div style={{ marginTop: '15px' }}>
             <h4>Social Media:</h4>
