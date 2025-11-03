@@ -257,11 +257,6 @@ export default function AuthorFormPage({
                         <Form.Item
                           label={"Awards"}
                           name={"awards"}
-                          rules={[
-                            {
-                              required: true
-                            }
-                          ]}
                         >
                           <FormQuill placeholder="Write something here..." />
                         </Form.Item>
