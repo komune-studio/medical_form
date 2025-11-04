@@ -88,8 +88,25 @@ export default function NewsFormPage({
   }
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (!newsData) {
+      const changed = Object.keys(allValues).some(key => {
+        if (key == "body" || key == "body_tl") {
+          if (allValues[key] && allValues[key] != '<p><br></p>') return true
+          return false
+        }
+        if (allValues[key]) {
+          return true
+        }
+        return false
+      })
+      return setHasChanges(changed)
+    }
     const changed = Object.keys(allValues).some(key => {
-      if (allValues[key] != newsData[key]) {
+      if (key == "body" || key == "body_tl") {
+        if (allValues[key] && allValues[key] != '<p><br></p>' && allValues[key] != newsData[key]) return true
+        return false
+      }
+      if (!!allValues[key] && allValues[key] != newsData[key]) {
         return true
       }
       return false
@@ -107,6 +124,7 @@ export default function NewsFormPage({
 
   const onSubmit = async (asDraft = false) => {
     if (asDraft) {
+      form.validateFields()
       toggleLoadingSubmit("saveDraft")
     } else {
       toggleLoadingSubmit("save")
@@ -363,7 +381,7 @@ export default function NewsFormPage({
         </Card>
       </Container>
       <Prompt
-        when={hasChanges}
+        when={hasChanges && !(loadingSubmit["save"] || loadingSubmit["saveDraft"])}
         message={"Are you sure you want to leave before saving?"}
       />
     </>

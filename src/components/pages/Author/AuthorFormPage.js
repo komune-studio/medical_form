@@ -65,9 +65,25 @@ export default function AuthorFormPage({
   }
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (!authorData) {
+      const changed = Object.keys(allValues).some((key) => {
+        if (key == "awards") {
+          if (allValues[key] && allValues[key] != '<p><br></p>') return true
+          return false
+        }
+        if (allValues[key]) {
+          return true
+        }
+        return false
+      })
+      return setHasChanges(changed)
+    }
     const changed = Object.keys(allValues).some((key) => {
-      if (allValues[key] != authorData[key]) {
-        console.log(key)
+      if (key == "awards") {
+        if (allValues[key] && allValues[key] != '<p><br></p>' && allValues[key] != authorData[key]) return true
+        return false
+      }
+      if (!!allValues[key] && allValues[key] != authorData[key]) {
         return true
       }
       return false
@@ -85,6 +101,7 @@ export default function AuthorFormPage({
 
   const onSubmit = async (asDraft = false) => {
     if (asDraft) {
+      form.validateFields();
       toggleLoadingSubmit("saveDraft")
     } else {
       toggleLoadingSubmit("save")
@@ -427,7 +444,7 @@ export default function AuthorFormPage({
         </Card>
       </Container>
       <Prompt
-        when={hasChanges}
+        when={hasChanges && !(loadingSubmit["save"] || loadingSubmit["saveDraft"])}
         message={"Are you sure you want to leave before saving?"}
       />
     </>

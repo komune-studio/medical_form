@@ -45,8 +45,17 @@ export default function IllustratorFormPage({
   }
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (!illustratorData) {
+      const changed = Object.keys(allValues).some((key) => {
+        if (allValues[key]) {
+          return true
+        }
+        return false
+      })
+      return setHasChanges(changed)
+    }
     const changed = Object.keys(allValues).some((key) => {
-      if (allValues[key] != illustratorData[key]) {
+      if (!!allValues[key] && allValues[key] != illustratorData[key]) {
         return true
       }
       return false;
@@ -64,6 +73,7 @@ export default function IllustratorFormPage({
 
   const onSubmit = async (asDraft = false) => {
     if (asDraft) {
+      form.validateFields()
       toggleLoadingSubmit("saveDraft")
     } else {
       toggleLoadingSubmit("save")
@@ -373,7 +383,7 @@ export default function IllustratorFormPage({
         </Card>
       </Container>
       <Prompt
-        when={hasChanges}
+        when={hasChanges && !(loadingSubmit["save"] || loadingSubmit["saveDraft"])}
         message={"Are you sure you want to leave before saving?"}
       />
     </>

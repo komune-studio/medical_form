@@ -68,8 +68,18 @@ export default function MediaFormPage({
   }
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (!mediaData) {
+      const changed = Object.keys(allValues).some((key) => {
+        if (allValues[key]) {
+          return true
+        }
+        return false
+      })
+      return setHasChanges(changed)
+    }
     const changed = Object.keys(allValues).some((key) => {
-      if (allValues[key] != mediaData[key]) {
+      console.log(key)
+      if (!!allValues[key] && allValues[key] != mediaData[key]) {
         return true
       }
       return false
@@ -87,6 +97,7 @@ export default function MediaFormPage({
 
   const onSubmit = async (asDraft = false) => {
     if (asDraft) {
+      form.validateFields()
       toggleLoadingSubmit("saveDraft")
     } else {
       toggleLoadingSubmit("save")
@@ -328,7 +339,7 @@ export default function MediaFormPage({
         </Card>
       </Container>
       <Prompt
-        when={hasChanges}
+        when={hasChanges && !(loadingSubmit["save"] || loadingSubmit["saveDraft"])}
         message={"Are you sure you want to leave before saving?"}
       />
     </>

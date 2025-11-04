@@ -156,6 +156,27 @@ export default function BookFormPage({
   }
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (!bookData) {
+      const changed = Object.keys(allValues).some((key) => {
+        if (key == "authors" || key == "categories") {
+          if (allValues[key] != undefined && allValues[key]?.length > 0) return true
+          return false
+        }
+        if (key == "release_date") {
+          if (allValues[key]) return true
+          return false
+        }
+        if (key == "description" || key == "description_tl") {
+          if (allValues[key] && allValues[key] != '<p><br></p>') return true
+          return false
+        }
+        if (allValues[key]) {
+          return true
+        }
+        return false
+      })
+      return setHasChanges(changed)
+    }
     const changed = Object.keys(allValues).some((key) => {
       if (key == "authors") {
         if (!allValues[key]) allValues[key] = [];
@@ -170,10 +191,14 @@ export default function BookFormPage({
         return false
       }
       if (key == "release_date") {
-        if (!dayjs(allValues[key]).isSame(bookData[key])) return true
+        if (allValues[key] && !dayjs(allValues[key]).isSame(bookData[key])) return true
         return false
       }
-      if (allValues[key] != bookData[key]) {
+      if (key == "description" || key == "description_tl") {
+        if (allValues[key] && allValues[key] != '<p><br></p>' && allValues[key] != bookData[key]) return true
+        return false
+      }
+      if (!!allValues[key] && allValues[key] != bookData[key]) {
         return true
       }
       return false
@@ -551,10 +576,10 @@ export default function BookFormPage({
                         <Divider>Detail Information</Divider>
 
                         <Form.Item
-                          label={"Released Date"}
+                          label={"Released Year"}
                           name="release_date"
                         >
-                          <DatePicker picker='date' style={{ width: "100%" }} />
+                          <DatePicker picker='year' style={{ width: "100%" }} />
                         </Form.Item >
 
                         <Form.Item
@@ -685,7 +710,7 @@ export default function BookFormPage({
         </Card>
       </Container>
       <Prompt
-        when={hasChanges}
+        when={hasChanges && !(loadingSubmit["save"] || loadingSubmit['saveDraft'])}
         message={"Are you sure you want to leave before saving?"}
       />
     </>
