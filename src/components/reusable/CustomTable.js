@@ -16,7 +16,7 @@ import {
 	Typography,
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
-import { filter } from 'lodash';
+import { filter, debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 import ListTableToolbar from './ListTableToolbar';
 import Palette from '../../utils/Palette';
@@ -121,27 +121,37 @@ const CustomTable = ({
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(10);
 	useEffect(() => {
-		if (columns && columns.length > 0) {
-			if (defaultOrder) {
-				setOrderBy(defaultOrder);
-			} else {
-				setOrderBy(columns[0].id);
-			}
-		}
-	}, [columns]);
+    if (columns && columns.length > 0) {
+      if (defaultOrder) {
+        setOrderBy(defaultOrder);
+      } else {
+        setOrderBy(columns[0].id);
+      }
+    }
+  }, [columns]);
 
-	const handleFilterByName = (event) => {
-		const searchValue = event.target.value;
-		setPage(0);
-		setFilterName(searchValue);
+  useEffect(() => {
+    const debouncedSearch = debounce((searchTerm) => {
+      if (onSearch) {
+        onSearch(searchTerm);
+      }
+    }, 300);
 
-		if (onSearch) {
-		onSearch(searchValue);
-		}
-	};
+    debouncedSearch(filterName);
 
-	 const filteredData = onSearch 
-    ? data 
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [filterName]);
+
+  const handleFilterByName = (event) => {
+    const searchValue = event.target.value;
+    setPage(0);
+    setFilterName(searchValue);
+  };
+
+  const filteredData = onSearch
+    ? data
     : applySortFilter(data, getComparator(order, orderBy), filterName, columns);
 
 	const handleRequestSort = (event, property) => {

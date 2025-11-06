@@ -237,10 +237,11 @@ const BookList = () => {
   const initializeData = async (keyword) => {
     setLoading(true)
     try {
-      let result = await Book.getAllWithFilter(1, keyword);
+      const searchKeyword = keyword ?? ''; 
+      let result = await Book.getAllWithFilter(1, searchKeyword);
       let formattedResult = result.map((value) => {
-        let bookAuthorsJoined = value.book_authors.map((book_author) => book_author.authors.name).join(",");
-        let bookCategoriesJoined = value.book_categories.map((book_category) => book_category.categories.name).join(",");
+      let bookAuthorsJoined = value.book_authors.map((book_author) => book_author.authors.name).join(",");
+      let bookCategoriesJoined = value.book_categories.map((book_category) => book_category.categories.name).join(",");
         return {
           ...value,
           authors: bookAuthorsJoined,
