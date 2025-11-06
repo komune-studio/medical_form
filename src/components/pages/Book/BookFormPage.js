@@ -47,6 +47,7 @@ export default function BookFormPage({
   const [formDisabled, setFormDisabled] = useState(false);
   const [initialBookCategories, setInitialBookCategories] = useState([]);
   const [initialBookAuthors, setInitialBookAuthors] = useState([]);
+  const [initialAvailableLanguages, setInitialAvailableLanguages] = useState([]);
   const [language, setLanguage] = useState("ID");
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -158,7 +159,7 @@ export default function BookFormPage({
   const onValuesChanged = (changedValues, allValues) => {
     if (!bookData) {
       const changed = Object.keys(allValues).some((key) => {
-        if (key == "authors" || key == "categories") {
+        if (key == "authors" || key == "categories" || key == "available_languages") {
           if (allValues[key] != undefined && allValues[key]?.length > 0) return true
           return false
         }
@@ -188,6 +189,12 @@ export default function BookFormPage({
         if (!allValues[key]) allValues[key] = [];
         if (allValues[key].length != initialBookCategories.length) return true
         if (allValues[key].some(id => !initialBookCategories.includes(id))) return true
+        return false
+      }
+      if (key == "available_languages") {
+        if (!allValues[key]) allValues[key] = [];
+        if (allValues[key].length != initialAvailableLanguages.length) return true
+        if (allValues[key].some(language => !initialAvailableLanguages.includes(language))) return true
         return false
       }
       if (key == "release_date") {
@@ -373,6 +380,11 @@ export default function BookFormPage({
         contact_person_email: bookData.contact_person_email,
         hide: bookData.hide,
       })
+
+      if (bookData.available_languages) {
+        setInitialAvailableLanguages(bookData.available_languages)
+        form.setFieldValue("available_languages", bookData.available_languages)
+      }
 
       if (bookData.release_date) {
         form.setFieldValue("release_date", dayjs(bookData.release_date))
@@ -617,6 +629,7 @@ export default function BookFormPage({
                             placeholder={Placeholder.select_illustrator}
                           />
                         </Form.Item>
+
                         <Form.Item
                           label={"Translator"}
                           name={"translator_id"}
@@ -632,6 +645,22 @@ export default function BookFormPage({
                             placeholder={Placeholder.select_translator}
                           />
                         </Form.Item>
+
+                        <Form.Item
+                          label={"Available Languages"}
+                          name={"available_languages"}
+                        // rules={[{
+                        //   required: true,
+                        // }]}
+                        >
+                          <Select
+                            mode='tags'
+                            variant='filled'
+                            filterOption={selectFilterFunction}
+                            placeholder={Placeholder.select_author}
+                          />
+                        </Form.Item>
+
                         <Form.Item
                           label={"Translation Rights"}
                           name="translation_rights"
