@@ -6,7 +6,7 @@ export default class Helper {
 
 	static allowedImageType = ["image/jpg", "image/jpeg", "image/png", "image/webp"]
 
-	static redirectURL = "https://dev.readindonesia.id/" 
+	static redirectURL = "https://dev.readindonesia.id/"
 
 	static formatNumber(number) {
 		// Convert number to string
@@ -23,6 +23,11 @@ export default class Helper {
 
 		// Join integer and decimal parts (if any)
 		return parts.join('.');
+	}
+
+	static removeHTMLTags(string) {
+		const regex = string?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, " ");
+		return regex
 	}
 
 	static toTitleCase(str) {
@@ -74,12 +79,12 @@ export default class Helper {
 
 	static getWeeksOfCurrentMonth() {
 		const currentMonth = moment().month();
-		const currentYear= moment().year()
+		const currentYear = moment().year()
 		const start = moment().startOf('month');
 		console.log(start.startOf('isoWeek').format("DD MMM YYYY"))
 		const weeksOfCurrentMonth = [];
 
-		while (start.month() <= currentMonth && start.year() <= currentYear ) {
+		while (start.month() <= currentMonth && start.year() <= currentYear) {
 			console.log("CHECKING " + start.month())
 			console.log(weeksOfCurrentMonth)
 			weeksOfCurrentMonth.push(`${start.format("DD MMM")}`)
