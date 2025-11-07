@@ -88,21 +88,19 @@ export default function CropperModal({
         throw new Error('Image does not exist');
       }
 
+      const imageCompressQuality = 0.8 // 80% of original quality
       let finalCrop = {
         unit: 'px',
-        x: (crop.x / 100) * image.width,
-        y: (crop.y / 100) * image.height,
-        width: (crop.width / 100) * image.width,
-        height: (crop.height / 100) * image.height,
+        x: (crop.x / 100) * image.naturalWidth,
+        y: (crop.y / 100) * image.naturalHeight,
+        width: (crop.width / 100) * image.naturalWidth,
+        height: (crop.height / 100) * image.naturalHeight,
       }
-
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
 
       const offscreenCanvas = document.createElement('canvas');
       offscreenCanvas.setAttribute('crossorigin', "anonymous")
-      offscreenCanvas.width = finalCrop.width * scaleX;
-      offscreenCanvas.height = finalCrop.height * scaleY;
+      offscreenCanvas.width = finalCrop.width;
+      offscreenCanvas.height = finalCrop.height;
       const offscreenCtx = offscreenCanvas.getContext('2d');
 
       if (!offscreenCtx) {
@@ -111,10 +109,10 @@ export default function CropperModal({
 
       offscreenCtx.drawImage(
         image,
-        finalCrop.x * scaleX,
-        finalCrop.y * scaleY,
-        finalCrop.width * scaleX,
-        finalCrop.height * scaleY,
+        finalCrop.x,
+        finalCrop.y,
+        finalCrop.width,
+        finalCrop.height,
         0,
         0,
         offscreenCanvas.width,
@@ -122,7 +120,7 @@ export default function CropperModal({
       );
 
 
-      const dataUrl = offscreenCanvas.toDataURL('image/jpeg');
+      const dataUrl = offscreenCanvas.toDataURL('image/jpeg', imageCompressQuality); // Get data url and also compress image
       onImageCropped(dataUrl);
       handleModalClose();
     } catch (error) {

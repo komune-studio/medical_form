@@ -15,6 +15,7 @@ export default function CropperUpload({
 }) {
   const [originalImagePreviewURL, setOriginalImagePreviewURL] = useState(initialPreview)
   const [imagePreviewURL, setImagePreviewURL] = useState(initialPreview);
+  const [imageName, setImageName] = useState("");
 
   const onUploadChange = async ({ file }) => {
     const isImage = Helper.allowedImageType.includes(file.type);
@@ -28,7 +29,7 @@ export default function CropperUpload({
       message.error("Image must be smaller than 5MB.")
       return Upload.LIST_IGNORE;
     }
-
+    setImageName(file?.name)
     const reader = new FileReader();
     reader.addEventListener('load', () => {
       setOriginalImagePreviewURL(reader.result?.toString() || '');
@@ -45,7 +46,8 @@ export default function CropperUpload({
       await fetch(croppedImage)
         .then((res) => res.blob())
         .then((blob) => {
-          const file = new File([blob], 'room-image.jpg', { type: 'image/jpeg' });
+          const file = new File([blob], imageName, { type: 'image/jpeg' });
+          console.log({fileSize: file.size / 1024 / 1024})
           onImageChange(file)
         });
     } catch (error) {
