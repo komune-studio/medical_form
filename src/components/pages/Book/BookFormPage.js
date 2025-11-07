@@ -658,7 +658,7 @@ export default function BookFormPage({
                             mode='tags'
                             variant='filled'
                             filterOption={selectFilterFunction}
-                            placeholder={Placeholder.select_author}
+                            placeholder={Placeholder.select_available_languages}
                           />
                         </Form.Item>
 
