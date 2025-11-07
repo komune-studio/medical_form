@@ -116,6 +116,7 @@ const CustomTable = ({
   categoryFilter,
   onCategoryChange,
   categories = [],
+  categoryLoading = false,
 }) => {
   const [selected, setSelected] = useState([]);
   const [order, setOrder] = useState("desc");
@@ -219,6 +220,7 @@ const CustomTable = ({
           categoryFilter={categoryFilter}
           onCategoryChange={onCategoryChange}
           categories={categories}
+          categoryLoading={categoryLoading}
         />
       )}
 

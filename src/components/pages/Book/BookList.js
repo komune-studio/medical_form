@@ -7,6 +7,7 @@ import { Col, } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import Palette from "../../../utils/Palette";
 import Book from 'models/BookModel';
+import Category from 'models/CategoryModel';
 import BookCategory from 'models/BookCategoryModel';
 import Helper from 'utils/Helper';
 import { create } from "zustand";
@@ -35,6 +36,8 @@ const useFilter = create((set) => ({
 
 const BookList = () => {
   const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState([]);
+  const [categoryLoading, setCategoryLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [openBookModal, setOpenBookModal] = useState(false);
@@ -264,6 +267,19 @@ const BookList = () => {
     }
   };
 
+  const initializeCategory = async () => {
+    setCategoryLoading(true);
+    try {
+      let result = await Category.getAll();
+    
+      setCategory(result);
+      setCategoryLoading(false);
+    } catch (error) {
+      setCategoryLoading(false);
+      console.error('Error fetching categories:', error);
+    }
+  };
+
   const initializeData = async (categoryIds = [], keyword = '') => {
     setLoading(true);
     try {
@@ -284,13 +300,15 @@ const BookList = () => {
       console.log(formattedResult[0]?.book_authors?.length);
       setDataSource(formattedResult);
       setLoading(false);
-    } catch (e) {
+    } catch (error) {
       setLoading(false);
+      console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
     initializeData();
+    initializeCategory();
   }, []);
 
   return (
@@ -331,7 +349,8 @@ const BookList = () => {
               }}
               categoryFilter={selectedCategories}
               onCategoryChange={handleCategoryChange}
-              categories={categories}
+              categories={category}
+              categoryLoading={categoryLoading} 
             />
           </CardBody>
         </Card>
