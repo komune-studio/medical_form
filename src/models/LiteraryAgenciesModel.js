@@ -10,6 +10,10 @@ export default class LiteraryAgencies {
     return await ApiRequest.set(`/v1/literary-agencies/getbyid/${id}`, "GET");
   }
 
+  static getAllWithPagination = async (limit, page, keyword) => {
+    return await ApiRequest.set(`v1/literary-agencies/get-with-pagination?page=${page}&limit=${limit}&sort_by=created_at&sort_type=asc&keyword=${keyword}`, "GET")
+  }
+
   static create = async (body) => {
     return await ApiRequest.set("/v1/literary-agencies/create", "POST", body);
   }
