@@ -14,7 +14,9 @@ export default class Translator {
     return await ApiRequest.set(`/v1/translators/getbyid/${id}`, "GET");
   }
 
-  
+  static getAllWithPagination = async (limit, page, keyword) => {
+    return await ApiRequest.set(`v1/translators/get-with-pagination?page=${page}&limit=${limit}&keyword=${keyword}`, "GET")
+  }
 
   static edit = async (id, body) => {
     console.log("Body: ", body)
