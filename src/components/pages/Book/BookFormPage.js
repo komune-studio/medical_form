@@ -130,15 +130,20 @@ export default function BookFormPage({
 
   const initializeData = async () => {
     setLoading(true);
-    await Promise.all([
-      getPublishersData(),
-      getTranslatorsData(),
-      getIllustratorsData(),
-      getAgenciesData(),
-      getCategoriesData(),
-      getAuthorsData(),
-    ])
+    try{
+      await Promise.all([
+        getPublishersData(),
+        getTranslatorsData(),
+        getIllustratorsData(),
+        getAgenciesData(),
+        getCategoriesData(),
+        getAuthorsData(),
+      ])
+    }catch (e) {
+
+    }
     setLoading(false);
+
   }
 
   const selectFilterFunction = (input, option) => {
