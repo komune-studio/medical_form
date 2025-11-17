@@ -50,6 +50,7 @@ export default function BookFormPage({
   const [initialBookAuthors, setInitialBookAuthors] = useState([]);
   const [initialAvailableLanguages, setInitialAvailableLanguages] = useState([]);
   const [language, setLanguage] = useState("ID");
+  const [contactOption, setContactOption] = useState("Literary Agency");
   const [hasChanges, setHasChanges] = useState(false);
 
   const [publishers, setPublishers] = useState([]);
@@ -361,6 +362,15 @@ export default function BookFormPage({
       await initializeData();
     })()
   }, [])
+
+  useEffect(() => {
+  if (contactOption !== "Individual") {
+    form.resetFields(["contact_person_name", "contact_person_email"]);
+  }
+  if (contactOption !== "Literary Agency") {
+    form.resetFields(["literary_agency_id"]);
+  }
+}, [contactOption]);
 
   useEffect(() => {
     if (bookData) {
@@ -675,9 +685,22 @@ export default function BookFormPage({
                         </Form.Item >
 
                         <Divider>Contact Person Information</Divider>
+
+                        <Flex justify='space-between' align='center'
+                        style={{ marginBottom: "16px"}}>
+                          <Typography.Text>
+                            Select Contact Source (one option only)
+                          </Typography.Text>
+                          <Segmented
+                            value={contactOption}
+                            onChange={setContactOption}
+                            options={['Literary Agency', 'Individual']}
+                          />
+                        </Flex>
                         <Form.Item
                           label={"Literary Agency"}
                           name={"literary_agency_id"}
+                          hidden={contactOption !== "Literary Agency"}
                         >
                           <Select
                             showSearch={true}
@@ -688,7 +711,7 @@ export default function BookFormPage({
                             allowClear
                           />
                         </Form.Item>
-                        <Row>
+                        <Row hidden={contactOption !== "Individual"}>
                           <Col md={6}>
                             <Form.Item
                               label={"Name"}
