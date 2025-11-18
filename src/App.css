@@ -131,3 +131,8 @@ input.order-input {
     -webkit-background-clip: text !important;
 }
 
+/* default segmented components */
+.ant-segmented-item-selected {
+  background-color: #bb3b3a !important;
+  color: #fff !important;
+}
