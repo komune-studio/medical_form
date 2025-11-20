@@ -1,6 +1,6 @@
 export default class Palette {
     static KOMUNE_YELLOW = "#febe10";
-    static MAIN_THEME = "#bb3b3a";
+    static MAIN_THEME = "#EC1D26";
 
     static THEME_YELLOW = "#febe10";
     static THEME_PURPLE = "#7f8fea";
