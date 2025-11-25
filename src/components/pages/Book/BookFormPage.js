@@ -431,6 +431,7 @@ export default function BookFormPage({
         contact_person_name: bookData.contact_person_name,
         contact_person_email: bookData.contact_person_email,
         hide: bookData.hide,
+        highlight: bookData.highlight,
       })
 
       if (bookData.available_languages) {
@@ -638,6 +639,20 @@ export default function BookFormPage({
                             allowClear
                           />
                         </Form.Item>
+
+                        <Flex align='center' gap={12}>
+                          <Typography.Text>
+                            Highlight per Category
+                          </Typography.Text>
+                          <Form.Item
+                            label={"Highlight"}
+                            name={"highlight"}
+                            valuePropName='checked'
+                            noStyle
+                          >
+                            <Switch />
+                          </Form.Item>
+                        </Flex>
 
                         <Divider>Detail Information</Divider>
 

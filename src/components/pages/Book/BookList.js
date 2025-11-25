@@ -116,12 +116,6 @@ const BookList = () => {
       ),
     },
     {
-      id: "publisher",
-      label: "Publisher",
-      filter: true,
-      render: (row) => (row?.publishers ? row?.publishers.name : "-"),
-    },
-    {
       id: "categories",
       label: "Categories",
       filter: true,
@@ -135,6 +129,20 @@ const BookList = () => {
       ),
     },
     {
+      id: "highlight",
+      label: "Highlight",
+      filter: true,
+      allowSort: true,
+      render: (row) => (
+        <Tooltip title="Highlight book per category">
+          <Switch
+            defaultValue={row?.highlight}
+            onChange={(checked) => toggleField("highlight", checked, row?.id)}
+          />
+        </Tooltip>
+      ),
+    },
+    {
       id: "hide",
       label: "Mark as Draft",
       filter: true,
@@ -142,7 +150,7 @@ const BookList = () => {
         <Tooltip title="Hide data on Landing Page">
           <Switch
             defaultValue={row?.hide}
-            onChange={(checked) => toggleHide(checked, row?.id)}
+            onChange={(checked) => toggleField('hide', checked, row?.id)}
           />
         </Tooltip>
       ),
@@ -254,12 +262,12 @@ const BookList = () => {
     });
   };
 
-  const toggleHide = async (checked, id) => {
+  const toggleField = async (field, checked, id) => {
     try {
-      await Book.edit(id, { hide: checked });
-      // initializeData()
+      await Book.edit(id, { [field]: checked });
+      // initializeData();
     } catch (e) {
-      message.error("Error updating book");
+      message.error(`Error updating book ${field}`);
     }
   };
 
