@@ -34,6 +34,7 @@ export default class Placeholder {
   static video_embed = "e.g. https://www.youtube.com/watch?v=w9WBlURy5yQ"
   static isbn = "e.g. 978-0-306-40615-7"
   static total_page = "e.g. 224"
+  static summary_news = "Insert news summary here"
 
 
   static translated = {
@@ -44,5 +45,6 @@ export default class Placeholder {
     name_media: "e.g. Ink & Ideas: From Drafts to Published Works (Translated Version)",
     biography: "Insert biography here (Translated Version)",
     description: "Insert description here (Translated Version)",
+    summary_news: "Insert news summary here (Translated Version)",
   }
 }

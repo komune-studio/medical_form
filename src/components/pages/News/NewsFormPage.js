@@ -214,6 +214,8 @@ export default function NewsFormPage({
         title_tl: newsData.title_tl,
         body: newsData.body,
         body_tl: newsData.body_tl,
+        summary: newsData.summary, 
+        summary_tl: newsData.summary_tl, 
         video_url: newsData.video_url,
         highlight: newsData.highlight,
         hide: newsData.hide,
@@ -301,7 +303,7 @@ export default function NewsFormPage({
                               </Form.Item>
                             </Flex>
                           </Flex>
-                          
+
 
                           <Segmented
                             value={language}
@@ -352,6 +354,34 @@ export default function NewsFormPage({
                         >
                           <Input variant='filled' placeholder={Placeholder.video_embed} />
                         </Form.Item>
+
+                        <Form.Item
+                          label={languageTag("Summary")}
+                          name={"summary"}
+                          hidden={language !== "ID"}
+                        >
+                          <Input.TextArea
+                            showCount
+                            maxLength={500}
+                            variant='filled'
+                            rows={4}
+                            placeholder={Placeholder.summary_news}
+                          />
+                        </Form.Item>
+                        <Form.Item
+                          label={languageTag("Summary")}
+                          name={"summary_tl"}
+                          hidden={language === "ID"}
+                        >
+                          <Input.TextArea
+                            showCount
+                            maxLength={500}
+                            variant='filled'
+                            rows={4}
+                            placeholder={Placeholder.translated.summary_news}
+                          />
+                        </Form.Item>
+
                         <Form.Item
                           label={languageTag("Body")}
                           name={"body"}
