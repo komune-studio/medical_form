@@ -14,12 +14,14 @@ import {
   TableSortLabel,
   Toolbar,
   Typography,
+  IconButton,
 } from "@mui/material";
 import { alpha, styled } from "@mui/material/styles";
 import { filter, debounce } from "lodash";
 import { useEffect, useState } from "react";
 import ListTableToolbar from "./ListTableToolbar";
 import Palette from "../../utils/Palette";
+import { Search as SearchIcon, Clear as ClearIcon } from "@mui/icons-material";
 
 function applySortFilter(array, comparator, query, columns) {
   if (!array) return [];
@@ -109,7 +111,7 @@ const CustomTable = ({
   searchText,
   pagination = true,
   showFilter = false,
-  mode = "dark",
+  mode = "light", // Default ke light mode
   extendToolbar = null,
   defaultOrder = null,
   rowAction,
@@ -174,6 +176,15 @@ const CustomTable = ({
       setLocalPage(0);
     }
     setFilterName(searchValue);
+  };
+
+  const handleClearSearch = () => {
+    setFilterName("");
+    if (apiPagination) {
+      onPageChange?.(null, 0);
+    } else {
+      setLocalPage(0);
+    }
   };
 
   // Use API data directly when API pagination is enabled
@@ -268,25 +279,90 @@ const CustomTable = ({
         />
       )}
 
-      <TableContainer sx={{ minWidth: 0, fontFamily: "Open Sans" }}>
+      <TableContainer 
+        sx={{ 
+          minWidth: 0, 
+          fontFamily: "Open Sans",
+          backgroundColor: '#FFFFFF',
+          borderRadius: '8px',
+          boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1)',
+          border: '1px solid #f0f0f0',
+        }}
+      >
+        {/* Search Bar */}
+        {onSearch && !showFilter && (
+          <Box sx={{ p: 2, borderBottom: '1px solid #f0f0f0' }}>
+            <OutlinedInput
+              placeholder="Search..."
+              value={filterName}
+              onChange={handleFilterByName}
+              fullWidth
+              size="small"
+              startAdornment={<SearchIcon sx={{ color: '#666', mr: 1 }} />}
+              endAdornment={
+                filterName && (
+                  <IconButton
+                    size="small"
+                    onClick={handleClearSearch}
+                    sx={{ mr: -1 }}
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                )
+              }
+              sx={{
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#ddd',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#004EEB',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#004EEB',
+                  borderWidth: '1px',
+                },
+              }}
+            />
+          </Box>
+        )}
+
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ backgroundColor: '#fafafa' }}>
               {checkbox && (
-                <TableCell padding="checkbox">
+                <TableCell 
+                  padding="checkbox"
+                  sx={{ 
+                    borderBottom: '1px solid #f0f0f0',
+                    color: '#333',
+                    fontWeight: 600,
+                  }}
+                >
                   <Checkbox
                     indeterminate={
                       selected.length > 0 && selected.length < data.length
                     }
                     checked={data.length > 0 && selected.length === data.length}
                     onChange={handleSelectAllClick}
+                    sx={{
+                      color: '#ddd',
+                      '&.Mui-checked': {
+                        color: '#004EEB',
+                      },
+                    }}
                   />
                 </TableCell>
               )}
               {columns.map((headCell) => (
                 <TableCell
                   width={headCell?.width}
-                  style={{ color: mode === "dark" ? "white" : "black" }}
+                  sx={{ 
+                    color: '#333',
+                    fontWeight: 600,
+                    borderBottom: '1px solid #f0f0f0',
+                    fontSize: '14px',
+                    py: 2,
+                  }}
                   scope="row"
                   component={"th"}
                   key={headCell.id}
@@ -294,14 +370,21 @@ const CustomTable = ({
                   sortDirection={orderBy === headCell.id ? order : false}
                 >
                   <TableSortLabel
-                    style={{
-                      color: mode === "dark" ? "white" : "black",
+                    sx={{
+                      color: '#333 !important',
+                      fontWeight: 600,
                       cursor:
                         headCell.allowSort || headCell.allowSort === undefined
                           ? "pointer"
                           : "auto",
+                      '&:hover': {
+                        color: '#004EEB !important',
+                      },
+                      '&.Mui-active': {
+                        color: '#004EEB !important',
+                      },
                     }}
-                    hideSortIcon
+                    hideSortIcon={false}
                     active={
                       orderBy === headCell.id && headCell.allowSort !== false
                     }
@@ -314,11 +397,20 @@ const CustomTable = ({
                         createSortHandler(headCell.id)(e);
                       }
                     }}
-                    sx={{
-                      "& .MuiTableSortLabel-icon": {
-                        color: `${Palette.MAIN_THEME} !important`,
-                      },
-                    }}
+                    IconComponent={(props) => (
+                      <Box
+                        component="span"
+                        sx={{
+                          ...props.style,
+                          color: orderBy === headCell.id ? '#004EEB' : '#999',
+                          '&:hover': {
+                            color: '#004EEB',
+                          },
+                        }}
+                      >
+                        {props.children}
+                      </Box>
+                    )}
                   >
                     {headCell.label}
                     {orderBy === headCell.id ? (
@@ -340,8 +432,27 @@ const CustomTable = ({
                 <TableCell
                   colSpan={columns.length + (checkbox ? 1 : 0)}
                   align="center"
+                  sx={{ py: 4, color: '#666' }}
                 >
-                  Loading...
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Box sx={{ width: 20, height: 20, mr: 2 }}>
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          border: '2px solid #004EEB',
+                          borderTopColor: 'transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 1s linear infinite',
+                          '@keyframes spin': {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                          },
+                        }}
+                      />
+                    </Box>
+                    Loading...
+                  </Box>
                 </TableCell>
               </TableRow>
             ) : (
@@ -362,40 +473,65 @@ const CustomTable = ({
                     tabIndex={-1}
                     role="checkbox"
                     selected={selectedItem}
-                    style={{
+                    sx={{
                       cursor: rowAction?.onClick ? "pointer" : "default",
+                      backgroundColor: selectedItem ? 'rgba(0, 78, 235, 0.04)' : 'inherit',
+                      '&:hover': {
+                        backgroundColor: 'rgba(0, 78, 235, 0.04)',
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: 'rgba(0, 78, 235, 0.08)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 78, 235, 0.12)',
+                        },
+                      },
                     }}
                   >
                     {checkbox && (
-                      <TableCell padding="checkbox">
+                      <TableCell 
+                        padding="checkbox"
+                        sx={{ borderBottom: '1px solid #f0f0f0' }}
+                      >
                         <Checkbox
                           checked={selectedItem}
                           onChange={(event) => handleClick(event, id)}
+                          sx={{
+                            color: '#ddd',
+                            '&.Mui-checked': {
+                              color: '#004EEB',
+                            },
+                          }}
                         />
                       </TableCell>
                     )}
 
                     {columns.map((columnSetting, key) => {
                       return (
-                        <>
-                          <TableCell
-                            style={{
-                              color: mode === "dark" ? "white" : "black",
-                            }}
-                            onClick={
-                              columnSetting.link
-                                ? () => rowAction?.onClick(row)
-                                : null
-                            }
-                            align={columnSetting.alignment}
-                          >
-                            {columnSetting.render
-                              ? columnSetting.render(row)
-                              : row[columnSetting.id]
-                              ? row[columnSetting.id]
-                              : "-"}
-                          </TableCell>
-                        </>
+                        <TableCell
+                          key={key}
+                          sx={{
+                            color: '#333',
+                            borderBottom: '1px solid #f0f0f0',
+                            fontSize: '14px',
+                            py: 1.5,
+                            '&:hover': columnSetting.link ? {
+                              color: '#004EEB',
+                              textDecoration: 'underline',
+                            } : {},
+                          }}
+                          onClick={
+                            columnSetting.link
+                              ? () => rowAction?.onClick(row)
+                              : null
+                          }
+                          align={columnSetting.alignment}
+                        >
+                          {columnSetting.render
+                            ? columnSetting.render(row)
+                            : row[columnSetting.id]
+                            ? row[columnSetting.id]
+                            : "-"}
+                        </TableCell>
                       );
                     })}
                   </TableRow>
@@ -412,23 +548,32 @@ const CustomTable = ({
           {isNotFound && (
             <TableBody>
               <TableRow>
-                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                <TableCell align="center" colSpan={columns.length + (checkbox ? 1 : 0)} sx={{ py: 4 }}>
                   <Paper
                     sx={{
                       textAlign: "center",
                       backgroundColor: "transparent",
                       fontFamily: "Open Sans",
+                      p: 3,
+                      border: '1px dashed #ddd',
+                      borderRadius: '8px',
                     }}
                   >
-                    <Typography variant="h6" paragraph>
+                    <SearchIcon 
+                      sx={{ 
+                        fontSize: 48, 
+                        color: '#999',
+                        mb: 2 
+                      }} 
+                    />
+                    <Typography variant="h6" paragraph sx={{ color: '#333', fontWeight: 600 }}>
                       Data Tidak Ditemukan
                     </Typography>
 
-                    <Typography variant="body2">
+                    <Typography variant="body2" sx={{ color: '#666' }}>
                       Tidak ada data ditemukan untuk &nbsp;
-                      <strong>&quot;{filterName}&quot;</strong>.
-                      <br /> Periksa nama barang atau coba dengan kata kunci
-                      lain
+                      <strong style={{ color: '#004EEB' }}>&quot;{filterName}&quot;</strong>.
+                      <br /> Coba dengan kata kunci lain.
                     </Typography>
                   </Paper>
                 </TableCell>
@@ -442,27 +587,50 @@ const CustomTable = ({
         <TablePagination
           rowsPerPageOptions={[10, 25, 50, 100]}
           component="div"
-          count={totalCountValue} // Use totalCount for API, data.length for local
+          count={totalCountValue}
           rowsPerPage={currentRowsPerPage}
           page={currentPageValue}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           sx={{
-            color: Palette.WHITE,
-            "& .MuiTablePagination-root": {
-              color: Palette.WHITE,
+            color: '#333',
+            backgroundColor: '#FFFFFF',
+            borderTop: '1px solid #f0f0f0',
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              color: '#333',
+              fontSize: '14px',
+            },
+            '& .MuiTablePagination-actions button': {
+              color: '#333',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 78, 235, 0.04)',
+              },
+              '&.Mui-disabled': {
+                color: '#999',
+              },
+            },
+            '& .MuiSelect-select': {
+              color: '#333',
+              fontSize: '14px',
+            },
+            '& .MuiInputBase-root': {
+              '&:hover': {
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#004EEB',
+                },
+              },
             },
           }}
           slotProps={{
             select: {
               sx: {
-                "& .MuiSelect-icon": {
-                  color: Palette.WHITE, // Change this to your desired color
+                '& .MuiSelect-icon': {
+                  color: '#333',
+                },
+                '&:hover .MuiSelect-icon': {
+                  color: '#004EEB',
                 },
               },
-            },
-            actions: {
-              nextButtonIcon: { "&.Mui-disabled": { color: Palette.WHITE } },
             },
           }}
         />

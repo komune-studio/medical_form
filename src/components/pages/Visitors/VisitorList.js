@@ -43,7 +43,6 @@ const VisitorList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [dataSource, setDataSource] = useState([]);
-  const [stats, setStats] = useState(null);
 
   const search = useFilter((state) => state.search);
   const status = useFilter((state) => state.status);
@@ -77,8 +76,8 @@ const VisitorList = () => {
   const getProfileTagColor = (profile) => {
     switch(profile) {
       case 'Player': return 'blue';
-      case 'Visitor': return 'green';
-      case 'Other': return 'orange';
+      case 'Visitor': return '#004EEB';
+      case 'Other': return 'default';
       default: return 'default';
     }
   };
@@ -90,8 +89,8 @@ const VisitorList = () => {
       filter: true,
       render: (row) => (
         <div>
-          <div style={{ fontWeight: 500 }}>{row.visitor_name}</div>
-          <div style={{ fontSize: '12px', color: '#888' }}>Phone: {row.phone_number}</div>
+          <div style={{ fontWeight: 500, color: '#333' }}>{row.visitor_name}</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Phone: {row.phone_number}</div>
         </div>
       )
     },
@@ -110,6 +109,9 @@ const VisitorList = () => {
       id: 'filled_by', 
       label: 'Filled By', 
       filter: true,
+      render: (row) => (
+        <div style={{ color: '#333' }}>{row.filled_by}</div>
+      )
     },
     {
       id: 'created_at', 
@@ -117,8 +119,8 @@ const VisitorList = () => {
       filter: false,
       render: (row) => (
         <div>
-          <div>{moment(row.created_at).format("DD MMM YYYY")}</div>
-          <div style={{ fontSize: '12px', color: '#888' }}>
+          <div style={{ color: '#333' }}>{moment(row.created_at).format("DD MMM YYYY")}</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>
             {moment(row.created_at).format("HH:mm")}
           </div>
         </div>
@@ -131,13 +133,13 @@ const VisitorList = () => {
       render: (row) => (
         row.checked_out_at ? (
           <div>
-            <div>{moment(row.checked_out_at).format("DD MMM YYYY")}</div>
-            <div style={{ fontSize: '12px', color: '#888' }}>
+            <div style={{ color: '#333' }}>{moment(row.checked_out_at).format("DD MMM YYYY")}</div>
+            <div style={{ fontSize: '12px', color: '#666' }}>
               {moment(row.checked_out_at).format("HH:mm")}
             </div>
           </div>
         ) : (
-          <Tag color="red">Active</Tag>
+          <Tag color="#004EEB">Active</Tag>
         )
       )
     },
@@ -152,7 +154,7 @@ const VisitorList = () => {
               <Link to={`/visitors/${row.id}/edit`}>
                 <AntButton
                   type={'link'}
-                  style={{ color: Palette.MAIN_THEME }}
+                  style={{ color: '#004EEB' }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:edit"} />} 
@@ -163,7 +165,7 @@ const VisitorList = () => {
             <Tooltip title="Quick Checkout">
               <AntButton
                 type={'link'}
-                style={{ color: row.checked_out_at ? '#ccc' : Palette.SUCCESS }}
+                style={{ color: row.checked_out_at ? '#ccc' : '#004EEB' }}
                 onClick={() => !row.checked_out_at && onQuickCheckout(row.id)}
                 className={"d-flex align-items-center justify-content-center"}
                 shape="circle"
@@ -175,7 +177,7 @@ const VisitorList = () => {
             <Tooltip title="Delete">
               <AntButton
                 type={'link'}
-                style={{ color: Palette.DANGER }}
+                style={{ color: '#004EEB' }}
                 onClick={() => onDelete(row.id)}
                 className={"d-flex align-items-center justify-content-center"}
                 shape="circle"
@@ -193,7 +195,6 @@ const VisitorList = () => {
       await FormModel.deleteVisitor(id);
       message.success('Visitor deleted successfully');
       initializeData();
-      loadStats();
     } catch (error) {
       console.error("Error deleting visitor:", error);
       message.error('Failed to delete visitor');
@@ -205,7 +206,7 @@ const VisitorList = () => {
       title: "Delete Visitor",
       content: "Are you sure you want to delete this visitor?",
       okText: "Delete",
-      okType: "danger",
+      okType: "primary",
       cancelText: "Cancel",
       onOk: () => deleteItem(id)
     });
@@ -222,7 +223,6 @@ const VisitorList = () => {
           await FormModel.checkoutVisitor(id);
           message.success('Visitor checked out successfully');
           initializeData();
-          loadStats();
         } catch (error) {
           console.error("Error checking out visitor:", error);
           message.error('Failed to checkout visitor');
@@ -250,7 +250,6 @@ const VisitorList = () => {
       const result = await FormModel.getAllVisitors(filters);
       
       if (result && result.http_code === 200) {
-        // Implement pagination on frontend since API doesn't have pagination
         const allData = result.data || [];
         const startIndex = currentPage * currentRowsPerPage;
         const endIndex = startIndex + currentRowsPerPage;
@@ -271,141 +270,88 @@ const VisitorList = () => {
     }
   };
 
-  const loadStats = async () => {
-    try {
-      const statsResult = await FormModel.getVisitorStats();
-      if (statsResult && statsResult.http_code === 200) {
-        setStats(statsResult.data);
-      }
-    } catch (error) {
-      console.error("Error loading stats:", error);
-    }
-  };
-
-  const exportToCSV = () => {
-    try {
-      const csvData = FormModel.exportVisitorsToCSV(dataSource);
-      const blob = new Blob([csvData], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `visitors_${moment().format('YYYYMMDD_HHmmss')}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-      message.success('Exported to CSV successfully');
-    } catch (error) {
-      console.error("Error exporting CSV:", error);
-      message.error('Failed to export CSV');
-    }
-  };
-
   useEffect(() => {
     initializeData(page, rowsPerPage);
   }, [page, rowsPerPage, search, status, profile]);
 
-  useEffect(() => {
-    loadStats();
-  }, []);
-
   return (
     <>
+      <style>{`
+        .custom-search-button .ant-btn-primary {
+          background: #004EEB !important;
+          border-color: #004EEB !important;
+        }
+        .custom-search-button .ant-btn-primary:hover {
+          background: #0040c4 !important;
+          border-color: #0040c4 !important;
+        }
+        .custom-add-button {
+          background: #004EEB !important;
+          border-color: #004EEB !important;
+        }
+        .custom-add-button:hover {
+          background: #0040c4 !important;
+          border-color: #0040c4 !important;
+        }
+      `}</style>
       <Container fluid>
-        <Card style={{ background: Palette.BACKGROUND_DARK_GRAY, color: "white" }}
+        <Card style={{ 
+          background: '#FFFFFF', 
+          color: "#333",
+          border: '1px solid #f0f0f0',
+          boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 6px -1px rgba(0,0,0,0.02), 0 2px 4px 0 rgba(0,0,0,0.02)'
+        }}
           className="card-stats mb-4 mb-xl-0">
           <CardBody>
-            <Row>
-              <Col className='mb-3' md={6}>
-                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>Visitors Management</div>
+            {/* Header dengan title dan buttons */}
+            <Row className="mb-4">
+              <Col md={6}>
+                <div style={{ fontWeight: "bold", fontSize: "1.2em", color: '#333' }}>
+                  Visitors Management
+                </div>
               </Col>
-              <Col className='mb-3 text-right' md={6}>
-                <Space>
-                  <Button 
-                    type="default"
-                    onClick={exportToCSV}
-                    icon={<Iconify icon={"material-symbols:download"} />}
+              <Col md={6} className="text-right">
+                <Link to="/visitors/create">
+                  <AntButton
+                    size={'middle'} 
+                    type={'primary'}
+                    icon={<Iconify icon={"material-symbols:add"} />}
+                    className="custom-add-button"
                   >
-                    Export CSV
-                  </Button>
-                  <Link to="/visitors/create">
-                    <AntButton
-                      size={'middle'} 
-                      type={'primary'}
-                      icon={<Iconify icon={"material-symbols:add"} />}
-                    >
-                      Add Visitor
-                    </AntButton>
-                  </Link>
-                </Space>
+                    Add Visitor
+                  </AntButton>
+                </Link>
               </Col>
             </Row>
 
-            {/* Stats Row */}
-            {stats && (
-              <Row style={{ marginBottom: 24 }}>
-                <Col md={3}>
-                  <Card style={{ background: Palette.MAIN_THEME, color: "white" }}>
-                    <CardBody>
-                      <div style={{ fontSize: '12px', opacity: 0.8 }}>Total Visitors</div>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.totalVisitors || 0}</div>
-                    </CardBody>
-                  </Card>
-                </Col>
-                <Col md={3}>
-                  <Card style={{ background: Palette.SUCCESS, color: "white" }}>
-                    <CardBody>
-                      <div style={{ fontSize: '12px', opacity: 0.8 }}>Active Now</div>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.activeVisitors || 0}</div>
-                    </CardBody>
-                  </Card>
-                </Col>
-                <Col md={3}>
-                  <Card style={{ background: Palette.INFO, color: "white" }}>
-                    <CardBody>
-                      <div style={{ fontSize: '12px', opacity: 0.8 }}>Checked Out</div>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.checkedOutCount || 0}</div>
-                    </CardBody>
-                  </Card>
-                </Col>
-                <Col md={3}>
-                  <Card style={{ background: Palette.WARNING, color: "white" }}>
-                    <CardBody>
-                      <div style={{ fontSize: '12px', opacity: 0.8 }}>Today</div>
-                      <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
-                        {dataSource.filter(v => 
-                          moment(v.created_at).isSame(moment(), 'day')
-                        ).length}
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-            )}
-
-            {/* Filter Row */}
-            <Row style={{ marginBottom: 24 }}>
-              <Col md={4}>
-                <Search
+            {/* Search and Filter Row */}
+            <Row style={{ marginBottom: 24, alignItems: 'center' }}>
+              <Col md={5}>
+                <Input
                   placeholder="Search by name, phone, or staff"
-                  onSearch={handleSearch}
-                  enterButton
-                  style={{ marginBottom: 16 }}
+                  onPressEnter={(e) => handleSearch(e.target.value)}
+                  prefix={<Iconify icon={"material-symbols:search"} style={{ color: '#666', fontSize: '18px' }} />}
+                  allowClear
+                  onClear={() => handleSearch("")}
+                  style={{ width: '100%' }}
                 />
               </Col>
-              <Col md={4}>
+              <Col md={3}></Col>
+              <Col md={2}>
                 <Select
-                  placeholder="Filter by status"
+                  placeholder="Status"
                   style={{ width: '100%' }}
                   value={status}
                   onChange={handleStatusChange}
                 >
                   <Select.Option value="all">All Visitors</Select.Option>
                   <Select.Option value="active">Active Only</Select.Option>
-                  <Select.Option value="checked-out">Checked Out Only</Select.Option>
+                  <Select.Option value="checked-out">Checked Out</Select.Option>
                 </Select>
               </Col>
-              <Col md={4}>
+              <Col md={2}>
                 <Select
-                  placeholder="Filter by profile"
+                  placeholder="Profile"
                   style={{ width: '100%' }}
                   value={profile}
                   onChange={handleProfileChange}
@@ -422,14 +368,14 @@ const VisitorList = () => {
             <Row>
               <Col md={12}>
                 <CustomTable
-                  showFilter={true}
+                  showFilter={false}
                   pagination={true}
-                  searchText={search}
+                  searchText=""
                   data={dataSource}
                   columns={columns}
                   defaultOrder={"created_at"}
-                  onSearch={handleSearch}
-                  apiPagination={false} // Using frontend pagination
+                  onSearch={null}
+                  apiPagination={false}
                   totalCount={totalCount}
                   currentPage={page}
                   rowsPerPage={rowsPerPage}
