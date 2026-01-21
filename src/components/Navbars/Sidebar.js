@@ -60,84 +60,11 @@ const SIDEBAR_COLOR = Palette.MAIN_THEME;
 
 const SIDEBAR = [
     {
-        path: "/grants",
-        name: "Grants",
-        icon: "mdi:file-document",
+        path: "/visitors",
+        name: "Visitors",
+        icon: "mdi:account-group",  // atau "mdi:people" atau "mdi:human-greeting"
         color: SIDEBAR_COLOR
-    },
-    {
-        path: "/books",
-        name: "Books",
-        icon: "mdi:book",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/authors",
-        name: "Authors",
-        icon: "fluent:calligraphy-pen-20-filled",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/news",
-        name: "News",
-        icon: "material-symbols:newsmode-rounded",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/e-bulletins",
-        name: "E Bulletins",
-        // Need to change Icon
-        icon: "material-symbols:newsmode-rounded",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/medias",
-        name: "Medias",
-        icon: "mdi:library-video",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/publishers",
-        name: "Publishers",
-        icon: "mdi:public",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/illustrators",
-        name: "Illustrators",
-        icon: "fluent:draw-image-20-filled",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/translators",
-        name: "Translators",
-        icon: "ic:round-translate",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/literary-agencies",
-        name: "Literary Agencies",
-        icon: "famicons:people",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/categories",
-        name: "Category",
-        icon: "mdi:category",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/banners",
-        name: "Banners",
-        icon: "mdi:image-area",
-        color: SIDEBAR_COLOR
-    },
-    {
-        path: "/admins",
-        name: "Admins",
-        icon: "mdi:user",
-        color: SIDEBAR_COLOR
-    },
+    }
 ]
 
 const Sidebar = (props) => {
@@ -171,7 +98,6 @@ const Sidebar = (props) => {
                         to={prop.path}
                         tag={NavLinkRRD}
                         onClick={closeCollapse}
-                    //  className={"active"}
                     >
                         <Iconify
                             style={{
@@ -181,7 +107,6 @@ const Sidebar = (props) => {
                                 fontSize: "1.05rem"
                             }}
                             icon={prop.icon} />
-                        {/*<i className={prop.icon} />*/}
                         <div style={{color : tint, fontWeight:600}}>{prop.name}</div>
                     </NavLink>
                 </NavItem>
@@ -228,20 +153,6 @@ const Sidebar = (props) => {
                             icon="mdi:menu" />
                     </span>
                 </button>
-                {/* Brand */}
-                {/* {logo ? (
-                    <NavbarBrand className="pt-0" {...navbarBrandProps}>
-                        <img
-                            style={{
-                                marginTop: 30
-                            }}
-                            alt={logo.imgAlt}
-                            className="navbar-brand-img"
-                            src={logo.imgSrc}
-                        />
-                    </NavbarBrand>
-                ) : null} */}
-                {/* User */}
                 {/* Collapse */}
                 <Collapse navbar isOpen={collapseOpen}>
                     {/* Collapse header */}
@@ -257,30 +168,7 @@ const Sidebar = (props) => {
                     {/* Navigation */}
                     <Nav className="mb-md-3" navbar>
                         <NavItem>
-                            {/*<NavLink*/}
-                            {/*    onClick={() => {*/}
-                            {/*        localStorage.removeItem("super_token")*/}
-                            {/*        localStorage.removeItem("username")*/}
-                            {/*        localStorage.removeItem("token")*/}
-                            {/*        localStorage.removeItem("role")*/}
-
-                            {/*        sessionStorage.removeItem("super_token")*/}
-                            {/*        sessionStorage.removeItem("username")*/}
-                            {/*        sessionStorage.removeItem("role")*/}
-                            {/*        sessionStorage.removeItem("token")*/}
-                            {/*        history.push('/login')*/}
-                            {/*        window.location.reload()*/}
-                            {/*    }}*/}
-                            {/*    href="javascript:;">*/}
-                            {/*    <Iconify*/}
-                            {/*        style={{*/}
-                            {/*            marginRight: "1rem",*/}
-                            {/*            lineHeight: "1.5rem",*/}
-                            {/*            fontSize: "1.05rem"*/}
-                            {/*        }}*/}
-                            {/*        icon="ri:logout-circle-r-line" />*/}
-                            {/*    Keluar*/}
-                            {/*</NavLink>*/}
+                            {/* Optional logout link */}
                         </NavItem>
                     </Nav>
                 </Collapse>
@@ -298,10 +186,8 @@ Sidebar.propTypes = {
     routes: PropTypes.arrayOf(PropTypes.object),
     logo: PropTypes.shape({
         // innerLink is for links that will direct the user within the app
-        // it will be rendered as <Link to="...">...</Link> tag
         innerLink: PropTypes.string,
         // outterLink is for links that will direct the user outside the app
-        // it will be rendered as simple <a href="...">...</a> tag
         outterLink: PropTypes.string,
         // the image src of the logo
         imgSrc: PropTypes.string.isRequired,
