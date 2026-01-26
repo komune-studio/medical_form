@@ -75,12 +75,8 @@ const VisitorList = () => {
   };
 
   const getProfileTagColor = (profile) => {
-    switch(profile) {
-      case 'Player': return 'blue';
-      case 'Visitor': return '#004EEB';
-      case 'Other': return 'default';
-      default: return 'default';
-    }
+    // Semua tag berwarna hitam putih
+    return 'default';
   };
 
   const columns = [
@@ -100,7 +96,11 @@ const VisitorList = () => {
       label: 'Profile', 
       filter: true,
       render: (row) => (
-        <Tag color={getProfileTagColor(row.visitor_profile)}>
+        <Tag style={{ 
+          background: '#f5f5f5', 
+          color: '#333',
+          border: '1px solid #d9d9d9'
+        }}>
           {row.visitor_profile}
           {row.visitor_profile_other && ` (${row.visitor_profile_other})`}
         </Tag>
@@ -140,7 +140,11 @@ const VisitorList = () => {
             </div>
           </div>
         ) : (
-          <Tag color="#004EEB">Active</Tag>
+          <Tag style={{ 
+            background: '#f5f5f5', 
+            color: '#333',
+            border: '1px solid #d9d9d9'
+          }}>Active</Tag>
         )
       )
     },
@@ -155,7 +159,7 @@ const VisitorList = () => {
               <Link to={`/visitors/${row.id}/edit`}>
                 <AntButton
                   type={'link'}
-                  style={{ color: '#004EEB' }}
+                  style={{ color: '#333' }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:edit"} />} 
@@ -166,7 +170,7 @@ const VisitorList = () => {
             <Tooltip title="Quick Checkout">
               <AntButton
                 type={'link'}
-                style={{ color: row.checked_out_at ? '#ccc' : '#004EEB' }}
+                style={{ color: row.checked_out_at ? '#ccc' : '#333' }}
                 onClick={() => !row.checked_out_at && onQuickCheckout(row.id)}
                 className={"d-flex align-items-center justify-content-center"}
                 shape="circle"
@@ -178,7 +182,7 @@ const VisitorList = () => {
             <Tooltip title="Delete">
               <AntButton
                 type={'link'}
-                style={{ color: '#004EEB' }}
+                style={{ color: '#333' }}
                 onClick={() => onDelete(row.id)}
                 className={"d-flex align-items-center justify-content-center"}
                 shape="circle"
@@ -278,21 +282,25 @@ const VisitorList = () => {
   return (
     <>
       <style>{`
+        /* Remove semua warna biru */
         .custom-search-button .ant-btn-primary {
-          background: #004EEB !important;
-          border-color: #004EEB !important;
+          background: #333 !important;
+          border-color: #333 !important;
+          color: white !important;
         }
         .custom-search-button .ant-btn-primary:hover {
-          background: #0040c4 !important;
-          border-color: #0040c4 !important;
+          background: #555 !important;
+          border-color: #555 !important;
         }
+        
         .custom-add-button {
-          background: #004EEB !important;
-          border-color: #004EEB !important;
+          background: #333 !important;
+          border-color: #333 !important;
+          color: white !important;
         }
         .custom-add-button:hover {
-          background: #0040c4 !important;
-          border-color: #0040c4 !important;
+          background: #555 !important;
+          border-color: #555 !important;
         }
         
         /* CSS untuk membuat search input seluruhnya putih */
@@ -314,12 +322,12 @@ const VisitorList = () => {
           color: #666 !important;
         }
         
-        /* Hover dan focus state */
+        /* Hover dan focus state - warna abu-abu */
         .visitor-search.ant-input-affix-wrapper:hover,
         .visitor-search.ant-input-affix-wrapper:focus,
         .visitor-search.ant-input-affix-wrapper-focused {
-          border-color: #004EEB !important;
-          box-shadow: 0 0 0 2px rgba(0, 78, 235, 0.1) !important;
+          border-color: #666 !important;
+          box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.1) !important;
         }
         
         /* Clear button */
@@ -356,14 +364,14 @@ const VisitorList = () => {
           color: rgba(0, 0, 0, 0.25) !important;
         }
         
-        /* Hover dan focus state untuk Select */
+        /* Hover dan focus state untuk Select - warna abu-abu */
         .filter-select .ant-select-selector:hover {
-          border-color: #004EEB !important;
+          border-color: #666 !important;
         }
         
         .filter-select.ant-select-focused .ant-select-selector {
-          border-color: #004EEB !important;
-          box-shadow: 0 0 0 2px rgba(0, 78, 235, 0.1) !important;
+          border-color: #666 !important;
+          box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.1) !important;
         }
         
         /* Dropdown menu untuk Select */
@@ -386,12 +394,107 @@ const VisitorList = () => {
         }
         
         .filter-select .ant-select-item-option-selected {
-          background-color: #f0f7ff !important;
-          color: #004EEB !important;
+          background-color: #f5f5f5 !important;
+          color: #333 !important;
         }
         
         .filter-select .ant-select-item-option-active {
           background-color: #f5f5f5 !important;
+        }
+        
+        /* Styling untuk tag */
+        .ant-tag {
+          background: #f5f5f5 !important;
+          color: #333 !important;
+          border: 1px solid #d9d9d9 !important;
+        }
+        
+        /* Tooltip styling */
+        .ant-tooltip-inner {
+          background: #333 !important;
+          color: white !important;
+        }
+        
+        .ant-tooltip-arrow-content {
+          background: #333 !important;
+        }
+        
+        /* Modal styling */
+        .ant-modal-header {
+          background: white !important;
+          border-bottom: 1px solid #f0f0f0 !important;
+        }
+        
+        .ant-modal-title {
+          color: #333 !important;
+        }
+        
+        .ant-modal-content {
+          background: white !important;
+          color: #333 !important;
+        }
+        
+        .ant-modal-footer {
+          border-top: 1px solid #f0f0f0 !important;
+        }
+        
+        .ant-btn-primary {
+          background: #333 !important;
+          border-color: #333 !important;
+          color: white !important;
+        }
+        
+        .ant-btn-primary:hover {
+          background: #555 !important;
+          border-color: #555 !important;
+        }
+        
+        .ant-btn-default:hover {
+          border-color: #666 !important;
+          color: #666 !important;
+        }
+        
+        /* Table header styling */
+        .ant-table-thead > tr > th {
+          background: #fafafa !important;
+          color: #333 !important;
+          border-bottom: 1px solid #f0f0f0 !important;
+        }
+        
+        /* Table row styling */
+        .ant-table-tbody > tr > td {
+          border-bottom: 1px solid #f0f0f0 !important;
+        }
+        
+        .ant-table-tbody > tr:hover > td {
+          background: #fafafa !important;
+        }
+        
+        /* Pagination styling */
+        .ant-pagination-item {
+          border: 1px solid #d9d9d9 !important;
+          background: white !important;
+        }
+        
+        .ant-pagination-item a {
+          color: #333 !important;
+        }
+        
+        .ant-pagination-item-active {
+          border-color: #333 !important;
+          background: #f5f5f5 !important;
+        }
+        
+        .ant-pagination-item-active a {
+          color: #333 !important;
+          font-weight: 500;
+        }
+        
+        .ant-pagination-prev .ant-pagination-item-link,
+        .ant-pagination-next .ant-pagination-item-link {
+          border: 1px solid #d9d9d9 !important;
+          background: white !important;
+          color: #333 !important;
         }
       `}</style>
       <Container fluid>

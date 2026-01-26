@@ -1,4 +1,4 @@
-    import {
+import {
     Card,
     CardHeader,
     CardBody,
@@ -9,13 +9,12 @@
     Row,
     Col
 } from "reactstrap";
-import { Button, Form, Input, message, Space } from "antd";
+import { Button, Form, Input, message, Space, Typography } from "antd";
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Admin from "../../models/AdminModel"
 import React, {useEffect, useState} from 'react'
 import {useHistory} from 'react-router-dom'
 
-import logo from "../../assets/img/brand/Logo_ReadIndonesia.png"
 import Palette from "../../utils/Palette";
 import swal from "../../components/reusable/CustomSweetAlert";
 
@@ -36,7 +35,7 @@ const Login = () => {
             sessionStorage.token = result.token;
             sessionStorage.admin_name = result.username;
             sessionStorage.id = result.id;
-            history.push('/books')
+            history.push('/visitors')
             window.location.reload()
 
         } catch (e) {
@@ -44,11 +43,6 @@ const Login = () => {
             let errorMessage = "An Error Occured"
             if (e.error_message) {
                 errorMessage = "Invalid Credential"
-                // if (e.error_message === "USERNAME_NOT_FOUND" || e.error_message === "Wrong password") {
-                //     errorMessage = "Invalid Credential"
-                // } else {
-                //     errorMessage = e.error_message
-                // }
             }
             await swal.fire({
                 title: 'Error',
@@ -60,17 +54,109 @@ const Login = () => {
     }
     return (
         <>
+            <style>{`
+                /* ===== FIX PASSWORD HITAM (FINAL) ===== */
+                
+                /* wrapper group */
+                .login-input.ant-input-group-wrapper .ant-input-affix-wrapper {
+                    background: #fff !important;
+                    border: 1px solid #d9d9d9 !important;
+                    color: #333 !important;
+                    border-radius: 0 6px 6px 0 !important;
+                }
+                
+                /* input di dalamnya */
+                .login-input.ant-input-group-wrapper .ant-input-affix-wrapper input {
+                    background: transparent !important;
+                    color: #333 !important;
+                }
+                
+                /* hover */
+                .login-input.ant-input-group-wrapper .ant-input-affix-wrapper:hover {
+                    border-color: #666 !important;
+                }
+                
+                /* focus */
+                .login-input.ant-input-group-wrapper .ant-input-affix-wrapper-focused {
+                    border-color: #666 !important;
+                    box-shadow: 0 0 0 2px rgba(102,102,102,0.1) !important;
+                }
+                
+                /* icon eye */
+                .login-input.ant-input-group-wrapper .ant-input-password-icon {
+                    color: #666 !important;
+                }
+                
+                /* addon lock */
+                .login-input.ant-input-group-wrapper .ant-input-group-addon {
+                    background: #f5f5f5 !important;
+                    border-color: #d9d9d9 !important;
+                    color: #333 !important;
+                    border-radius: 6px 0 0 6px !important;
+                }
+                
+                /* ===== STYLING USERNAME INPUT ===== */
+                .login-input .ant-input-group-addon {
+                    background: #f5f5f5 !important;
+                    border-color: #d9d9d9 !important;
+                    color: #333 !important;
+                    border-radius: 6px 0 0 6px !important;
+                }
+                
+                .login-input .ant-input {
+                    background: #fff !important;
+                    border-color: #d9d9d9 !important;
+                    color: #333 !important;
+                    border-radius: 0 6px 6px 0 !important;
+                }
+                
+                .login-input .ant-input:hover {
+                    border-color: #666 !important;
+                }
+                
+                .login-input .ant-input:focus {
+                    border-color: #666 !important;
+                    box-shadow: 0 0 0 2px rgba(102,102,102,0.1) !important;
+                }
+                
+                /* icon user & lock */
+                .anticon-user, .anticon-lock {
+                    color: #333 !important;
+                }
+                
+                /* placeholder text color */
+                .login-input .ant-input::placeholder,
+                .login-input.ant-input-group-wrapper .ant-input-affix-wrapper input::placeholder {
+                    color: rgba(0, 0, 0, 0.25) !important;
+                }
+            `}</style>
             <Col lg="5" md="7">
-                <Card style={{background:Palette.BACKGROUND_BLACK, borderRadius:14}} >
-                    <CardBody  className="px-5 py-5">
-                        <div className="text-center text-muted mb-4">
-                            <img
-                                style={{
-                                    width: "100%",
-                                    objectFit: "contain"
+                <Card style={{
+                    background: '#FFFFFF',
+                    borderRadius: 14,
+                    border: '1px solid #f0f0f0',
+                    boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 6px -1px rgba(0,0,0,0.02), 0 2px 4px 0 rgba(0,0,0,0.02)'
+                }} >
+                    <CardBody className="px-5 py-5">
+                        <div className="text-center mb-4">
+                            <Typography.Title 
+                                level={2} 
+                                style={{ 
+                                    color: '#333',
+                                    fontWeight: 600,
+                                    marginBottom: '10px'
                                 }}
-                                src={logo}
-                            />
+                            >
+                                Komune
+                            </Typography.Title>
+                            <Typography.Text 
+                                style={{ 
+                                    color: '#666',
+                                    fontSize: '16px'
+                                }}
+                            >
+                                Visitor Management System
+                            </Typography.Text>
                         </div>
                         <Form
                             form={form}
@@ -85,24 +171,30 @@ const Login = () => {
                                 rules={[
                                     {
                                         required: true,
+                                        message: 'Please input your username!'
                                     },
                                 ]}
                             >
-                                <Space.Compact block>
-                                    <Input addonBefore={<UserOutlined />} placeholder="Username" />
-                                </Space.Compact>
+                                <Input 
+                                    className="login-input"
+                                    addonBefore={<UserOutlined style={{ color: '#333' }} />} 
+                                    placeholder="Username"
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="password"
                                 rules={[
                                     {
                                         required: true,
+                                        message: 'Please input your password!'
                                     },
                                 ]}
                             >
-                                <Space.Compact block>
-                                    <Input.Password addonBefore={<LockOutlined />} placeholder="Password" />
-                                </Space.Compact>
+                                <Input.Password 
+                                    className="login-input"
+                                    addonBefore={<LockOutlined style={{ color: '#333' }} />} 
+                                    placeholder="Password"
+                                />
                             </Form.Item>
                             <Form.Item style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                                 <Button 
@@ -110,6 +202,12 @@ const Login = () => {
                                     type="primary"
                                     style={{
                                         marginTop: '10px',
+                                        background: '#333',
+                                        borderColor: '#333',
+                                        width: '100%',
+                                        height: '40px',
+                                        fontWeight: 500,
+                                        borderRadius: '6px'
                                     }}
                                 >
                                     LOGIN
@@ -118,7 +216,6 @@ const Login = () => {
                         </Form>
                     </CardBody>
                 </Card>
-
             </Col>
         </>
     );

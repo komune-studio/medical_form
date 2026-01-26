@@ -56,13 +56,14 @@ import {
 import Iconify from "../reusable/Iconify";
 import Palette from "../../utils/Palette";
 
-const SIDEBAR_COLOR = Palette.MAIN_THEME;
+// Mengubah SIDEBAR_COLOR dari biru menjadi putih
+const SIDEBAR_COLOR = "#FFFFFF"; // Ganti dari Palette.MAIN_THEME menjadi putih
 
 const SIDEBAR = [
     {
         path: "/visitors",
         name: "Visitors",
-        icon: "mdi:account-group",  // atau "mdi:people" atau "mdi:human-greeting"
+        icon: "mdi:account-group",
         color: SIDEBAR_COLOR
     }
 ]
@@ -89,7 +90,7 @@ const Sidebar = (props) => {
             let tint = Palette.INACTIVE_GRAY
 
             if(activeRoute(prop.path)){
-                tint = SIDEBAR_COLOR
+                tint = SIDEBAR_COLOR // Sekarang akan berwarna putih saat aktif
             }
             return (
                 <NavItem
@@ -148,7 +149,7 @@ const Sidebar = (props) => {
                                 marginRight: "1rem",
                                 lineHeight: "1.5rem",
                                 fontSize: "30px",
-                                color: "white"
+                                color: "white" // Menu icon tetap putih untuk kontras dengan background hitam
                             }}
                             icon="mdi:menu" />
                     </span>
@@ -164,7 +165,7 @@ const Sidebar = (props) => {
                     {/* Navigation */}
                     <Nav navbar>{createLinks(routes)}</Nav>
                     {/* Divider */}
-                    <hr className="my-3" />
+                
                     {/* Navigation */}
                     <Nav className="mb-md-3" navbar>
                         <NavItem>

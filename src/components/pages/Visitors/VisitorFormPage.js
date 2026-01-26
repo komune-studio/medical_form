@@ -151,7 +151,7 @@ export default function VisitorFormPage({
         showCancelButton: true,
         confirmButtonText: 'Yes, delete',
         cancelButtonText: 'Cancel',
-        confirmButtonColor: '#d33'
+        confirmButtonColor: '#000000'
       }).then(async (result) => {
         if (result.isConfirmed) {
           const deleteResult = await FormModel.deleteVisitor(visitorData.id);
@@ -231,7 +231,7 @@ export default function VisitorFormPage({
   };
 
   const requiredStyle = {
-    color: '#d93025',
+    color: '#000000',
     marginLeft: '4px'
   };
 
@@ -262,18 +262,18 @@ export default function VisitorFormPage({
                     <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
                       <Row gutter={[16, 8]}>
                         <Col xs={24} sm={12} md={8}>
-                          <Text style={{ fontSize: '13px', color: '#666666' }}>
-                            <strong style={{ color: '#000000' }}>Created:</strong> {moment(visitorData.created_at).format('DD MMM YYYY HH:mm')}
+                          <Text style={{ fontSize: '13px', color: '#000000' }}>
+                            <strong>Created:</strong> {moment(visitorData.created_at).format('DD MMM YYYY HH:mm')}
                           </Text>
                         </Col>
                         <Col xs={24} sm={12} md={8}>
-                          <Text style={{ fontSize: '13px', color: '#666666' }}>
-                            <strong style={{ color: '#000000' }}>Modified:</strong> {moment(visitorData.modified_at).format('DD MMM YYYY HH:mm')}
+                          <Text style={{ fontSize: '13px', color: '#000000' }}>
+                            <strong>Modified:</strong> {moment(visitorData.modified_at).format('DD MMM YYYY HH:mm')}
                           </Text>
                         </Col>
                         {visitorData.checked_out_at && (
                           <Col xs={24} sm={12} md={8}>
-                            <Text style={{ fontSize: '13px', color: '#d93025' }}>
+                            <Text style={{ fontSize: '13px', color: '#000000' }}>
                               <strong>Checked out:</strong> {moment(visitorData.checked_out_at).format('DD MMM YYYY HH:mm')}
                             </Text>
                           </Col>
@@ -457,6 +457,7 @@ export default function VisitorFormPage({
                           {!formDisabled ? (
                             <>
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+                                {/* SUBMIT BUTTON - White background, black text, no hover */}
                                 <Button 
                                   type='primary' 
                                   htmlType='submit' 
@@ -464,14 +465,16 @@ export default function VisitorFormPage({
                                   size="large"
                                   className="bw-primary-button"
                                   style={{ 
-                                    background: '#004EEB',
-                                    borderColor: '#004EEB',
+                                    background: '#FFFFFF',
+                                    borderColor: '#000000',
+                                    borderWidth: '1px',
+                                    borderStyle: 'solid',
                                     fontWeight: 500,
                                     height: '44px',
                                     paddingLeft: '32px',
                                     paddingRight: '32px',
                                     fontSize: '16px',
-                                    color: '#FFFFFF'
+                                    color: '#000000'
                                   }}
                                 >
                                   {!visitorData ? "Submit Form" : "Save Changes"}
@@ -488,6 +491,8 @@ export default function VisitorFormPage({
                                       fontSize: '16px',
                                       background: '#FFFFFF',
                                       borderColor: '#000000',
+                                      borderWidth: '1px',
+                                      borderStyle: 'solid',
                                       color: '#000000'
                                     }}
                                   >
@@ -506,6 +511,8 @@ export default function VisitorFormPage({
                                       fontSize: '16px',
                                       background: '#FFFFFF',
                                       borderColor: '#000000',
+                                      borderWidth: '1px',
+                                      borderStyle: 'solid',
                                       color: '#000000'
                                     }}
                                   >
@@ -523,8 +530,10 @@ export default function VisitorFormPage({
                                     paddingRight: '32px',
                                     fontSize: '16px',
                                     background: '#FFFFFF',
-                                    borderColor: '#e0e0e0',
-                                    color: '#666666'
+                                    borderColor: '#000000',
+                                    borderWidth: '1px',
+                                    borderStyle: 'solid',
+                                    color: '#000000'
                                   }}
                                 >
                                   Cancel
@@ -532,8 +541,8 @@ export default function VisitorFormPage({
                               </div>
 
                               <div style={{ paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
-                                <Text style={{ fontSize: '13px', color: '#666666' }}>
-                                  <span style={{ color: '#d93025' }}>*</span> Required fields
+                                <Text style={{ fontSize: '13px', color: '#000000' }}>
+                                  <span style={{ color: '#000000' }}>*</span> Required fields
                                 </Text>
                               </div>
                             </>
@@ -556,15 +565,16 @@ export default function VisitorFormPage({
           outline: none !important;
         }
         .bw-form-input:hover {
-          border-bottom-color: #666666;
+          border-bottom-color: #000000;
         }
         .ant-input:focus,
         .ant-input-focused {
           box-shadow: none !important;
         }
         .bw-primary-button:hover {
-          background: #0040c4 !important;
-          border-color: #0040c4 !important;
+          background: #FFFFFF !important;
+          border-color: #000000 !important;
+          color: #000000 !important;
         }
         .ant-radio-checked .ant-radio-inner {
           border-color: #000000 !important;
@@ -578,6 +588,26 @@ export default function VisitorFormPage({
         }
         .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
           display: none !important;
+        }
+        .ant-btn-primary:not([disabled]):not(.ant-btn-background-ghost):hover {
+          background: #FFFFFF !important;
+          border-color: #000000 !important;
+          color: #000000 !important;
+        }
+        .ant-btn:hover {
+          background: #FFFFFF !important;
+          border-color: #000000 !important;
+          color: #000000 !important;
+        }
+        .ant-btn:focus {
+          background: #FFFFFF !important;
+          border-color: #000000 !important;
+          color: #000000 !important;
+        }
+        .ant-btn:active {
+          background: #FFFFFF !important;
+          border-color: #000000 !important;
+          color: #000000 !important;
         }
       `}</style>
       
