@@ -294,6 +294,105 @@ const VisitorList = () => {
           background: #0040c4 !important;
           border-color: #0040c4 !important;
         }
+        
+        /* CSS untuk membuat search input seluruhnya putih */
+        .visitor-search.ant-input-affix-wrapper {
+          background: white !important;
+          border: 1px solid #d9d9d9 !important;
+        }
+        
+        .visitor-search .ant-input {
+          background: white !important;
+          color: #333 !important;
+        }
+        
+        .visitor-search .ant-input::placeholder {
+          color: rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        .visitor-search .ant-input-prefix {
+          color: #666 !important;
+        }
+        
+        /* Hover dan focus state */
+        .visitor-search.ant-input-affix-wrapper:hover,
+        .visitor-search.ant-input-affix-wrapper:focus,
+        .visitor-search.ant-input-affix-wrapper-focused {
+          border-color: #004EEB !important;
+          box-shadow: 0 0 0 2px rgba(0, 78, 235, 0.1) !important;
+        }
+        
+        /* Clear button */
+        .visitor-search .ant-input-clear-icon {
+          color: rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        .visitor-search .ant-input-clear-icon:hover {
+          color: rgba(0, 0, 0, 0.45) !important;
+        }
+        
+        /* Pastikan border radius konsisten */
+        .visitor-search.ant-input-affix-wrapper {
+          border-radius: 6px !important;
+        }
+        
+        /* CSS untuk Select filter */
+        .filter-select .ant-select-selector {
+          background: white !important;
+          border: 1px solid #d9d9d9 !important;
+          color: #333 !important;
+          border-radius: 6px !important;
+        }
+        
+        .filter-select .ant-select-selection-placeholder {
+          color: rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        .filter-select .ant-select-selection-item {
+          color: #333 !important;
+        }
+        
+        .filter-select .ant-select-arrow {
+          color: rgba(0, 0, 0, 0.25) !important;
+        }
+        
+        /* Hover dan focus state untuk Select */
+        .filter-select .ant-select-selector:hover {
+          border-color: #004EEB !important;
+        }
+        
+        .filter-select.ant-select-focused .ant-select-selector {
+          border-color: #004EEB !important;
+          box-shadow: 0 0 0 2px rgba(0, 78, 235, 0.1) !important;
+        }
+        
+        /* Dropdown menu untuk Select */
+        .filter-select .ant-select-dropdown {
+          background: white !important;
+          border: 1px solid #f0f0f0 !important;
+          border-radius: 6px !important;
+          box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+                      0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+                      0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+        }
+        
+        .filter-select .ant-select-item {
+          color: #333 !important;
+          background: white !important;
+        }
+        
+        .filter-select .ant-select-item:hover {
+          background-color: #f5f5f5 !important;
+        }
+        
+        .filter-select .ant-select-item-option-selected {
+          background-color: #f0f7ff !important;
+          color: #004EEB !important;
+        }
+        
+        .filter-select .ant-select-item-option-active {
+          background-color: #f5f5f5 !important;
+        }
       `}</style>
       <Container fluid>
         <Card style={{ 
@@ -329,9 +428,15 @@ const VisitorList = () => {
             <Row style={{ marginBottom: 24, alignItems: 'center' }}>
               <Col md={5}>
                 <Input
+                  className="visitor-search"
                   placeholder="Search by name, phone, or staff"
                   onPressEnter={(e) => handleSearch(e.target.value)}
-                  prefix={<Iconify icon={"material-symbols:search"} style={{ color: '#666', fontSize: '18px' }} />}
+                  prefix={
+                    <Iconify
+                      icon="material-symbols:search"
+                      style={{ color: '#666', fontSize: '18px' }}
+                    />
+                  }
                   allowClear
                   onClear={() => handleSearch("")}
                   style={{ width: '100%' }}
@@ -340,6 +445,7 @@ const VisitorList = () => {
               <Col md={3}></Col>
               <Col md={2}>
                 <Select
+                  className="filter-select"
                   placeholder="Status"
                   style={{ width: '100%' }}
                   value={status}
@@ -352,6 +458,7 @@ const VisitorList = () => {
               </Col>
               <Col md={2}>
                 <Select
+                  className="filter-select"
                   placeholder="Profile"
                   style={{ width: '100%' }}
                   value={profile}
