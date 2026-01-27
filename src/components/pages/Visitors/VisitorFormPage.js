@@ -10,7 +10,8 @@ import {
   Radio, 
   Space,
   Row,
-  Col
+  Col,
+  Divider
 } from 'antd';
 import { Container } from 'reactstrap';
 import swal from '../../reusable/CustomSweetAlert';
@@ -151,7 +152,7 @@ export default function VisitorFormPage({
         showCancelButton: true,
         confirmButtonText: 'Yes, delete',
         cancelButtonText: 'Cancel',
-        confirmButtonColor: '#000000'
+        confirmButtonColor: '#d33'
       }).then(async (result) => {
         if (result.isConfirmed) {
           const deleteResult = await FormModel.deleteVisitor(visitorData.id);
@@ -206,8 +207,13 @@ export default function VisitorFormPage({
     border: '1px solid #e0e0e0'
   };
 
+  const formCardStyle = {
+    ...cardStyle,
+    padding: '48px 32px'
+  };
+
   const cardBodyStyle = {
-    padding: '32px'
+    padding: '32px 0'
   };
 
   const labelStyle = {
@@ -231,8 +237,13 @@ export default function VisitorFormPage({
   };
 
   const requiredStyle = {
-    color: '#000000',
+    color: '#d93025',
     marginLeft: '4px'
+  };
+
+  const dividerStyle = {
+    margin: '32px 0',
+    borderColor: '#e0e0e0'
   };
 
   return (
@@ -250,7 +261,7 @@ export default function VisitorFormPage({
             {/* Header Card */}
             <Col span={24}>
               <div style={headerCardStyle}>
-                <div style={cardBodyStyle}>
+                <div style={{ padding: '32px' }}>
                   <Title level={2} style={{ margin: 0, fontSize: '32px', color: '#000000', fontWeight: 600 }}>
                     {!visitorData ? "Visitor Registration Form" : "Update Visitor Information"}
                   </Title>
@@ -262,18 +273,18 @@ export default function VisitorFormPage({
                     <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
                       <Row gutter={[16, 8]}>
                         <Col xs={24} sm={12} md={8}>
-                          <Text style={{ fontSize: '13px', color: '#000000' }}>
-                            <strong>Created:</strong> {moment(visitorData.created_at).format('DD MMM YYYY HH:mm')}
+                          <Text style={{ fontSize: '13px', color: '#666666' }}>
+                            <strong style={{ color: '#000000' }}>Created:</strong> {moment(visitorData.created_at).format('DD MMM YYYY HH:mm')}
                           </Text>
                         </Col>
                         <Col xs={24} sm={12} md={8}>
-                          <Text style={{ fontSize: '13px', color: '#000000' }}>
-                            <strong>Modified:</strong> {moment(visitorData.modified_at).format('DD MMM YYYY HH:mm')}
+                          <Text style={{ fontSize: '13px', color: '#666666' }}>
+                            <strong style={{ color: '#000000' }}>Modified:</strong> {moment(visitorData.modified_at).format('DD MMM YYYY HH:mm')}
                           </Text>
                         </Col>
                         {visitorData.checked_out_at && (
                           <Col xs={24} sm={12} md={8}>
-                            <Text style={{ fontSize: '13px', color: '#000000' }}>
+                            <Text style={{ fontSize: '13px', color: '#d93025' }}>
                               <strong>Checked out:</strong> {moment(visitorData.checked_out_at).format('DD MMM YYYY HH:mm')}
                             </Text>
                           </Col>
@@ -293,265 +304,233 @@ export default function VisitorFormPage({
               </Col>
             ) : (
               <Col span={24}>
-                <Form
-                  layout='vertical'
-                  form={form}
-                  onFinish={onSubmit}
-                  onValuesChange={onValuesChanged}
-                  validateTrigger="onSubmit"
-                  disabled={formDisabled}
-                  autoComplete='off'
-                >
-                  <Row gutter={[24, 24]}>
-                    <Col span={24}>
-                      {/* Visitor Name */}
-                      <div style={cardStyle}>
-                        <div style={cardBodyStyle}>
-                          <Form.Item
-                            label={
-                              <span style={labelStyle}>
-                                Visitor Name <span style={requiredStyle}>*</span>
-                              </span>
-                            }
-                            name="visitor_name"
-                            rules={[
-                              { required: true, message: 'Please input visitor name!' },
-                              { max: 255, message: 'Maximum 255 characters!' }
-                            ]}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Input 
-                              placeholder="Your answer"
-                              style={inputStyle}
-                              className="bw-form-input"
-                            />
-                          </Form.Item>
-                        </div>
-                      </div>
+                <div style={formCardStyle}>
+                  <Form
+                    layout='vertical'
+                    form={form}
+                    onFinish={onSubmit}
+                    onValuesChange={onValuesChanged}
+                    validateTrigger="onSubmit"
+                    disabled={formDisabled}
+                    autoComplete='off'
+                  >
+                    {/* Visitor Name */}
+                    <Form.Item
+                      label={
+                        <span style={labelStyle}>
+                          Visitor Name <span style={requiredStyle}>*</span>
+                        </span>
+                      }
+                      name="visitor_name"
+                      rules={[
+                        { required: true, message: 'Please input visitor name!' },
+                        { max: 255, message: 'Maximum 255 characters!' }
+                      ]}
+                      style={{ marginBottom: 40 }}
+                    >
+                      <Input 
+                        placeholder="Your answer"
+                        style={inputStyle}
+                        className="bw-form-input"
+                      />
+                    </Form.Item>
 
-                      {/* Phone Number */}
-                      <div style={cardStyle}>
-                        <div style={cardBodyStyle}>
-                          <Form.Item
-                            label={
-                              <span style={labelStyle}>
-                                Phone Number <span style={requiredStyle}>*</span>
-                              </span>
-                            }
-                            name="phone_number"
-                            rules={[
-                              { required: true, message: 'Please input phone number!' },
-                              { 
-                                pattern: /^[0-9+()-]+$/, 
-                                message: 'Invalid phone number format!' 
-                              },
-                              { max: 20, message: 'Maximum 20 characters!' }
-                            ]}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Input 
-                              placeholder="Your answer"
-                              style={inputStyle}
-                              className="bw-form-input"
-                            />
-                          </Form.Item>
-                        </div>
-                      </div>
+                    <Divider style={dividerStyle} />
 
-                      {/* Visitor Profile */}
-                      <div style={cardStyle}>
-                        <div style={cardBodyStyle}>
-                          <Form.Item
-                            label={
-                              <span style={labelStyle}>
-                                Visitor Profile <span style={requiredStyle}>*</span>
-                              </span>
-                            }
-                            name="visitor_profile"
-                            rules={[{ required: true, message: 'Please select visitor profile!' }]}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Radio.Group 
-                              style={{ width: '100%' }}
-                              onChange={(e) => setCurrentProfile(e.target.value)}
+                    {/* Phone Number */}
+                    <Form.Item
+                      label={
+                        <span style={labelStyle}>
+                          Phone Number <span style={requiredStyle}>*</span>
+                        </span>
+                      }
+                      name="phone_number"
+                      rules={[
+                        { required: true, message: 'Please input phone number!' },
+                        { 
+                          pattern: /^[0-9+()-]+$/, 
+                          message: 'Invalid phone number format!' 
+                        },
+                        { max: 20, message: 'Maximum 20 characters!' }
+                      ]}
+                      style={{ marginBottom: 40 }}
+                    >
+                      <Input 
+                        placeholder="Your answer"
+                        style={inputStyle}
+                        className="bw-form-input"
+                      />
+                    </Form.Item>
+
+                    <Divider style={dividerStyle} />
+
+                    {/* Visitor Profile */}
+                    <Form.Item
+                      label={
+                        <span style={labelStyle}>
+                          Visitor Profile <span style={requiredStyle}>*</span>
+                        </span>
+                      }
+                      name="visitor_profile"
+                      rules={[{ required: true, message: 'Please select visitor profile!' }]}
+                      style={{ marginBottom: 40 }}
+                    >
+                      <Radio.Group 
+                        style={{ width: '100%' }}
+                        onChange={(e) => setCurrentProfile(e.target.value)}
+                      >
+                        <Space direction="vertical" style={{ width: '100%' }} size={12}>
+                          {profileOptions.map(option => (
+                            <Radio 
+                              key={option.value} 
+                              value={option.value}
+                              style={{ 
+                                fontSize: '15px',
+                                color: '#000000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: '6px 0'
+                              }}
                             >
-                              <Space direction="vertical" style={{ width: '100%' }} size={12}>
-                                {profileOptions.map(option => (
-                                  <Radio 
-                                    key={option.value} 
-                                    value={option.value}
-                                    style={{ 
-                                      fontSize: '15px',
-                                      color: '#000000',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      padding: '6px 0'
-                                    }}
-                                  >
-                                    {option.label}
-                                  </Radio>
-                                ))}
-                              </Space>
-                            </Radio.Group>
-                          </Form.Item>
-                        </div>
-                      </div>
+                              {option.label}
+                            </Radio>
+                          ))}
+                        </Space>
+                      </Radio.Group>
+                    </Form.Item>
 
-                      {/* Other Profile Specification */}
-                      {currentProfile === "Other" && (
-                        <div style={cardStyle}>
-                          <div style={cardBodyStyle}>
-                            <Form.Item
-                              label={
-                                <span style={labelStyle}>
-                                  Please specify <span style={requiredStyle}>*</span>
-                                </span>
-                              }
-                              name="visitor_profile_other"
-                              rules={[
-                                { required: currentProfile === "Other", message: 'Please specify the profile!' },
-                                { max: 255, message: 'Maximum 255 characters!' }
-                              ]}
-                              style={{ marginBottom: 0 }}
-                            >
-                              <Input 
-                                placeholder="Your answer"
-                                style={inputStyle}
-                                className="bw-form-input"
-                              />
-                            </Form.Item>
-                          </div>
-                        </div>
-                      )}
+                    {/* Other Profile Specification */}
+                    {currentProfile === "Other" && (
+                      <>
+                        <Divider style={dividerStyle} />
+                        <Form.Item
+                          label={
+                            <span style={labelStyle}>
+                              Please specify <span style={requiredStyle}>*</span>
+                            </span>
+                          }
+                          name="visitor_profile_other"
+                          rules={[
+                            { required: currentProfile === "Other", message: 'Please specify the profile!' },
+                            { max: 255, message: 'Maximum 255 characters!' }
+                          ]}
+                          style={{ marginBottom: 40 }}
+                        >
+                          <Input 
+                            placeholder="Your answer"
+                            style={inputStyle}
+                            className="bw-form-input"
+                          />
+                        </Form.Item>
+                      </>
+                    )}
 
-                      {/* Filled By */}
-                      <div style={cardStyle}>
-                        <div style={cardBodyStyle}>
-                          <Form.Item
-                            label={
-                              <span style={labelStyle}>
-                                Staff Name <span style={requiredStyle}>*</span>
-                              </span>
-                            }
-                            name="filled_by"
-                            rules={[
-                              { required: true, message: 'Please input staff name!' },
-                              { max: 255, message: 'Maximum 255 characters!' }
-                            ]}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Input 
-                              placeholder="Your answer"
-                              style={inputStyle}
-                              className="bw-form-input"
-                            />
-                          </Form.Item>
-                        </div>
-                      </div>
-                    </Col>
+                    <Divider style={dividerStyle} />
+
+                    {/* Filled By */}
+                    <Form.Item
+                      label={
+                        <span style={labelStyle}>
+                          Staff Name <span style={requiredStyle}>*</span>
+                        </span>
+                      }
+                      name="filled_by"
+                      rules={[
+                        { required: true, message: 'Please input staff name!' },
+                        { max: 255, message: 'Maximum 255 characters!' }
+                      ]}
+                      style={{ marginBottom: 40 }}
+                    >
+                      <Input 
+                        placeholder="Your answer"
+                        style={inputStyle}
+                        className="bw-form-input"
+                      />
+                    </Form.Item>
+
+           
 
                     {/* Action Buttons */}
-                    <Col span={24}>
-                      <div style={cardStyle}>
-                        <div style={cardBodyStyle}>
-                          {!formDisabled ? (
-                            <>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
-                                {/* SUBMIT BUTTON - White background, black text, no hover */}
-                                <Button 
-                                  type='primary' 
-                                  htmlType='submit' 
-                                  loading={loadingSubmit}
-                                  size="large"
-                                  className="bw-primary-button"
-                                  style={{ 
-                                    background: '#FFFFFF',
-                                    borderColor: '#000000',
-                                    borderWidth: '1px',
-                                    borderStyle: 'solid',
-                                    fontWeight: 500,
-                                    height: '44px',
-                                    paddingLeft: '32px',
-                                    paddingRight: '32px',
-                                    fontSize: '16px',
-                                    color: '#000000'
-                                  }}
-                                >
-                                  {!visitorData ? "Submit Form" : "Save Changes"}
-                                </Button>
-                                
-                                {visitorData && !visitorData.checked_out_at && (
-                                  <Button 
-                                    onClick={handleCheckout}
-                                    size="large"
-                                    style={{ 
-                                      height: '44px',
-                                      paddingLeft: '32px',
-                                      paddingRight: '32px',
-                                      fontSize: '16px',
-                                      background: '#FFFFFF',
-                                      borderColor: '#000000',
-                                      borderWidth: '1px',
-                                      borderStyle: 'solid',
-                                      color: '#000000'
-                                    }}
-                                  >
-                                    Checkout Visitor
-                                  </Button>
-                                )}
-                                
-                                {visitorData && (
-                                  <Button 
-                                    onClick={handleDelete}
-                                    size="large"
-                                    style={{ 
-                                      height: '44px',
-                                      paddingLeft: '32px',
-                                      paddingRight: '32px',
-                                      fontSize: '16px',
-                                      background: '#FFFFFF',
-                                      borderColor: '#000000',
-                                      borderWidth: '1px',
-                                      borderStyle: 'solid',
-                                      color: '#000000'
-                                    }}
-                                  >
-                                    Delete Visitor
-                                  </Button>
-                                )}
+                    <div style={{ marginTop: '40px' }}>
+                      {!formDisabled ? (
+                        <>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+                            <Button 
+                              htmlType='submit' 
+                              loading={loadingSubmit}
+                              size="large"
+                              style={{ 
+                                background: '#000000',
+                                borderColor: '#000000',
+                                fontWeight: 500,
+                                height: '44px',
+                                paddingLeft: '32px',
+                                paddingRight: '32px',
+                                fontSize: '16px',
+                                color: '#FFFFFF'
+                              }}
+                            >
+                              {!visitorData ? "Submit Form" : "Save Changes"}
+                            </Button>
+                            
+                            {visitorData && !visitorData.checked_out_at && (
+                              <Button 
+                                onClick={handleCheckout}
+                                size="large"
+                                style={{ 
+                                  height: '44px',
+                                  paddingLeft: '32px',
+                                  paddingRight: '32px',
+                                  fontSize: '16px',
+                                  background: '#FFFFFF',
+                                  borderColor: '#000000',
+                                  color: '#000000'
+                                }}
+                              >
+                                Checkout Visitor
+                              </Button>
+                            )}
+                            
+                            {visitorData && (
+                              <Button 
+                                onClick={handleDelete}
+                                size="large"
+                                style={{ 
+                                  height: '44px',
+                                  paddingLeft: '32px',
+                                  paddingRight: '32px',
+                                  fontSize: '16px',
+                                  background: '#FFFFFF',
+                                  borderColor: '#000000',
+                                  color: '#000000'
+                                }}
+                              >
+                                Delete Visitor
+                              </Button>
+                            )}
 
-                                <Button 
-                                  type='default'
-                                  onClick={() => history.push("/visitors")}
-                                  size="large"
-                                  style={{ 
-                                    height: '44px',
-                                    paddingLeft: '32px',
-                                    paddingRight: '32px',
-                                    fontSize: '16px',
-                                    background: '#FFFFFF',
-                                    borderColor: '#000000',
-                                    borderWidth: '1px',
-                                    borderStyle: 'solid',
-                                    color: '#000000'
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                              </div>
-
-                              <div style={{ paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
-                                <Text style={{ fontSize: '13px', color: '#000000' }}>
-                                  <span style={{ color: '#000000' }}>*</span> Required fields
-                                </Text>
-                              </div>
-                            </>
-                          ) : null}
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                </Form>
+                            <Button 
+                              type='default'
+                              onClick={() => history.push("/visitors")}
+                              size="large"
+                              style={{ 
+                                height: '44px',
+                                paddingLeft: '32px',
+                                paddingRight: '32px',
+                                fontSize: '16px',
+                                background: '#FFFFFF',
+                                borderColor: '#e0e0e0',
+                                color: '#666666'
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </>
+                      ) : null}
+                    </div>
+                  </Form>
+                </div>
               </Col>
             )}
           </Row>
@@ -565,16 +544,11 @@ export default function VisitorFormPage({
           outline: none !important;
         }
         .bw-form-input:hover {
-          border-bottom-color: #000000;
+          border-bottom-color: #666666;
         }
         .ant-input:focus,
         .ant-input-focused {
           box-shadow: none !important;
-        }
-        .bw-primary-button:hover {
-          background: #FFFFFF !important;
-          border-color: #000000 !important;
-          color: #000000 !important;
         }
         .ant-radio-checked .ant-radio-inner {
           border-color: #000000 !important;
@@ -588,26 +562,6 @@ export default function VisitorFormPage({
         }
         .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
           display: none !important;
-        }
-        .ant-btn-primary:not([disabled]):not(.ant-btn-background-ghost):hover {
-          background: #FFFFFF !important;
-          border-color: #000000 !important;
-          color: #000000 !important;
-        }
-        .ant-btn:hover {
-          background: #FFFFFF !important;
-          border-color: #000000 !important;
-          color: #000000 !important;
-        }
-        .ant-btn:focus {
-          background: #FFFFFF !important;
-          border-color: #000000 !important;
-          color: #000000 !important;
-        }
-        .ant-btn:active {
-          background: #FFFFFF !important;
-          border-color: #000000 !important;
-          color: #000000 !important;
         }
       `}</style>
       

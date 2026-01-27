@@ -133,6 +133,13 @@ input.order-input {
 
 /* default segmented components */
 .ant-segmented-item-selected {
-  background-color: #EC1D26 !important;
+  background-color: #ffffff !important;
   color: #fff !important;
+}
+.navbar-vertical .nav-link.active::before {
+    display: none !important;
+}
+
+.navbar-vertical .nav-link.active {
+    border-left: 3px solid #FFFFFF !important;
 }

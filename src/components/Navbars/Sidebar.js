@@ -71,18 +71,39 @@ const SIDEBAR = [
 const Sidebar = (props) => {
     const history = useHistory();
     const [collapseOpen, setCollapseOpen] = useState();
+    
     // verifies if routeName is the one active (in browser input)
     const activeRoute = (routeName) => {
         return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
     };
+    
     // toggles collapse between opened and closed (true/false)
     const toggleCollapse = () => {
         setCollapseOpen((data) => !data);
     };
+    
     // closes the collapse
     const closeCollapse = () => {
         setCollapseOpen(false);
     };
+    
+    // Handle logout - sama kayak di AdminNavbar
+    const handleLogout = () => {
+        localStorage.removeItem("super_token");
+        localStorage.removeItem("username");
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("admin_name");
+
+        sessionStorage.removeItem("super_token");
+        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("role");
+        sessionStorage.removeItem("token");
+
+        history.push('/login');
+        window.location.reload();
+    };
+    
     // creates the links that appear in the left menu / Sidebar
     const createLinks = (routes) => {
         return SIDEBAR.map((prop, key) => {
@@ -149,7 +170,7 @@ const Sidebar = (props) => {
                                 marginRight: "1rem",
                                 lineHeight: "1.5rem",
                                 fontSize: "30px",
-                                color: "white" // Menu icon tetap putih untuk kontras dengan background hitam
+                                color: "white"
                             }}
                             icon="mdi:menu" />
                     </span>
@@ -165,11 +186,25 @@ const Sidebar = (props) => {
                     {/* Navigation */}
                     <Nav navbar>{createLinks(routes)}</Nav>
                     {/* Divider */}
-                
-                    {/* Navigation */}
+                    <hr className="my-3" style={{ borderColor: "rgba(255, 255, 255, 0.1)" }} />
+                    
+                    {/* Logout Navigation */}
                     <Nav className="mb-md-3" navbar>
                         <NavItem>
-                            {/* Optional logout link */}
+                            <NavLink
+                                onClick={handleLogout}
+                                style={{ cursor: "pointer" }}
+                            >
+                                <Iconify
+                                    style={{
+                                        color: Palette.INACTIVE_GRAY,
+                                        marginRight: "1rem",
+                                        lineHeight: "1.5rem",
+                                        fontSize: "1.05rem"
+                                    }}
+                                    icon="mdi:logout" />
+                                <div style={{color: Palette.INACTIVE_GRAY, fontWeight: 600}}>Logout</div>
+                            </NavLink>
                         </NavItem>
                     </Nav>
                 </Collapse>
