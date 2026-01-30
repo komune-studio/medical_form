@@ -14,16 +14,16 @@ const { Search } = Input;
 
 const useFilter = create((set) => ({
   search: "",
-  status: "all",
+  timeRange: "all",
   profile: "",
 
   setSearch: (keyword) =>
     set((state) => ({
       search: keyword,
     })),
-  setStatus: (status) =>
+  setTimeRange: (timeRange) =>
     set((state) => ({
-      status: status,
+      timeRange: timeRange,
     })),
   setProfile: (profile) =>
     set((state) => ({
@@ -32,7 +32,7 @@ const useFilter = create((set) => ({
   resetSearch: () =>
     set((state) => ({
       search: "",
-      status: "all",
+      timeRange: "all",
       profile: ""
     })),
 }));
@@ -45,10 +45,10 @@ const VisitorList = () => {
   const [dataSource, setDataSource] = useState([]);
 
   const search = useFilter((state) => state.search);
-  const status = useFilter((state) => state.status);
+  const timeRange = useFilter((state) => state.timeRange);
   const profile = useFilter((state) => state.profile);
   const setSearch = useFilter((state) => state.setSearch);
-  const setStatus = useFilter((state) => state.setStatus);
+  const setTimeRange = useFilter((state) => state.setTimeRange);
   const setProfile = useFilter((state) => state.setProfile);
   const resetSearch = useFilter((state) => state.resetSearch);
 
@@ -65,16 +65,12 @@ const VisitorList = () => {
     setSearch(searchTerm);
   };
 
-  const handleStatusChange = (value) => {
-    setStatus(value);
+  const handleTimeRangeChange = (value) => {
+    setTimeRange(value);
   };
 
   const handleProfileChange = (value) => {
     setProfile(value);
-  };
-
-  const getProfileTagColor = (profile) => {
-    return 'default';
   };
 
   const columns = [
@@ -126,27 +122,6 @@ const VisitorList = () => {
       )
     },
     {
-      id: 'checked_out_at', 
-      label: 'Check-out', 
-      filter: false,
-      render: (row) => (
-        row.checked_out_at ? (
-          <div>
-            <div style={{ color: '#333' }}>{moment(row.checked_out_at).format("DD MMM YYYY")}</div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              {moment(row.checked_out_at).format("HH:mm")}
-            </div>
-          </div>
-        ) : (
-          <Tag style={{ 
-            background: '#f5f5f5', 
-            color: '#333',
-            border: '1px solid #d9d9d9'
-          }}>Active</Tag>
-        )
-      )
-    },
-    {
       id: '', 
       label: 'Actions', 
       filter: false,
@@ -163,18 +138,6 @@ const VisitorList = () => {
                   icon={<Iconify icon={"material-symbols:edit"} />} 
                 />
               </Link>
-            </Tooltip>
-            
-            <Tooltip title="Quick Checkout">
-              <AntButton
-                type={'link'}
-                style={{ color: row.checked_out_at ? '#ccc' : '#333' }}
-                onClick={() => !row.checked_out_at && onQuickCheckout(row.id)}
-                className={"d-flex align-items-center justify-content-center"}
-                shape="circle"
-                icon={<Iconify icon={"material-symbols:logout-rounded"} />}
-                disabled={!!row.checked_out_at}
-              />
             </Tooltip>
 
             <Tooltip title="Delete">
@@ -215,25 +178,6 @@ const VisitorList = () => {
     });
   };
 
-  const onQuickCheckout = async (id) => {
-    Modal.confirm({
-      title: "Checkout Visitor",
-      content: "Are you sure you want to checkout this visitor?",
-      okText: "Checkout",
-      cancelText: "Cancel",
-      onOk: async () => {
-        try {
-          await FormModel.checkoutVisitor(id);
-          message.success('Visitor checked out successfully');
-          initializeData();
-        } catch (error) {
-          console.error("Error checking out visitor:", error);
-          message.error('Failed to checkout visitor');
-        }
-      }
-    });
-  };
-
   const initializeData = async (
     currentPage = page,
     currentRowsPerPage = rowsPerPage
@@ -243,11 +187,11 @@ const VisitorList = () => {
       const filters = {};
       
       if (search) filters.search = search;
-      if (status !== "all") {
-        filters.includeCheckedOut = status === "checked-out";
-      }
       if (profile) {
         filters.visitorProfile = profile;
+      }
+      if (timeRange && timeRange !== "all") {
+        filters.timeRange = timeRange;
       }
       
       const result = await FormModel.getAllVisitors(filters);
@@ -275,7 +219,7 @@ const VisitorList = () => {
 
   useEffect(() => {
     initializeData(page, rowsPerPage);
-  }, [page, rowsPerPage, search, status, profile]);
+  }, [page, rowsPerPage, search, timeRange, profile]);
 
   return (
     <>
@@ -704,14 +648,15 @@ const VisitorList = () => {
               <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0 pe-md-2">
                 <Select
                   className="filter-select"
-                  placeholder="Status"
+                  placeholder="Time Range"
                   style={{ width: '100%' }}
-                  value={status}
-                  onChange={handleStatusChange}
+                  value={timeRange}
+                  onChange={handleTimeRangeChange}
                 >
-                  <Select.Option value="all">All Status</Select.Option>
-                  <Select.Option value="active">Active</Select.Option>
-                  <Select.Option value="checked-out">Checked Out</Select.Option>
+                  <Select.Option value="all">All Time</Select.Option>
+                  <Select.Option value="today">Today</Select.Option>
+                  <Select.Option value="last7days">Last 7 Days</Select.Option>
+                  <Select.Option value="last30days">Last 30 Days</Select.Option>
                 </Select>
               </Col>
               <Col xl={2} lg={3} md={6} xs={6} className="mb-3 mb-lg-0 ps-md-2">
