@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   Space,
   Button as AntButton,
+  Button,
   Tooltip,
   Input,
   Select,
@@ -604,39 +605,41 @@ const StaffList = () => {
               </Col>
             </Row>
 
-            {/* Search and Filter Row */}
-            <Row style={{ marginBottom: 24, alignItems: 'center' }}>
-              <Col xl={6} lg={6} md={12} className="mb-3 mb-lg-0">
-                <Input
-                  className="staff-search"
-                  placeholder="Search by name or phone"
-                  onPressEnter={(e) => handleSearch(e.target.value)}
-                  prefix={
-                    <Iconify
-                      icon="material-symbols:search"
-                      style={{ color: '#666', fontSize: '18px' }}
-                    />
-                  }
-                  allowClear
-                  onClear={() => handleSearch("")}
-                  style={{ width: '100%' }}
-                />
-              </Col>
-              <Col xl={3} lg={3} md={6} xs={6} className="mb-3 mb-lg-0 pe-md-2">
-                <Select
-                  className="filter-select"
-                  placeholder="Status"
-                  style={{ width: '100%' }}
-                  value={status}
-                  onChange={handleStatusChange}
-                >
-                  <Select.Option value="all">All Status</Select.Option>
-                  <Select.Option value="active">Active Only</Select.Option>
-                  <Select.Option value="inactive">Inactive Only</Select.Option>
-                </Select>
-              </Col>
-              <Col xl={3} lg={3} className="d-none d-lg-block"></Col>
-            </Row>
+          {/* Search and Filter Row */}
+<Row style={{ marginBottom: 24, alignItems: 'center' }}>
+  <Col xl={5} lg={4} md={12} className="mb-3 mb-lg-0">
+    <Input
+      className="staff-search"
+      placeholder="Search by name or phone"
+      onPressEnter={(e) => handleSearch(e.target.value)}
+      prefix={
+        <Iconify
+          icon="material-symbols:search"
+          style={{ color: '#666', fontSize: '18px' }}
+        />
+      }
+      allowClear
+      onClear={() => handleSearch("")}
+      style={{ width: '100%' }}
+    />
+  </Col>
+  <Col xl={3} lg={3} className="d-none d-lg-block"></Col>
+  <Col xl={4} lg={5} md={12} xs={12} className="mb-3 mb-lg-0">
+    <div className="d-flex justify-content-end">
+      <Select
+        className="filter-select"
+        placeholder="Status"
+        style={{ width: '100%', maxWidth: '200px' }}
+        value={status}
+        onChange={handleStatusChange}
+      >
+        <Select.Option value="all">All Status</Select.Option>
+        <Select.Option value="active">Active Only</Select.Option>
+        <Select.Option value="inactive">Inactive Only</Select.Option>
+      </Select>
+    </div>
+  </Col>
+</Row>
 
             {/* Table */}
             <Row>
