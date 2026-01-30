@@ -25,9 +25,107 @@ const { Option } = Select;
 
 // Add custom styles for responsive field spacing
 const customStyles = `
+  /* Custom styling untuk Select dropdown */
+  .staff-select .ant-select-selector {
+    background-color: #FFFFFF !important;
+    border: 1px solid #d9d9d9 !important;
+    color: #000000 !important;
+    border-radius: 4px !important;
+    height: 34px !important;
+    padding: 4px 11px !important;
+    font-size: 14px !important;
+  }
+  
+  .staff-select .ant-select-selection-placeholder {
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-size: 14px !important;
+  }
+  
+  .staff-select .ant-select-selection-item {
+    color: #000000 !important;
+    font-size: 14px !important;
+  }
+  
+  .staff-select .ant-select-arrow {
+    color: rgba(0, 0, 0, 0.25) !important;
+  }
+  
+  /* Hover state */
+  .staff-select .ant-select-selector:hover {
+    border-color: #666666 !important;
+  }
+  
+  /* Focus state */
+  .staff-select.ant-select-focused .ant-select-selector {
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Dropdown menu styling */
+  .staff-select .ant-select-dropdown {
+    background-color: #FFFFFF !important;
+    border: 1px solid #d9d9d9 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+                0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+                0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+  }
+  
+  .staff-select .ant-select-item {
+    color: #000000 !important;
+    background-color: #FFFFFF !important;
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+    min-height: 36px !important;
+  }
+  
+  .staff-select .ant-select-item:hover {
+    background-color: #f5f5f5 !important;
+  }
+  
+  .staff-select .ant-select-item-option-selected {
+    background-color: #f5f5f5 !important;
+    color: #000000 !important;
+    font-weight: normal !important;
+  }
+  
+  .staff-select .ant-select-item-option-active {
+    background-color: #f5f5f5 !important;
+  }
+  
+  /* Search input inside dropdown */
+  .staff-select .ant-select-dropdown .ant-select-dropdown-search input {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #d9d9d9 !important;
+  }
+  
+  /* Tablet responsive */
   @media (min-width: 768px) and (max-width: 1024px) {
     .visitor-form-item {
       margin-bottom: 14px !important;
+    }
+    
+    .staff-select .ant-select-selector {
+      height: 40px !important;
+      font-size: 16px !important;
+      padding: 8px 12px !important;
+    }
+    
+    .staff-select .ant-select-selection-placeholder {
+      font-size: 16px !important;
+      line-height: 24px !important;
+    }
+    
+    .staff-select .ant-select-selection-item {
+      font-size: 16px !important;
+      line-height: 24px !important;
+    }
+    
+    .staff-select .ant-select-item {
+      font-size: 16px !important;
+      padding: 10px 12px !important;
+      min-height: 44px !important;
     }
   }
 `;
@@ -528,6 +626,7 @@ export default function VisitorFormPage({
                         className="visitor-form-item"
                       >
                         <Select
+                          className="staff-select"
                           placeholder="Select staff"
                           loading={staffLoading}
                           showSearch
@@ -537,19 +636,15 @@ export default function VisitorFormPage({
                           }
                           style={{ 
                             width: '100%',
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #d9d9d9',
-                            borderRadius: '4px',
                           }}
                           dropdownStyle={{
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #d9d9d9',
-                            borderRadius: '4px',
+                            maxHeight: 300,
+                            overflowY: 'auto'
                           }}
+                          notFoundContent={
+                            staffLoading ? "Loading staff..." : "No staff found"
+                          }
                         >
-                          <Option value="" disabled>
-                            {staffLoading ? "Loading staff..." : "Select a staff member"}
-                          </Option>
                           {staffOptions.map(option => (
                             <Option key={option.value} value={option.value}>
                               {option.label}
@@ -569,10 +664,10 @@ export default function VisitorFormPage({
                           fontSize: '13px',
                           color: '#333'
                         }}>
-                          <div style={{ fontWeight: 500, marginBottom: '4px' }}>
+                          <div style={{ fontWeight: 500, marginBottom: '4px', color: '#000000' }}>
                             Selected Staff: {selectedStaff.name}
                           </div>
-                          <div>
+                          <div style={{ color: '#666666' }}>
                             Phone: {selectedStaff.phone_number}
                           </div>
                           {selectedStaff.active === false && (

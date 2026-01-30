@@ -72,6 +72,12 @@ const SIDEBAR = [
         color: SIDEBAR_COLOR
     },
     {
+        path: "/staff",
+        name: "Staff",
+        icon: "mdi:badge",
+        color: SIDEBAR_COLOR
+    },
+    {
         path: "/form",
         name: "Form",
         icon: "mdi:clipboard-text",
