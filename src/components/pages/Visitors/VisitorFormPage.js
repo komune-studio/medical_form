@@ -8,6 +8,7 @@ import {
   Form, 
   Input, 
   Radio, 
+  Select,
   Space,
   Row,
   Col,
@@ -16,62 +17,18 @@ import {
 import { Container } from 'reactstrap';
 import swal from '../../reusable/CustomSweetAlert';
 import FormModel from 'models/VisitorModel';
+import StaffModel from 'models/StaffModel';
 import moment from 'moment';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
+const { Option } = Select;
 
-// Add custom styles for responsive field spacing and radio buttons
+// Add custom styles for responsive field spacing
 const customStyles = `
   @media (min-width: 768px) and (max-width: 1024px) {
     .visitor-form-item {
       margin-bottom: 14px !important;
     }
-  }
-  
-  /* Custom Radio Button Styles */
-  .custom-radio .ant-radio-wrapper {
-    display: flex !important;
-    align-items: flex-start !important;
-    margin-bottom: 8px !important;
-  }
-  
-  .custom-radio .ant-radio {
-    top: 2px !important;
-  }
-  
-  .custom-radio .ant-radio-inner {
-    width: 20px !important;
-    height: 20px !important;
-    border: 2px solid #d9d9d9 !important;
-    background-color: #ffffff !important;
-  }
-  
-  .custom-radio .ant-radio-inner::after {
-    width: 20px !important;
-    height: 20px !important;
-    margin-top: -10px !important;
-    margin-left: -10px !important;
-    background-color: #000000 !important;
-  }
-  
-  .custom-radio .ant-radio-checked .ant-radio-inner {
-    border-color: #000000 !important;
-  }
-  
-  .custom-radio .ant-radio-wrapper:hover .ant-radio-inner {
-    border-color: #000000 !important;
-  }
-  
-  .custom-radio .ant-radio-input:focus + .ant-radio-inner {
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  .custom-radio .ant-radio + span {
-    padding-left: 12px !important;
-    padding-right: 0 !important;
-    color: #000000 !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
   }
 `;
 
@@ -90,10 +47,50 @@ export default function VisitorFormPage({
   const [hasChanges, setHasChanges] = useState(false);
   const [currentProfile, setCurrentProfile] = useState("Visitor");
   const [formKey, setFormKey] = useState(0);
+  
+  // New states for staff dropdown
+  const [staffOptions, setStaffOptions] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+
+  // Fetch staff data for dropdown
+  const fetchStaffData = async () => {
+    setStaffLoading(true);
+    try {
+      const result = await StaffModel.getActiveStaff();
+      if (result && result.http_code === 200) {
+        const options = result.data.map(staff => ({
+          value: staff.id,
+          label: `${staff.name} - ${staff.phone_number}`,
+          staffData: staff
+        }));
+        setStaffOptions(options);
+        
+        // If editing visitor, set the selected staff
+        if (visitorData && visitorData.staff_id) {
+          const staff = result.data.find(s => s.id === visitorData.staff_id);
+          if (staff) {
+            setSelectedStaff(staff);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching staff:", error);
+      message.error('Failed to load staff data');
+    } finally {
+      setStaffLoading(false);
+    }
+  };
 
   const onValuesChanged = (changedValues, allValues) => {
     if (changedValues.visitor_profile) {
       setCurrentProfile(changedValues.visitor_profile);
+    }
+    
+    // Handle staff_id change
+    if (changedValues.staff_id !== undefined) {
+      const selected = staffOptions.find(opt => opt.value === changedValues.staff_id);
+      setSelectedStaff(selected ? selected.staffData : null);
     }
 
     if (!visitorData) {
@@ -133,10 +130,21 @@ export default function VisitorFormPage({
       
       let body = form.getFieldsValue();
       
-      const validation = FormModel.validateVisitorData(body);
-      if (!validation.isValid) {
-        const errorMsg = Object.values(validation.errors).join(', ');
-        message.error(`Validation errors: ${errorMsg}`);
+      // Transform data for new API (with staff_id instead of filled_by)
+      const transformedBody = {
+        visitor_name: body.visitor_name,
+        phone_number: body.phone_number,
+        visitor_profile: body.visitor_profile,
+        staff_id: body.staff_id,
+      };
+      
+      if (body.visitor_profile === 'Other' && body.visitor_profile_other) {
+        transformedBody.visitor_profile_other = body.visitor_profile_other;
+      }
+
+      // Validate required fields
+      if (!transformedBody.staff_id) {
+        message.error('Please select a staff member');
         setLoadingSubmit(false);
         return;
       }
@@ -146,10 +154,10 @@ export default function VisitorFormPage({
 
       if (!visitorData) {
         msg = 'Successfully added new Visitor';
-        result = await FormModel.createVisitor(body);
+        result = await FormModel.createVisitor(transformedBody);
       } else {
         msg = 'Successfully updated Visitor';
-        result = await FormModel.updateVisitor(visitorData.id, body);
+        result = await FormModel.updateVisitor(visitorData.id, transformedBody);
       }
 
       if (result && result.http_code === 200) {
@@ -159,6 +167,7 @@ export default function VisitorFormPage({
           form.resetFields();
           setHasChanges(false);
           setCurrentProfile("Visitor");
+          setSelectedStaff(null);
           setFormKey(prev => prev + 1);
           
           setTimeout(() => {
@@ -241,19 +250,27 @@ export default function VisitorFormPage({
   const profileOptions = FormModel.getVisitorProfileOptions();
 
   useEffect(() => {
+    // Fetch staff data on component mount
+    fetchStaffData();
+  }, []);
+
+  useEffect(() => {
     if (visitorData) {
-      form.setFieldsValue({
+      const formValues = {
         visitor_name: visitorData.visitor_name,
         phone_number: visitorData.phone_number,
         visitor_profile: visitorData.visitor_profile,
         visitor_profile_other: visitorData.visitor_profile_other,
-        filled_by: visitorData.filled_by,
-      });
+        staff_id: visitorData.staff_id || (visitorData.staff ? visitorData.staff.id : null),
+      };
+      
+      form.setFieldsValue(formValues);
       setCurrentProfile(visitorData.visitor_profile);
       setHasChanges(false);
     } else {
       form.resetFields();
       setCurrentProfile("Visitor");
+      setSelectedStaff(null);
       setHasChanges(false);
     }
     
@@ -357,7 +374,6 @@ export default function VisitorFormPage({
                   autoComplete='off'
                   key={formKey}
                   layout="vertical"
-                  requiredMark={false}
                 >
                   <Row gutter={[32, 0]}>
                     {/* Single Column - All fields vertical */}
@@ -365,7 +381,11 @@ export default function VisitorFormPage({
                       {/* 1. Nama Visitor */}
                       <Form.Item
                         label={
-                          <span style={{ fontWeight: 600, fontSize: '14px', color: '#000' }}>
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
                             Nama Visitor <span style={{ color: '#ff4d4f' }}>*</span>
                           </span>
                         }
@@ -377,16 +397,18 @@ export default function VisitorFormPage({
                         style={{ marginBottom: '10px' }}
                         className="visitor-form-item"
                       >
-                        <Input
+                        <Input 
                           placeholder="Enter name"
-                          style={{
+                          style={{ 
                             backgroundColor: '#FFFFFF',
                             border: '1px solid #d9d9d9',
+                            color: '#000000',
                             borderRadius: '4px',
                             padding: '8px 12px',
                             fontSize: '14px',
                             height: '34px'
                           }}
+                          className="responsive-input"
                         />
                       </Form.Item>
 
@@ -439,26 +461,25 @@ export default function VisitorFormPage({
                         rules={[{ required: true, message: 'Required!' }]}
                         style={{ marginBottom: currentProfile === "Other" ? '6px' : '10px' }}
                       >
-                        <div className="custom-radio">
-                          <Radio.Group 
-                            onChange={(e) => setCurrentProfile(e.target.value)}
-                            style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
-                          >
-                            {profileOptions.map(option => (
-                              <Radio 
-                                key={option.value} 
-                                value={option.value}
-                                style={{ 
-                                  fontSize: '14px',
-                                  display: 'block',
-                                  marginBottom: '4px'
-                                }}
-                              >
-                                {option.label}
-                              </Radio>
-                            ))}
-                          </Radio.Group>
-                        </div>
+                        <Radio.Group 
+                          onChange={(e) => setCurrentProfile(e.target.value)}
+                          style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+                        >
+                          {profileOptions.map(option => (
+                            <Radio 
+                              key={option.value} 
+                              value={option.value}
+                              style={{ 
+                                color: '#000000',
+                                fontSize: '14px',
+                                display: 'block',
+                                marginBottom: '4px'
+                              }}
+                            >
+                              {option.label}
+                            </Radio>
+                          ))}
+                        </Radio.Group>
                       </Form.Item>
 
                       {/* Other Profile Field */}
@@ -471,7 +492,6 @@ export default function VisitorFormPage({
                           ]}
                           style={{ 
                             marginBottom: '10px',
-                            marginTop: '4px'
                           }}
                         >
                           <Input 
@@ -489,7 +509,7 @@ export default function VisitorFormPage({
                         </Form.Item>
                       )}
 
-                      {/* 4. Diisi Oleh (Nama Front Desk) */}
+                      {/* 4. Diisi Oleh (Staff) - NEW DROPDOWN */}
                       <Form.Item
                         label={
                           <span style={{ 
@@ -497,30 +517,71 @@ export default function VisitorFormPage({
                             fontWeight: 600, 
                             fontSize: '14px' 
                           }}>
-                            Diisi Oleh (Nama Front Desk) <span style={{ color: '#ff4d4f' }}>*</span>
+                            Diisi Oleh (Staff) <span style={{ color: '#ff4d4f' }}>*</span>
                           </span>
                         }
-                        name="filled_by"
+                        name="staff_id"
                         rules={[
-                          { required: true, message: 'Required!' },
-                          { max: 255, message: 'Max 255 chars!' }
+                          { required: true, message: 'Please select a staff member!' }
                         ]}
                         style={{ marginBottom: '10px' }}
                         className="visitor-form-item"
                       >
-                        <Input 
-                          placeholder="Enter staff name"
+                        <Select
+                          placeholder="Select staff"
+                          loading={staffLoading}
+                          showSearch
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                          }
                           style={{ 
+                            width: '100%',
                             backgroundColor: '#FFFFFF',
                             border: '1px solid #d9d9d9',
-                            color: '#000000',
                             borderRadius: '4px',
-                            padding: '8px 12px',
-                            fontSize: '14px',
-                            height: '34px'
                           }}
-                        />
+                          dropdownStyle={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #d9d9d9',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          <Option value="" disabled>
+                            {staffLoading ? "Loading staff..." : "Select a staff member"}
+                          </Option>
+                          {staffOptions.map(option => (
+                            <Option key={option.value} value={option.value}>
+                              {option.label}
+                            </Option>
+                          ))}
+                        </Select>
                       </Form.Item>
+
+                      {/* Selected Staff Info */}
+                      {selectedStaff && (
+                        <div style={{
+                          marginBottom: '16px',
+                          padding: '12px',
+                          backgroundColor: '#f5f5f5',
+                          border: '1px solid #e8e8e8',
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                          color: '#333'
+                        }}>
+                          <div style={{ fontWeight: 500, marginBottom: '4px' }}>
+                            Selected Staff: {selectedStaff.name}
+                          </div>
+                          <div>
+                            Phone: {selectedStaff.phone_number}
+                          </div>
+                          {selectedStaff.active === false && (
+                            <div style={{ color: '#d93025', marginTop: '4px' }}>
+                              ⚠️ This staff is inactive
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </Col>
                   </Row>
 

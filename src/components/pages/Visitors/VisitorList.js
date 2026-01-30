@@ -101,11 +101,18 @@ const VisitorList = () => {
       )
     },
     {
-      id: 'filled_by', 
+      id: 'staff', 
       label: 'Staff', 
       filter: true,
       render: (row) => (
-        <div style={{ color: '#333' }}>{row.filled_by}</div>
+        <div style={{ color: '#333' }}>
+          {row.staff ? row.staff.name : 'No Staff'}
+          {row.staff && (
+            <div style={{ fontSize: '12px', color: '#666' }}>
+              Phone: {row.staff.phone_number}
+            </div>
+          )}
+        </div>
       )
     },
     {
@@ -178,44 +185,49 @@ const VisitorList = () => {
     });
   };
 
-  const initializeData = async (
-    currentPage = page,
-    currentRowsPerPage = rowsPerPage
-  ) => {
-    setLoading(true);
-    try {
-      const filters = {};
+ const initializeData = async (currentPage = page, currentRowsPerPage = rowsPerPage) => {
+  setLoading(true);
+  try {
+    const filters = {};
+    
+    if (search) filters.search = search;
+    if (profile) {
+      filters.visitorProfile = profile;
+    }
+    if (timeRange && timeRange !== "all") {
+      filters.timeRange = timeRange;
+    }
+    
+    const result = await FormModel.getAllVisitors(filters);
+    
+    console.log("FULL API RESULT:", result); // DEBUG
+    console.log("Result data type:", typeof result.data); // DEBUG
+    console.log("Result data:", result.data); // DEBUG
+    
+    if (result && result.http_code === 200) {
+      // Mungkin result.data bukan array langsung?
+      const allData = Array.isArray(result.data) ? result.data : [];
       
-      if (search) filters.search = search;
-      if (profile) {
-        filters.visitorProfile = profile;
-      }
-      if (timeRange && timeRange !== "all") {
-        filters.timeRange = timeRange;
-      }
+      console.log("First item staff:", allData[0]?.staff); // DEBUG
       
-      const result = await FormModel.getAllVisitors(filters);
+      const startIndex = currentPage * currentRowsPerPage;
+      const endIndex = startIndex + currentRowsPerPage;
+      const paginatedData = allData.slice(startIndex, endIndex);
       
-      if (result && result.http_code === 200) {
-        const allData = result.data || [];
-        const startIndex = currentPage * currentRowsPerPage;
-        const endIndex = startIndex + currentRowsPerPage;
-        const paginatedData = allData.slice(startIndex, endIndex);
-        
-        setDataSource(paginatedData);
-        setTotalCount(allData.length);
-      } else {
-        setDataSource([]);
-        setTotalCount(0);
-      }
-    } catch (error) {
-      console.error("Error fetching visitors:", error);
+      setDataSource(paginatedData);
+      setTotalCount(allData.length);
+    } else {
       setDataSource([]);
       setTotalCount(0);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching visitors:", error);
+    setDataSource([]);
+    setTotalCount(0);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     initializeData(page, rowsPerPage);
