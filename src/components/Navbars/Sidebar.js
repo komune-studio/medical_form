@@ -66,15 +66,9 @@ const SIDEBAR_COLOR = "#FFFFFF";
 
 const SIDEBAR = [
     {
-        path: "/visitors",
-        name: "Visitors",
-        icon: "mdi:account-group",
-        color: SIDEBAR_COLOR
-    },
-    {
         path: "/patients",
         name: "Patients",
-        icon: "mdi:hospital-box",
+        icon: "mdi:account-group",
         color: SIDEBAR_COLOR
     },
     {
@@ -83,12 +77,7 @@ const SIDEBAR = [
         icon: "mdi:badge",
         color: SIDEBAR_COLOR
     },
-    {
-        path: "/form",
-        name: "Form",
-        icon: "mdi:clipboard-text",
-        color: SIDEBAR_COLOR
-    }
+    
 ]
 
 const Sidebar = (props) => {

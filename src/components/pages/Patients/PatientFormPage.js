@@ -204,7 +204,6 @@ export default function PatientFormPage({
   const [formDisabled, setFormDisabled] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [formKey, setFormKey] = useState(0);
-  const [currentPatientCode, setCurrentPatientCode] = useState(null);
 
   const onValuesChanged = (changedValues, allValues) => {
     if (!patientData) {
@@ -239,35 +238,6 @@ export default function PatientFormPage({
     setHasChanges(changed);
   };
 
-  const calculateAge = (dateOfBirth) => {
-    if (!dateOfBirth) return '';
-    try {
-      const birthDate = moment(dateOfBirth);
-      const today = moment();
-      
-      if (!birthDate.isValid()) return '';
-      
-      const years = today.diff(birthDate, 'years');
-      const months = today.diff(birthDate, 'months') % 12;
-      
-      if (years === 0) {
-        return `${months} bulan`;
-      } else if (months === 0) {
-        return `${years} tahun`;
-      } else {
-        return `${years} tahun ${months} bulan`;
-      }
-    } catch (error) {
-      console.error('Error calculating age:', error);
-      return '';
-    }
-  };
-
-  const handleDateOfBirthChange = (date) => {
-    const age = calculateAge(date);
-    form.setFieldsValue({ age_display: age });
-  };
-
   const onSubmit = async () => {
     console.log('Form submitted');
     setLoadingSubmit(true);
@@ -278,20 +248,13 @@ export default function PatientFormPage({
       let body = form.getFieldsValue();
       console.log('Form data before processing:', body);
       
+      // Hapus field yang tidak perlu dikirim ke backend
       delete body.patient_code;
       
+      // Format tanggal lahir
       if (body.date_of_birth) {
         body.date_of_birth = moment(body.date_of_birth).format('YYYY-MM-DD');
       }
-      
-      if (body.date_of_birth) {
-        const birthDate = moment(body.date_of_birth);
-        const today = moment();
-        const years = today.diff(birthDate, 'years');
-        body.age = years;
-      }
-
-      delete body.age_display;
 
       console.log('Data to be saved:', body);
 
@@ -393,7 +356,6 @@ export default function PatientFormPage({
         patient_code: patientData.patient_code,
         name: patientData.name,
         date_of_birth: patientData.date_of_birth ? moment(patientData.date_of_birth) : null,
-        age_display: calculateAge(patientData.date_of_birth),
         gender: patientData.gender,
         phone: patientData.phone,
         email: patientData.email,
@@ -405,12 +367,10 @@ export default function PatientFormPage({
       
       console.log('Form values to set:', formValues);
       form.setFieldsValue(formValues);
-      setCurrentPatientCode(patientData.patient_code);
       setHasChanges(false);
     } else {
       console.log('Resetting form for new patient');
       form.resetFields();
-      setCurrentPatientCode(null);
       setHasChanges(false);
     }
     
@@ -581,71 +541,34 @@ export default function PatientFormPage({
                         />
                       </Form.Item>
 
-                      <Row gutter={16}>
-                        <Col xs={24} md={12}>
-                          {/* Date of Birth */}
-                          <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Date of Birth
-                              </span>
-                            }
-                            name="date_of_birth"
-                            rules={[
-                              { required: true, message: 'Required!' }
-                            ]}
-                            style={{ marginBottom: '10px' }}
-                            className="patient-form-item"
-                          >
-                            <DatePicker
-                              className="patient-datepicker"
-                              placeholder="DD/MM/YYYY"
-                              format="DD/MM/YYYY"
-                              onChange={handleDateOfBirthChange}
-                              disabledDate={(current) => {
-                                return current && current > moment().endOf('day');
-                              }}
-                              style={{ width: '100%' }}
-                            />
-                          </Form.Item>
-                        </Col>
-                        
-                        <Col xs={24} md={12}>
-                          {/* Age (Display only) */}
-                          <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Age
-                              </span>
-                            }
-                            name="age_display"
-                            style={{ marginBottom: '10px' }}
-                          >
-                            <Input 
-                              placeholder="Age will be calculated automatically"
-                              className="readonly-field"
-                              readOnly
-                              style={{ 
-                                backgroundColor: '#fafafa',
-                                border: '1px solid #d9d9d9',
-                                color: '#666666',
-                                borderRadius: '4px',
-                                padding: '8px 12px',
-                                fontSize: '14px',
-                                height: '34px'
-                              }}
-                            />
-                          </Form.Item>
-                        </Col>
-                      </Row>
+                      {/* Date of Birth */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Date of Birth
+                          </span>
+                        }
+                        name="date_of_birth"
+                        rules={[
+                          { required: true, message: 'Required!' }
+                        ]}
+                        style={{ marginBottom: '10px' }}
+                        className="patient-form-item"
+                      >
+                        <DatePicker
+                          className="patient-datepicker"
+                          placeholder="DD/MM/YYYY"
+                          format="DD/MM/YYYY"
+                          disabledDate={(current) => {
+                            return current && current > moment().endOf('day');
+                          }}
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>

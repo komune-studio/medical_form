@@ -1,16 +1,13 @@
-import { Space, Button as AntButton, Tooltip, Modal, message, Image, Flex, Tag, Switch, Input, Select, Button, Dropdown, Menu } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message, Input, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { Card, Row, CardBody, Container } from "reactstrap";
 import { Link } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
 import { Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
-import Palette from "../../../utils/Palette";
 import PatientModel from 'models/PatientModel';
 import moment from 'moment';
 import create from 'zustand';
-
-const { Search } = Input;
 
 const useFilter = create((set) => ({
   search: "",
@@ -72,18 +69,22 @@ const PatientList = () => {
 
   const handleSearch = (searchTerm) => {
     setSearch(searchTerm);
+    setPage(0);
   };
 
   const handleTimeRangeChange = (value) => {
     setTimeRange(value);
+    setPage(0);
   };
 
   const handleGenderChange = (value) => {
     setGender(value);
+    setPage(0);
   };
 
   const handleBloodTypeChange = (value) => {
     setBloodType(value);
+    setPage(0);
   };
 
   const columns = [
@@ -92,10 +93,7 @@ const PatientList = () => {
       label: 'Patient ID',
       filter: true,
       render: (row) => (
-        <div>
-          <div style={{ fontWeight: 500, color: '#333' }}>{row.patient_code}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>MRN: {row.medical_record_number}</div>
-        </div>
+        <div style={{ fontWeight: 500, color: '#333' }}>{row.patient_code}</div>
       )
     },
     {
@@ -106,7 +104,7 @@ const PatientList = () => {
         <div>
           <div style={{ fontWeight: 500, color: '#333' }}>{row.name}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>
-            {row.age} yrs • {row.gender}
+            {row.gender}
           </div>
         </div>
       )
@@ -127,9 +125,9 @@ const PatientList = () => {
       label: 'Blood Type',
       filter: true,
       render: (row) => (
-        <Tag className={`blood-tag blood-${row.blood_type?.toLowerCase() || 'unknown'}`}>
+        <span className={`ant-tag blood-tag blood-${row.blood_type?.toLowerCase() || 'unknown'}`}>
           {row.blood_type || 'Unknown'}
-        </Tag>
+        </span>
       )
     },
     {
@@ -240,17 +238,14 @@ const PatientList = () => {
       const headers = [
         'ID',
         'Patient Code',
-        'Medical Record Number',
         'Full Name',
         'Date of Birth',
-        'Age',
         'Gender',
         'Phone Number',
         'Email',
         'Blood Type',
         'Address',
-        'Registration Date',
-        'Status'
+        'Registration Date'
       ];
       
       const rows = data.map(patient => {
@@ -263,17 +258,14 @@ const PatientList = () => {
         return [
           patient.id || '',
           patient.patient_code || '',
-          patient.medical_record_number || '',
           patient.name || '',
           dob,
-          patient.age || '',
           patient.gender || '',
           patient.phone || '',
           patient.email || '',
           patient.blood_type || 'Unknown',
           patient.address || '',
-          regDate,
-          patient.status || 'Active'
+          regDate
         ];
       });
       
@@ -318,17 +310,6 @@ const PatientList = () => {
       setExportLoading(false);
     }
   };
-
-  const exportMenu = (
-    <Menu>
-      <Menu.Item key="1" onClick={exportCSV}>
-        <Space>
-          <Iconify icon="mdi:file-excel-outline" />
-          Export to CSV
-        </Space>
-      </Menu.Item>
-    </Menu>
-  );
 
   const initializeData = async (currentPage = page, currentRowsPerPage = rowsPerPage) => {
     setLoading(true);
@@ -473,6 +454,13 @@ const PatientList = () => {
         }
         
         /* Blood type tags */
+        .blood-tag {
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-size: 13px;
+          display: inline-block;
+        }
+        
         .blood-tag.blood-a {
           background: #fff1f0 !important;
           color: #cf1322 !important;
@@ -501,25 +489,6 @@ const PatientList = () => {
           background: #f5f5f5 !important;
           color: #8c8c8c !important;
           border: 1px solid #d9d9d9 !important;
-        }
-        
-        /* Gender tags */
-        .gender-tag.male {
-          background: #e6f7ff !important;
-          color: #0050b3 !important;
-          border: 1px solid #91d5ff !important;
-        }
-        
-        .gender-tag.female {
-          background: #fff0f6 !important;
-          color: #c41d7f !important;
-          border: 1px solid #ffadd2 !important;
-        }
-        
-        .gender-tag.other {
-          background: #f6ffed !important;
-          color: #389e0d !important;
-          border: 1px solid #b7eb8f !important;
         }
         
         /* Modal styling */
@@ -680,7 +649,7 @@ const PatientList = () => {
             padding: 18px 16px !important;
           }
           
-          .ant-tag {
+          .blood-tag {
             font-size: 15px !important;
             padding: 6px 14px !important;
           }
@@ -772,7 +741,8 @@ const PatientList = () => {
                 <Input
                   className="patient-search"
                   placeholder="Search by name, ID, or phone"
-                  onPressEnter={(e) => handleSearch(e.target.value)}
+                  value={search}
+                  onChange={(e) => handleSearch(e.target.value)}
                   prefix={
                     <Iconify
                       icon="material-symbols:search"
@@ -790,13 +760,15 @@ const PatientList = () => {
                   className="filter-select"
                   placeholder="Gender"
                   style={{ width: '100%' }}
-                  value={gender}
+                  value={gender || undefined}
                   onChange={handleGenderChange}
+                  allowClear
+                  onClear={() => handleGenderChange("")}
                 >
                   <Select.Option value="">All Gender</Select.Option>
-                  <Select.Option value="Male">Male</Select.Option>
-                  <Select.Option value="Female">Female</Select.Option>
-                  <Select.Option value="Other">Other</Select.Option>
+                  <Select.Option value="MALE">Male</Select.Option>
+                  <Select.Option value="FEMALE">Female</Select.Option>
+                 
                 </Select>
               </Col>
               <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0">
@@ -804,8 +776,10 @@ const PatientList = () => {
                   className="filter-select"
                   placeholder="Blood Type"
                   style={{ width: '100%' }}
-                  value={bloodType}
+                  value={bloodType || undefined}
                   onChange={handleBloodTypeChange}
+                  allowClear
+                  onClear={() => handleBloodTypeChange("")}
                 >
                   <Select.Option value="">All Blood Types</Select.Option>
                   <Select.Option value="A">A</Select.Option>

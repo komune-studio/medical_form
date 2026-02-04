@@ -9,24 +9,10 @@ export default class PatientModel {
       if (filters.search) queryParams.append('search', filters.search);
       if (filters.gender) queryParams.append('gender', filters.gender);
       if (filters.blood_type) queryParams.append('blood_type', filters.blood_type);
-      if (filters.timeRange && filters.timeRange !== "all") {
-        if (filters.timeRange === "today") {
-          const today = new Date().toISOString().split('T')[0];
-          queryParams.append('dateFrom', today);
-          queryParams.append('dateTo', today);
-        } else if (filters.timeRange === "last7days") {
-          const dateTo = new Date();
-          const dateFrom = new Date();
-          dateFrom.setDate(dateFrom.getDate() - 7);
-          queryParams.append('dateFrom', dateFrom.toISOString().split('T')[0]);
-          queryParams.append('dateTo', dateTo.toISOString().split('T')[0]);
-        } else if (filters.timeRange === "last30days") {
-          const dateTo = new Date();
-          const dateFrom = new Date();
-          dateFrom.setDate(dateFrom.getDate() - 30);
-          queryParams.append('dateFrom', dateFrom.toISOString().split('T')[0]);
-          queryParams.append('dateTo', dateTo.toISOString().split('T')[0]);
-        }
+      
+      // Kirim timeRange langsung ke backend
+      if (filters.timeRange) {
+        queryParams.append('timeRange', filters.timeRange);
       }
       
       const queryString = queryParams.toString();
@@ -83,6 +69,7 @@ export default class PatientModel {
       if (filters.search) queryParams.append('search', filters.search);
       if (filters.gender) queryParams.append('gender', filters.gender);
       if (filters.blood_type) queryParams.append('blood_type', filters.blood_type);
+      if (filters.timeRange) queryParams.append('timeRange', filters.timeRange);
       
       const queryString = queryParams.toString();
       const url = queryString ? `v1/patient/export/csv?${queryString}` : 'v1/patient/export/csv';
