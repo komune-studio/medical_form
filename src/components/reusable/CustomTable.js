@@ -129,7 +129,7 @@ const CustomTable = ({
   currentPage = 0,
   onPageChange,
   onRowsPerPageChange,
-  rowsPerPage = 5,
+  rowsPerPage = 10,
   loading = false,
 }) => {
   const [selected, setSelected] = useState([]);

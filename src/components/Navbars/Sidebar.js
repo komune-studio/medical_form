@@ -72,6 +72,12 @@ const SIDEBAR = [
         color: SIDEBAR_COLOR
     },
     {
+        path: "/patients",
+        name: "Patients",
+        icon: "mdi:hospital-box",
+        color: SIDEBAR_COLOR
+    },
+    {
         path: "/staff",
         name: "Staff",
         icon: "mdi:badge",

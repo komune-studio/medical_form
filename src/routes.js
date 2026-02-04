@@ -8,6 +8,10 @@ import VisitorFormStandalone from "components/pages/Visitors/VisitorFormStandalo
 import StaffList from "components/pages/Staff/StaffList";
 import StaffCreate from "components/pages/Staff/StaffCreate";
 import StaffEdit from "components/pages/Staff/StaffEdit";
+import PatientList from "components/pages/Patients/PatientList";
+import PatientCreate from "components/pages/Patients/PatientCreate";
+import PatientEdit from "components/pages/Patients/PatientEdit";
+
 
 var routes = [
     // VISITORS
@@ -27,6 +31,26 @@ var routes = [
         path: "/visitors",
         name: "Visitors",
         component: VisitorList,
+        layout: "/admin",
+    },
+    
+    // PATIENTS
+    {
+        path: "/patients/create",
+        name: "Patient Create",
+        component: PatientCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/patients/:id/edit",
+        name: "Patient Edit",
+        component: PatientEdit,
+        layout: "/admin",
+    },
+    {
+        path: "/patients",
+        name: "Patients",
+        component: PatientList,
         layout: "/admin",
     },
     
