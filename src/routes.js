@@ -1,13 +1,13 @@
 import Logout from "./components/pages/Logout";
 import Login from "./components/pages/Login";
 import UserList from "./components/pages/Users/UserList";
-
 import StaffList from "components/pages/Staff/StaffList";
 import StaffCreate from "components/pages/Staff/StaffCreate";
 import StaffEdit from "components/pages/Staff/StaffEdit";
 import PatientList from "components/pages/Patients/PatientList";
 import PatientCreate from "components/pages/Patients/PatientCreate";
 import PatientEdit from "components/pages/Patients/PatientEdit";
+import MedicalHistoryList from "components/pages/MedicalHistory/MedicalHistoryList";
 
 
 var routes = [
@@ -29,6 +29,14 @@ var routes = [
         path: "/patients",
         name: "Patients",
         component: PatientList,
+        layout: "/admin",
+    },
+    
+    // MEDICAL HISTORY
+    {
+        path: "/medical-history",
+        name: "Medical History",
+        component: MedicalHistoryList,
         layout: "/admin",
     },
     
