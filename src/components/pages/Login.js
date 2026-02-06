@@ -35,7 +35,7 @@ const Login = () => {
             sessionStorage.token = result.token;
             sessionStorage.admin_name = result.username;
             sessionStorage.id = result.id;
-            history.push('/visitors')
+            history.push('/patients')
             window.location.reload()
 
         } catch (e) {
@@ -147,7 +147,7 @@ const Login = () => {
                                     marginBottom: '10px'
                                 }}
                             >
-                                Komune
+                                Rangka
                             </Typography.Title>
                             <Typography.Text 
                                 style={{ 
@@ -155,7 +155,7 @@ const Login = () => {
                                     fontSize: '16px'
                                 }}
                             >
-                                Visitor Management System
+                                Management System
                             </Typography.Text>
                         </div>
                         <Form

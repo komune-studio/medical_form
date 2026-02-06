@@ -8,8 +8,6 @@ import {
   Form, 
   Input, 
   Select,
-  DatePicker,
-  TimePicker,
   Row,
   Col,
   Card,
@@ -96,28 +94,34 @@ const customStyles = `
     background-color: #f5f5f5 !important;
   }
   
-  /* DatePicker and TimePicker styling */
-  .medical-history-datetime .ant-picker {
+  /* Native DateTime Input styling */
+  .native-datetime-input {
+    width: 100%;
     background-color: #FFFFFF !important;
     border: 1px solid #d9d9d9 !important;
     color: #000000 !important;
     border-radius: 4px !important;
     height: 34px !important;
-    width: 100% !important;
-  }
-  
-  .medical-history-datetime .ant-picker-input > input {
-    color: #000000 !important;
+    padding: 4px 11px !important;
     font-size: 14px !important;
-    height: 24px !important;
+    font-family: inherit;
+    transition: all 0.3s;
   }
   
-  .medical-history-datetime .ant-picker-input > input::placeholder {
-    color: rgba(0, 0, 0, 0.4) !important;
+  .native-datetime-input:hover {
+    border-color: #666666 !important;
   }
   
-  .medical-history-datetime .ant-picker-suffix {
-    color: rgba(0, 0, 0, 0.25) !important;
+  .native-datetime-input:focus {
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+    outline: none;
+  }
+  
+  .native-datetime-input:disabled {
+    background-color: #fafafa !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
   }
   
   /* InputNumber styling */
@@ -191,13 +195,9 @@ const customStyles = `
       min-height: 44px !important;
     }
     
-    .medical-history-datetime .ant-picker {
+    .native-datetime-input {
       height: 40px !important;
-    }
-    
-    .medical-history-datetime .ant-picker-input > input {
       font-size: 16px !important;
-      height: 32px !important;
     }
     
     .pain-level-input .ant-input-number {
@@ -232,6 +232,7 @@ export default function MedicalHistoryFormPage({
   const [formKey, setFormKey] = useState(0);
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(false);
+  const [appointmentDateTime, setAppointmentDateTime] = useState('');
 
   // Fetch patients for dropdown
   useEffect(() => {
@@ -253,6 +254,53 @@ export default function MedicalHistoryFormPage({
     fetchPatients();
   }, []);
 
+  // Inisialisasi data saat medicalHistoryData berubah
+  useEffect(() => {
+    console.log('MedicalHistoryFormPage useEffect triggered with medicalHistoryData:', medicalHistoryData);
+    
+    if (medicalHistoryData) {
+      console.log('Setting form values for medical history:', medicalHistoryData);
+      
+      // Parse appointment_date jika ada - convert to local datetime string
+      let dateTimeValue = '';
+      
+      if (medicalHistoryData.appointment_date) {
+        const momentDate = moment(medicalHistoryData.appointment_date);
+        // Format: YYYY-MM-DDTHH:mm (required for datetime-local input)
+        dateTimeValue = momentDate.format('YYYY-MM-DDTHH:mm');
+        setAppointmentDateTime(dateTimeValue);
+      }
+      
+      const formValues = {
+        patient_id: medicalHistoryData.patient_id,
+        staff_id: medicalHistoryData.staff_id || '',
+        service_type: medicalHistoryData.service_type || '',
+        diagnosis_result: medicalHistoryData.diagnosis_result || '',
+        pain_before: medicalHistoryData.pain_before || '',
+        pain_after: medicalHistoryData.pain_after || '',
+        treatments: medicalHistoryData.treatments || '',
+        exercise: medicalHistoryData.exercise || '',
+        homework: medicalHistoryData.homework || '',
+        recommended_next_session: medicalHistoryData.recommended_next_session || '',
+        additional_notes: medicalHistoryData.additional_notes || '',
+      };
+      
+      console.log('Form values to set:', formValues);
+      console.log('DateTime value:', dateTimeValue);
+      form.setFieldsValue(formValues);
+      setHasChanges(false);
+    } else {
+      console.log('Resetting form for new medical history');
+      form.resetFields();
+      setAppointmentDateTime('');
+      setHasChanges(false);
+    }
+    
+    if (disabled) {
+      setFormDisabled(disabled);
+    }
+  }, [medicalHistoryData, form, disabled, formKey]);
+
   const onValuesChanged = (changedValues, allValues) => {
     if (!medicalHistoryData) {
       const changed = Object.keys(allValues).some(key => {
@@ -261,7 +309,7 @@ export default function MedicalHistoryFormPage({
           return true;
         }
         return false;
-      });
+      }) || appointmentDateTime !== '';
       setHasChanges(changed);
       return;
     }
@@ -270,16 +318,6 @@ export default function MedicalHistoryFormPage({
       const currentValue = allValues[key];
       const originalValue = medicalHistoryData[key];
       
-      if (key === 'appointment_date' && currentValue) {
-        const formattedCurrent = moment(currentValue).format('YYYY-MM-DD HH:mm:ss');
-        const formattedOriginal = moment(originalValue).format('YYYY-MM-DD HH:mm:ss');
-        return formattedCurrent !== formattedOriginal;
-      }
-      
-      if (key === 'recommended_next_session' && currentValue) {
-        return currentValue !== originalValue;
-      }
-      
       if (Array.isArray(currentValue) || Array.isArray(originalValue)) {
         return JSON.stringify(currentValue) !== JSON.stringify(originalValue);
       }
@@ -287,7 +325,14 @@ export default function MedicalHistoryFormPage({
       return currentValue !== originalValue;
     });
     
-    setHasChanges(changed);
+    setHasChanges(changed || appointmentDateTime !== '');
+  };
+
+  const handleDateTimeChange = (e) => {
+    const value = e.target.value;
+    console.log('DateTime changed to:', value);
+    setAppointmentDateTime(value);
+    setHasChanges(true);
   };
 
   const onSubmit = async () => {
@@ -295,15 +340,24 @@ export default function MedicalHistoryFormPage({
     setLoadingSubmit(true);
     
     try {
+      // Validate datetime first
+      if (!appointmentDateTime) {
+        throw new Error('Appointment date and time is required');
+      }
+
       await form.validateFields();
       
       let body = form.getFieldsValue();
       console.log('Form data before processing:', body);
       
-      // Format appointment date
-      if (body.appointment_date) {
-        body.appointment_date = moment(body.appointment_date).format('YYYY-MM-DD HH:mm:ss');
+      // Convert datetime-local value to ISO string
+      const appointmentMoment = moment(appointmentDateTime);
+      if (!appointmentMoment.isValid()) {
+        throw new Error('Invalid appointment date and time');
       }
+      
+      body.appointment_date = appointmentMoment.toISOString();
+      console.log('Final appointment datetime:', body.appointment_date);
 
       // Format pain levels as integers
       if (body.pain_before !== undefined) {
@@ -342,6 +396,7 @@ export default function MedicalHistoryFormPage({
         
         if (isStandalone && onSubmitSuccess) {
           form.resetFields();
+          setAppointmentDateTime('');
           setHasChanges(false);
           setFormKey(prev => prev + 1);
           
@@ -407,40 +462,6 @@ export default function MedicalHistoryFormPage({
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log('MedicalHistoryFormPage useEffect triggered with medicalHistoryData:', medicalHistoryData);
-    
-    if (medicalHistoryData) {
-      console.log('Setting form values for medical history:', medicalHistoryData);
-      const formValues = {
-        patient_id: medicalHistoryData.patient_id,
-        appointment_date: medicalHistoryData.appointment_date ? moment(medicalHistoryData.appointment_date) : null,
-        staff_id: medicalHistoryData.staff_id || '',
-        service_type: medicalHistoryData.service_type || '',
-        diagnosis_result: medicalHistoryData.diagnosis_result || '',
-        pain_before: medicalHistoryData.pain_before || '',
-        pain_after: medicalHistoryData.pain_after || '',
-        treatments: medicalHistoryData.treatments || '',
-        exercise: medicalHistoryData.exercise || '',
-        homework: medicalHistoryData.homework || '',
-        recommended_next_session: medicalHistoryData.recommended_next_session || '',
-        additional_notes: medicalHistoryData.additional_notes || '',
-      };
-      
-      console.log('Form values to set:', formValues);
-      form.setFieldsValue(formValues);
-      setHasChanges(false);
-    } else {
-      console.log('Resetting form for new medical history');
-      form.resetFields();
-      setHasChanges(false);
-    }
-    
-    if (disabled) {
-      setFormDisabled(disabled);
-    }
-  }, [medicalHistoryData, form, disabled, formKey]);
 
   return (
     <div style={{ 
@@ -575,32 +596,26 @@ export default function MedicalHistoryFormPage({
                         </Select>
                       </Form.Item>
 
-                      {/* Appointment Date and Time */}
-                      <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Appointment Date & Time
-                          </span>
-                        }
-                        name="appointment_date"
-                        rules={[
-                          { required: true, message: 'Appointment date is required!' }
-                        ]}
-                        style={{ marginBottom: '10px' }}
-                        className="medical-history-form-item"
-                      >
-                        <DatePicker
-                          className="medical-history-datetime"
-                          showTime
-                          format="DD/MM/YYYY HH:mm"
-                          placeholder="Select date and time"
-                          style={{ width: '100%' }}
+                      {/* Appointment Date and Time - Native HTML5 Input */}
+                      <div style={{ marginBottom: '10px' }}>
+                        <label style={{ 
+                          display: 'block',
+                          marginBottom: '8px',
+                          color: '#000000',
+                          fontWeight: 600, 
+                          fontSize: '14px' 
+                        }}>
+                          Appointment Date & Time <span style={{ color: '#ff4d4f' }}>*</span>
+                        </label>
+                        <input
+                          type="datetime-local"
+                          className="native-datetime-input"
+                          value={appointmentDateTime}
+                          onChange={handleDateTimeChange}
+                          disabled={formDisabled}
+                          required
                         />
-                      </Form.Item>
+                      </div>
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>

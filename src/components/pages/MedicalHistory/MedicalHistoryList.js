@@ -129,19 +129,26 @@ const MedicalHistoryList = () => {
       id: 'appointment_info',
       label: 'Appointment',
       filter: false,
-      render: (row) => (
-        <div>
-          <div style={{ fontWeight: 500, color: '#333' }}>
-            {moment(row.appointment_date).format("DD MMM YYYY")}
+      render: (row) => {
+        return (
+          <div>
+            <div style={{ fontWeight: 500, color: '#333' }}>
+              {moment(row.appointment_date).format("DD MMM YYYY")}
+            </div>
+            <div style={{ fontSize: '12px', color: '#666' }}>
+              {moment(row.appointment_date).format("HH:mm")}
+            </div>
+            <div style={{ 
+              fontSize: '12px', 
+              color: '#1890ff',
+              marginTop: '2px',
+              fontWeight: 500
+            }}>
+              {row.service_type || 'N/A'}
+            </div>
           </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            {moment(row.appointment_date).format("HH:mm")}
-          </div>
-          <div style={{ fontSize: '12px', color: '#1890ff' }}>
-            {row.service_type || 'N/A'}
-          </div>
-        </div>
-      )
+        );
+      }
     },
     {
       id: 'staff_info',

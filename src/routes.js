@@ -8,6 +8,9 @@ import PatientList from "components/pages/Patients/PatientList";
 import PatientCreate from "components/pages/Patients/PatientCreate";
 import PatientEdit from "components/pages/Patients/PatientEdit";
 import MedicalHistoryList from "components/pages/MedicalHistory/MedicalHistoryList";
+import MedicalHistoryCreate from "components/pages/MedicalHistory/MedicalHistoryCreate";
+import MedicalHistoryEdit from "components/pages/MedicalHistory/MedicalHistoryEdit";
+
 
 
 var routes = [
@@ -33,6 +36,18 @@ var routes = [
     },
     
     // MEDICAL HISTORY
+    {
+        path: "/medical-history/create",
+        name: "Medical History Create",
+        component: MedicalHistoryCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/medical-history/:id/edit",
+        name: "Medical History Edit",
+        component: MedicalHistoryEdit,
+        layout: "/admin",
+    },
     {
         path: "/medical-history",
         name: "Medical History",
