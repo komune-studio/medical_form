@@ -6,6 +6,8 @@ import Iconify from "../../reusable/Iconify";
 import { Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import PatientModel from 'models/PatientModel';
+import MedicalHistoryModel from 'models/MedicalHistoryModel';
+
 import moment from 'moment';
 import create from 'zustand';
 
@@ -87,6 +89,35 @@ const PatientList = () => {
     setPage(0);
   };
 
+  const handleDownloadProgressPDF = async (patientId, patientName, patientCode) => {
+    try {
+      message.loading({ content: 'Generating PDF report...', key: 'pdf-gen', duration: 0 });
+      
+      await MedicalHistoryModel.generateProgressPDF(patientId);
+      
+      message.success({ 
+        content: `Progress report for ${patientName} (${patientCode}) downloaded successfully!`, 
+        key: 'pdf-gen',
+        duration: 3
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      
+      let errorMsg = 'Failed to generate PDF report';
+      if (error.message.includes('No medical history')) {
+        errorMsg = 'No medical history records found for this patient';
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      message.error({ 
+        content: errorMsg, 
+        key: 'pdf-gen',
+        duration: 5
+      });
+    }
+  };
+
   const columns = [
     {
       id: 'patient_code',
@@ -161,8 +192,8 @@ const PatientList = () => {
                 />
               </Link>
             </Tooltip>
-
-            <Tooltip title="Edit">
+    
+            <Tooltip title="Edit Patient">
               <Link to={`/patients/${row.id}/edit`}>
                 <AntButton
                   type={'link'}
@@ -173,11 +204,22 @@ const PatientList = () => {
                 />
               </Link>
             </Tooltip>
-
-            <Tooltip title="Delete">
+    
+            <Tooltip title="Download Progress Report (PDF)">
               <AntButton
                 type={'link'}
-                style={{ color: '#333' }}
+                style={{ color: '#1890ff' }}
+                onClick={() => handleDownloadProgressPDF(row.id, row.name, row.patient_code)}
+                className={"d-flex align-items-center justify-content-center"}
+                shape="circle"
+                icon={<Iconify icon={"mdi:file-pdf-box"} />}
+              />
+            </Tooltip>
+    
+            <Tooltip title="Delete Patient">
+              <AntButton
+                type={'link'}
+                style={{ color: '#ff4d4f' }}
                 onClick={() => onDelete(row.id)}
                 className={"d-flex align-items-center justify-content-center"}
                 shape="circle"
