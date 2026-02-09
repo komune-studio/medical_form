@@ -100,10 +100,7 @@ const BodyAnnotation = forwardRef(({
         setCanvasInitialized(true);
       };
       
-      img.onerror = (e) => {
-        console.error('Failed to load image:', e);
-        message.error('Failed to load image');
-      };
+      
       
       img.src = imageUrl;
     }

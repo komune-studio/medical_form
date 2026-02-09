@@ -665,7 +665,7 @@ export default function MedicalHistoryFormPage({
                   backgroundColor: '#FFFFFF',
                   borderBottom: '1px solid #e0e0e0',
                   padding: '16px'
-                }} bodyStyle={{ padding: 0 }}>
+                }} bodyStyle={{ padding: 20 }}>
                 <Form
                   form={form}
                   onFinish={onSubmit}
