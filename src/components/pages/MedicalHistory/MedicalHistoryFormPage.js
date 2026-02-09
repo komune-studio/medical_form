@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, Link, Prompt } from 'react-router-dom';
 import { 
   Button, 
@@ -18,11 +18,27 @@ import { Container } from 'reactstrap';
 import swal from '../../reusable/CustomSweetAlert';
 import MedicalHistoryModel from 'models/MedicalHistoryModel';
 import PatientModel from 'models/PatientModel';
+import StaffModel from 'models/StaffModel';
+import UploadService from '../../../utils/Uploadservice';
 import moment from 'moment';
+import BodyAnnotation from './BodyAnnotation';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+
+// Helper function untuk convert base64 ke Blob
+function dataURLtoBlob(dataurl) {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while(n--){
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], {type:mime});
+}
 
 // Custom styles matching the design
 const customStyles = `
@@ -233,6 +249,38 @@ export default function MedicalHistoryFormPage({
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [appointmentDateTime, setAppointmentDateTime] = useState('');
+  
+  // Staff state
+  const [staffList, setStaffList] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  
+  // Body Annotation ref
+  const bodyAnnotationRef = useRef(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Fetch staff data
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        setStaffLoading(true);
+        const response = await StaffModel.getActiveStaff();
+        console.log('Staff response:', response);
+        
+        if (response && response.http_code === 200) {
+          setStaffList(Array.isArray(response.data) ? response.data : []);
+        } else if (Array.isArray(response.data)) {
+          setStaffList(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching staff:", error);
+        message.error('Failed to load staff list');
+      } finally {
+        setStaffLoading(false);
+      }
+    };
+
+    fetchStaff();
+  }, []);
 
   // Fetch patients for dropdown
   useEffect(() => {
@@ -254,26 +302,24 @@ export default function MedicalHistoryFormPage({
     fetchPatients();
   }, []);
 
-  // Inisialisasi data saat medicalHistoryData berubah
+  // Initialize form data
   useEffect(() => {
     console.log('MedicalHistoryFormPage useEffect triggered with medicalHistoryData:', medicalHistoryData);
     
     if (medicalHistoryData) {
       console.log('Setting form values for medical history:', medicalHistoryData);
       
-      // Parse appointment_date jika ada - convert to local datetime string
       let dateTimeValue = '';
       
       if (medicalHistoryData.appointment_date) {
         const momentDate = moment(medicalHistoryData.appointment_date);
-        // Format: YYYY-MM-DDTHH:mm (required for datetime-local input)
         dateTimeValue = momentDate.format('YYYY-MM-DDTHH:mm');
         setAppointmentDateTime(dateTimeValue);
       }
       
       const formValues = {
         patient_id: medicalHistoryData.patient_id,
-        staff_id: medicalHistoryData.staff_id || '',
+        staff_id: medicalHistoryData.staff_id || undefined,
         service_type: medicalHistoryData.service_type || '',
         diagnosis_result: medicalHistoryData.diagnosis_result || '',
         pain_before: medicalHistoryData.pain_before || '',
@@ -283,6 +329,7 @@ export default function MedicalHistoryFormPage({
         homework: medicalHistoryData.homework || '',
         recommended_next_session: medicalHistoryData.recommended_next_session || '',
         additional_notes: medicalHistoryData.additional_notes || '',
+        body_annotation: medicalHistoryData.body_annotation || '',
       };
       
       console.log('Form values to set:', formValues);
@@ -350,6 +397,72 @@ export default function MedicalHistoryFormPage({
       let body = form.getFieldsValue();
       console.log('Form data before processing:', body);
       
+      // 👇 SIMPLE LOGIC: UPLOAD GAMBAR + ANNOTATION
+      if (bodyAnnotationRef.current) {
+        const hasLocalFile = bodyAnnotationRef.current.hasLocalFile();
+        const hasAnnotations = bodyAnnotationRef.current.hasAnnotations();
+        
+        // Jika ada gambar baru atau ada annotation
+        if (hasLocalFile || hasAnnotations) {
+          try {
+            setUploadingImage(true);
+            message.loading({ content: 'Processing anatomy image...', key: 'uploadImage', duration: 0 });
+            
+            let fileToUpload;
+            
+            // Jika ada annotation, export canvas sebagai gambar
+            if (hasAnnotations) {
+              const imageDataUrl = bodyAnnotationRef.current.exportAsImage();
+              
+              if (imageDataUrl) {
+                // Convert base64 to File
+                const blob = dataURLtoBlob(imageDataUrl);
+                const fileName = hasLocalFile ? bodyAnnotationRef.current.getLocalFile().name : 'body-annotation.jpg';
+                fileToUpload = new File([blob], fileName, { type: 'image/jpeg' });
+              }
+            } 
+            // Jika hanya upload gambar baru tanpa annotation
+            else if (hasLocalFile) {
+              fileToUpload = bodyAnnotationRef.current.getLocalFile();
+            }
+            
+            if (fileToUpload) {
+              console.log('Uploading image with annotations:', fileToUpload.name);
+              
+              const uploadedUrl = await UploadService.uploadAnatomyImage(fileToUpload);
+              console.log('Image uploaded successfully:', uploadedUrl);
+              
+              message.success({ content: 'Image uploaded!', key: 'uploadImage', duration: 2 });
+              
+              // Update BodyAnnotation component
+              bodyAnnotationRef.current.setUploadedImageUrl(uploadedUrl);
+              
+              // 👇 SIMPLE: Simpan HANYA URL-nya aja (string), bukan JSON!
+              body.body_annotation = uploadedUrl; // Langsung string URL
+            }
+            
+          } catch (uploadError) {
+            message.error({ content: 'Failed to upload image', key: 'uploadImage' });
+            throw new Error('Image upload failed: ' + uploadError.message);
+          } finally {
+            setUploadingImage(false);
+          }
+        } else {
+          // Jika tidak ada perubahan gambar/annotation, tetap simpan data yang ada
+          if (body.body_annotation) {
+            try {
+              // Coba parse dulu, mungkin masih JSON
+              const parsed = JSON.parse(body.body_annotation);
+              // Ambil URL-nya aja
+              body.body_annotation = parsed.imageUrl || body.body_annotation;
+            } catch (e) {
+              // Kalo udah string URL, biarin aja
+              console.log('body_annotation is already a string URL');
+            }
+          }
+        }
+      }
+      
       // Convert datetime-local value to ISO string
       const appointmentMoment = moment(appointmentDateTime);
       if (!appointmentMoment.isValid()) {
@@ -358,6 +471,14 @@ export default function MedicalHistoryFormPage({
       
       body.appointment_date = appointmentMoment.toISOString();
       console.log('Final appointment datetime:', body.appointment_date);
+
+      // Convert staff_id to integer
+      if (body.staff_id !== undefined && body.staff_id !== null && body.staff_id !== '') {
+        body.staff_id = parseInt(body.staff_id);
+        console.log('Converted staff_id to integer:', body.staff_id);
+      } else {
+        body.staff_id = null;
+      }
 
       // Format pain levels as integers
       if (body.pain_before !== undefined) {
@@ -446,18 +567,25 @@ export default function MedicalHistoryFormPage({
       }).then(async (result) => {
         if (result.isConfirmed) {
           setLoading(true);
+          
           const deleteResult = await MedicalHistoryModel.deleteMedicalHistory(medicalHistoryData.id);
+          
           if (deleteResult && deleteResult.http_code === 200) {
             message.success('Medical history deleted successfully');
             history.push("/medical-history");
           } else {
-            message.error('Failed to delete medical history');
+            throw new Error(deleteResult?.error_message || 'Failed to delete medical history');
           }
         }
       });
     } catch (error) {
       console.error("Error deleting medical history:", error);
-      message.error('Failed to delete medical history');
+      await swal.fire({
+        title: 'Error',
+        text: error.message || 'Failed to delete medical history',
+        icon: 'error',
+        confirmButtonText: 'Okay'
+      });
     } finally {
       setLoading(false);
     }
@@ -465,88 +593,79 @@ export default function MedicalHistoryFormPage({
 
   return (
     <div style={{ 
-      minHeight: 'auto', 
-      backgroundColor: '#FFFFFF',
-      padding: '8px',
-      color: '#000000'
+      backgroundColor: '#f7f8fa',
+      minHeight: '100vh',
+      paddingTop: '80px',
+      paddingBottom: '40px'
     }}>
       <style>{customStyles}</style>
-      <Container fluid style={{ maxWidth: '800px', margin: '0 auto' }}>
-        
-        {!isStandalone && (
-          <Row style={{ marginBottom: '12px' }}>
-            <Col span={24}>
-              <Link to="/medical-history" style={{ 
-                color: '#000000',
-                fontSize: '13px', 
-                textDecoration: 'none', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                gap: '6px',
-                fontWeight: 500
-              }}>
-                <span>←</span> Back
-              </Link>
-            </Col>
-          </Row>
-        )}
-
+      
+      <Container>
         {loading ? (
-          <Row>
-            <Col span={24}>
-              <Card style={{ 
-                textAlign: 'center', 
-                padding: '40px', 
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #d9d9d9'
-              }}>
-                <Spin size="large" />
-              </Card>
-            </Col>
-          </Row>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            minHeight: '400px' 
+          }}>
+            <Spin size="large" tip="Loading..." />
+          </div>
         ) : (
-          <Row gutter={[16, 16]}>
-            {/* Header Section */}
-            <Col span={24}>
-              <Card style={{ 
-                backgroundColor: '#FFFFFF',
-                borderRadius: '6px', 
-                border: '1px solid #e0e0e0',
-                padding: '12px'
-              }} bodyStyle={{ padding: 0 }}>
-                <Row align="middle" justify="space-between">
-                  <Col span={24}>
+          <Row justify="center">
+            <Col xs={24} sm={24} md={22} lg={20} xl={18}>
+              <Card 
+                bordered={false}
+                style={{
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+                }}
+                headStyle={{
+                  borderBottom: '1px solid #e0e0e0',
+                  backgroundColor: '#FFFFFF',
+                  padding: '16px'
+                }}
+                title={
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                  }}>
                     <Title level={4} style={{ 
-                      margin: 0, 
-                      fontSize: '20px', 
+                      margin: 0,
                       color: '#000000',
-                      fontWeight: 700 
+                      fontWeight: 700,
+                      fontSize: '20px'
                     }}>
-                      {!medicalHistoryData ? "Add New Medical History" : "Update Medical History"}
+                      {!medicalHistoryData ? "New Medical History" : "Medical History Details"}
                     </Title>
-                    {medicalHistoryData && (
-                      <div style={{ marginTop: '8px', fontSize: '12px', color: '#666666' }}>
-                        <div style={{ marginBottom: '4px' }}>
-                          <strong style={{ color: '#000000' }}>Record ID:</strong> {medicalHistoryData.id}
-                        </div>
-                        <div>
-                          <strong style={{ color: '#000000' }}>Created:</strong> {moment(medicalHistoryData.created_at).format('DD MMM YYYY HH:mm')}
-                        </div>
-                      </div>
+                    
+                    {!isStandalone && (
+                      <Button 
+                        onClick={() => history.push("/medical-history")}
+                        style={{ 
+                          height: '32px',
+                          padding: '0 16px',
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                          borderColor: '#d9d9d9'
+                        }}
+                      >
+                        ← Back to List
+                      </Button>
                     )}
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-
-            {/* Main Form Section */}
-            <Col span={24}>
-              <Card style={{ 
-                backgroundColor: '#FFFFFF',
-                borderRadius: '6px', 
-                border: '1px solid #e0e0e0',
-                padding: '16px'
-              }} bodyStyle={{ padding: 0 }}>
+                  </div>
+                }
+                bodyStyle={{ 
+                  backgroundColor: '#FFFFFF',
+                  padding: '16px'
+                }} 
+                headStyle={{ 
+                  backgroundColor: '#FFFFFF',
+                  borderBottom: '1px solid #e0e0e0',
+                  padding: '16px'
+                }} bodyStyle={{ padding: 0 }}>
                 <Form
                   form={form}
                   onFinish={onSubmit}
@@ -652,7 +771,7 @@ export default function MedicalHistoryFormPage({
                         </Col>
                         
                         <Col xs={24} md={12}>
-                          {/* Staff ID (optional for now) */}
+                          {/* Staff Dropdown */}
                           <Form.Item
                             label={
                               <span style={{ 
@@ -660,24 +779,29 @@ export default function MedicalHistoryFormPage({
                                 fontWeight: 600, 
                                 fontSize: '14px' 
                               }}>
-                                Staff ID
+                                Staff
                               </span>
                             }
                             name="staff_id"
                             style={{ marginBottom: '10px' }}
                           >
-                            <Input 
-                              placeholder="Enter staff ID"
-                              style={{ 
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #d9d9d9',
-                                color: '#000000',
-                                borderRadius: '4px',
-                                padding: '8px 12px',
-                                fontSize: '14px',
-                                height: '34px'
-                              }}
-                            />
+                            <Select
+                              className="medical-history-select"
+                              placeholder="Select staff (optional)"
+                              loading={staffLoading}
+                              showSearch
+                              allowClear
+                              optionFilterProp="children"
+                              filterOption={(input, option) =>
+                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                              }
+                            >
+                              {staffList.map(staff => (
+                                <Option key={staff.id} value={staff.id}>
+                                  {staff.name} - {staff.phone_number}
+                                </Option>
+                              ))}
+                            </Select>
                           </Form.Item>
                         </Col>
                       </Row>
@@ -697,26 +821,15 @@ export default function MedicalHistoryFormPage({
                             }
                             name="pain_before"
                             rules={[
-                              { 
-                                validator: (_, value) => {
-                                  if (value === undefined || value === '' || value === null) {
-                                    return Promise.resolve();
-                                  }
-                                  const num = parseInt(value);
-                                  if (isNaN(num) || num < 1 || num > 10) {
-                                    return Promise.reject(new Error('Please enter a number between 1-10'));
-                                  }
-                                  return Promise.resolve();
-                                }
-                              }
+                              { type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }
                             ]}
                             style={{ marginBottom: '10px' }}
+                            className="pain-level-input"
                           >
                             <InputNumber
-                              className="pain-level-input"
-                              min={1}
+                              min={0}
                               max={10}
-                              placeholder="1-10"
+                              placeholder="0-10 scale"
                               style={{ width: '100%' }}
                             />
                           </Form.Item>
@@ -735,26 +848,15 @@ export default function MedicalHistoryFormPage({
                             }
                             name="pain_after"
                             rules={[
-                              { 
-                                validator: (_, value) => {
-                                  if (value === undefined || value === '' || value === null) {
-                                    return Promise.resolve();
-                                  }
-                                  const num = parseInt(value);
-                                  if (isNaN(num) || num < 1 || num > 10) {
-                                    return Promise.reject(new Error('Please enter a number between 1-10'));
-                                  }
-                                  return Promise.resolve();
-                                }
-                              }
+                              { type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }
                             ]}
                             style={{ marginBottom: '10px' }}
+                            className="pain-level-input"
                           >
                             <InputNumber
-                              className="pain-level-input"
-                              min={1}
+                              min={0}
                               max={10}
-                              placeholder="1-10"
+                              placeholder="0-10 scale"
                               style={{ width: '100%' }}
                             />
                           </Form.Item>
@@ -774,11 +876,9 @@ export default function MedicalHistoryFormPage({
                         }
                         name="diagnosis_result"
                         rules={[
-                          { required: true, message: 'Diagnosis result is required!' },
-                          { max: 500, message: 'Max 500 characters!' }
+                          { max: 1000, message: 'Max 1000 characters!' }
                         ]}
                         style={{ marginBottom: '10px' }}
-                        className="medical-history-form-item"
                       >
                         <TextArea 
                           placeholder="Enter diagnosis result"
@@ -913,6 +1013,26 @@ export default function MedicalHistoryFormPage({
                           rows={2}
                         />
                       </Form.Item>
+
+                      {/* Body Annotation */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Body Pain Diagram
+                          </span>
+                        }
+                        name="body_annotation"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <BodyAnnotation 
+                          ref={bodyAnnotationRef}
+                          disabled={formDisabled} 
+                        />
+                      </Form.Item>
                     </Col>
                   </Row>
 
@@ -941,7 +1061,7 @@ export default function MedicalHistoryFormPage({
                             <Space size={8}>
                               <Button 
                                 htmlType='submit' 
-                                loading={loadingSubmit}
+                                loading={loadingSubmit || uploadingImage}
                                 style={{ 
                                   backgroundColor: '#000000',
                                   borderColor: '#000000',
