@@ -8,7 +8,6 @@ export default class PatientModel {
       // Add filters to query params
       if (filters.search) queryParams.append('search', filters.search);
       if (filters.gender) queryParams.append('gender', filters.gender);
-      if (filters.blood_type) queryParams.append('blood_type', filters.blood_type);
       
       // Kirim timeRange langsung ke backend
       if (filters.timeRange) {
@@ -68,7 +67,6 @@ export default class PatientModel {
       // Add filters to query params
       if (filters.search) queryParams.append('search', filters.search);
       if (filters.gender) queryParams.append('gender', filters.gender);
-      if (filters.blood_type) queryParams.append('blood_type', filters.blood_type);
       if (filters.timeRange) queryParams.append('timeRange', filters.timeRange);
       
       const queryString = queryParams.toString();

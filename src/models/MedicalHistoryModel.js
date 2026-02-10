@@ -107,13 +107,34 @@ export default class MedicalHistoryModel {
 
   /**
    * Get patient progress report for PDF generation
+   * Updated: Better error handling for 404 and other errors
    */
   static getProgressReport = async (patientId) => {
     try {
-      return await ApiRequest.set(`v1/medical-history/progress-report/${patientId}`, "GET");
+      const response = await ApiRequest.set(`v1/medical-history/progress-report/${patientId}`, "GET");
+      
+      // Check if response indicates no medical history found
+      if (response && response.http_code === 404) {
+        const errorMsg = response.error_message || 'No medical history found for this patient';
+        throw new Error(errorMsg);
+      }
+      
+      // Check for other error codes
+      if (response && response.http_code !== 200) {
+        const errorMsg = response.error_message || `Failed to fetch progress report (HTTP ${response.http_code})`;
+        throw new Error(errorMsg);
+      }
+      
+      return response;
     } catch (error) {
       console.error("Error fetching progress report:", error);
-      throw error;
+      
+      // Re-throw with proper message
+      if (error.message) {
+        throw error;
+      } else {
+        throw new Error('Failed to fetch progress report. Please try again.');
+      }
     }
   }
 
@@ -136,26 +157,30 @@ export default class MedicalHistoryModel {
 
   /**
    * Generate Progress Report PDF - Rangka Style (Improved Layout)
+   * ✅ UPDATED: Now uses base64 images from backend (NO CORS ISSUES!)
    */
   static generateProgressPDF = async (patientId) => {
     try {
-      // Fetch data
+      // Fetch data - this will now throw proper errors
       const response = await this.getProgressReport(patientId);
       
-      if (!response || response.http_code !== 200 || !response.data) {
-        throw new Error('Failed to fetch progress report data');
+      // Validate response structure
+      if (!response || !response.data) {
+        throw new Error('Invalid response from server. Please try again.');
       }
       
       const reportData = response.data;
       const patient = reportData.patient;
       const sessions = reportData.sessions;
       
+      // Check if patient data exists
       if (!patient) {
-        throw new Error('Patient data not found');
+        throw new Error('Patient information not found. Please contact support.');
       }
 
+      // Check if sessions exist
       if (!sessions || sessions.length === 0) {
-        throw new Error('No medical history records found for this patient');
+        throw new Error('No medical history records found for this patient. Please add treatment records first.');
       }
       
       // Create PDF
@@ -212,37 +237,50 @@ export default class MedicalHistoryModel {
       
       // ========== RIGHT COLUMN: RANGKA ASSESSMENT ==========
       yPos = 32;
-      
+
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text("Rangka Assessment:", rightX, yPos);
-      
+
       yPos += 7;
       doc.setFontSize(9);
-      
+
       // Get first session for assessment data
       const firstSession = sessions[0] || {};
-      
+
       const assessmentInfo = [
         ['Assessment Date:', firstSession.appointment_date ? new Date(firstSession.appointment_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'],
         ['Assessment Therapist:', firstSession.staff_name || '-'],
         ['Injury Type:', firstSession.service_type || '-'],
         ['Area Concern:', '-'],
-        ['Diagnosis:', this.truncateText(firstSession.diagnosis_result, 28) || '-'],
+        ['Diagnosis:', firstSession.diagnosis_result || '-'],
         ['Range of Motion Impact:', '-'],
-        ['Recovery Goals:', this.truncateText(firstSession.exercise, 28) || '-'],
+        ['Recovery Goals:', firstSession.exercise || '-'],
         ['Expected Recovery Time:', firstSession.recommended_next_session || '-']
       ];
-      
+
+      // Maximum width untuk value text (dalam mm)
+      const maxValueWidth = 40;
+
       assessmentInfo.forEach(([label, value]) => {
         doc.setFont('helvetica', 'bold');
         doc.text(label, rightX, yPos);
+        
         doc.setFont('helvetica', 'normal');
-        doc.text(value, rightX + 42, yPos);
-        yPos += 5.5;
+        
+        // Split text jika terlalu panjang
+        const splitValue = doc.splitTextToSize(value, maxValueWidth);
+        
+        // Print setiap baris
+        splitValue.forEach((line, index) => {
+          doc.text(line, rightX + 42, yPos + (index * 4.5));
+        });
+        
+        // Update yPos berdasarkan jumlah baris
+        yPos += Math.max(5.5, splitValue.length * 4.5);
       });
-      
-      yPos = 85;
+
+      yPos = Math.max(yPos, 85); // Pastikan yPos minimal di 85 untuk konsistensi layout
       
       // ========================================
       // HORIZONTAL LINE BEFORE PROGRESS TABLE
@@ -281,7 +319,7 @@ export default class MedicalHistoryModel {
       ];
       
       // Position legend on the right side
-      const legendStartX = pageWidth - 50; // Position di kanan
+      const legendStartX = pageWidth - 50;
       
       // Draw legend items on right side
       legendItems.forEach((item, index) => {
@@ -328,14 +366,14 @@ export default class MedicalHistoryModel {
             console.warn('Invalid date format:', session.appointment_date);
           }
         }
-
+      
         return [
           (index + 1).toString(),
           formattedDate,
           session.staff_name || '-',
-          this.truncateText(session.diagnosis_result, 45) || '-',
-          this.truncateText(session.exercise, 40) || '-',
-          this.truncateText(session.additional_notes, 35) || '-',
+          session.diagnosis_result || '-',
+          session.exercise || '-',
+          session.additional_notes || '-',
           session.pain_before !== null && session.pain_before !== undefined ? session.pain_before.toString() : '-',
           session.pain_after !== null && session.pain_after !== undefined ? session.pain_after.toString() : '-'
         ];
@@ -370,14 +408,14 @@ export default class MedicalHistoryModel {
           valign: 'top'
         },
         columnStyles: {
-          0: { cellWidth: 12, halign: 'center', fontStyle: 'bold' }, // Session #
-          1: { cellWidth: 20, halign: 'center' }, // Date
-          2: { cellWidth: 22, halign: 'left' }, // Therapist
-          3: { cellWidth: 38, halign: 'left' }, // Objective Progress
-          4: { cellWidth: 36, halign: 'left' }, // Home Exercise
-          5: { cellWidth: 32, halign: 'left' }, // Recovery Tips
-          6: { cellWidth: 14, halign: 'center', fillColor: [255, 250, 235] }, // Pre-Treatment
-          7: { cellWidth: 14, halign: 'center', fillColor: [240, 255, 245] }  // Post-Treatment
+          0: { cellWidth: 12, halign: 'center', fontStyle: 'bold' },
+          1: { cellWidth: 20, halign: 'center' },
+          2: { cellWidth: 22, halign: 'left' },
+          3: { cellWidth: 38, halign: 'left' },
+          4: { cellWidth: 36, halign: 'left' },
+          5: { cellWidth: 32, halign: 'left' },
+          6: { cellWidth: 14, halign: 'center', fillColor: [255, 250, 235] },
+          7: { cellWidth: 14, halign: 'center', fillColor: [240, 255, 245] }
         },
         margin: { left: 12, right: 12 },
         tableWidth: 'auto',
@@ -390,18 +428,19 @@ export default class MedicalHistoryModel {
                 const painValue = parseFloat(cellValue);
                 if (!isNaN(painValue)) {
                   let color;
-                  // Green for low pain (1-3), Yellow for moderate (4-6), Red for high (7-10)
                   if (painValue <= 3) color = [76, 175, 80]; // Green
                   else if (painValue <= 6) color = [255, 193, 7]; // Yellow
                   else color = [255, 77, 77]; // Red
                   
                   doc.setFillColor(...color);
-                  doc.circle(
-                    data.cell.x + data.cell.width - 3.5,
-                    data.cell.y + data.cell.height / 2,
-                    1.3,
-                    'F'
-                  );
+                  
+                  const textWidth = doc.getTextWidth(cellValue.toString());
+                  const cellPadding = 3;
+                  
+                  const circleX = data.cell.x + (data.cell.width / 2) + (textWidth / 2) + 2.5;
+                  const circleY = data.cell.y + cellPadding + 2.5;
+                  
+                  doc.circle(circleX, circleY, 1.1, 'F');
                 }
               } catch (e) {
                 console.warn('Error parsing pain value:', cellValue);
@@ -410,10 +449,143 @@ export default class MedicalHistoryModel {
           }
         },
         didDrawPage: (data) => {
-          // HAPUS SEMUA FOOTER - tidak ada footer sama sekali
-          // Tidak ada contact info, hashtags, social media, atau page number
+          // No footer
         }
       });
+      
+      // ========================================
+      // BODY ANNOTATION IMAGES - AFTER TABLE
+      // ✅ UPDATED: Uses base64 images from backend
+      // ========================================
+      
+      yPos = doc.lastAutoTable.finalY + 15;
+      
+      // Process each session's body annotation
+      for (let index = 0; index < sessions.length; index++) {
+        const session = sessions[index];
+        
+        // ✅ USE BASE64 IMAGE FROM BACKEND (No CORS issues!)
+        const imageData = session.body_annotation_base64 || session.body_annotation_url;
+        
+        console.log(`Session ${index + 1}:`, {
+          hasBase64: !!session.body_annotation_base64,
+          hasUrl: !!session.body_annotation_url,
+          imageDataLength: imageData ? imageData.length : 0
+        });
+        
+        if (imageData && imageData.trim() !== '') {
+          try {
+            // Check if we need a new page for the image
+            if (yPos > pageHeight - 80) {
+              doc.addPage();
+              yPos = 20;
+            }
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Session ${index + 1} - Body Annotation:`, 20, yPos);
+            yPos += 7;
+            
+            // Check if it's base64 or URL
+            const isBase64 = imageData.startsWith('data:image');
+            
+            if (isBase64) {
+              // ✅ DIRECT USE - Base64 image (recommended)
+              console.log(`✅ Using base64 image for session ${index + 1}`);
+              
+              // Calculate image dimensions (default size)
+              const maxWidth = 120;
+              const maxHeight = 100;
+              
+              // For base64, we use default dimensions
+              const imgWidth = maxWidth;
+              const imgHeight = maxHeight;
+              
+              // Center the image
+              const imgX = (pageWidth - imgWidth) / 2;
+              
+              console.log(`Adding base64 image to PDF: ${imgWidth}x${imgHeight} at position (${imgX}, ${yPos})`);
+              
+              // Add base64 image directly to PDF
+              doc.addImage(
+                imageData,
+                'JPEG',
+                imgX,
+                yPos,
+                imgWidth,
+                imgHeight,
+                undefined,
+                'FAST'
+              );
+              
+              yPos += imgHeight + 10;
+              
+            } else {
+              // ⚠️ FALLBACK - URL image (might have CORS issues)
+              console.warn(`⚠️ Falling back to URL image for session ${index + 1} (CORS might fail)`);
+              
+              const img = await new Promise((resolve, reject) => {
+                const image = new window.Image();
+                image.crossOrigin = 'Anonymous';
+                
+                image.onload = () => {
+                  console.log(`URL image loaded successfully for session ${index + 1}`);
+                  resolve(image);
+                };
+                image.onerror = (err) => {
+                  console.error(`Failed to load URL image for session ${index + 1}:`, err);
+                  reject(new Error('Failed to load image - CORS blocked or image not found'));
+                };
+                
+                image.src = imageData;
+              });
+              
+              // Calculate image dimensions
+              const maxWidth = 120;
+              const maxHeight = 100;
+              
+              let imgWidth = maxWidth;
+              let imgHeight = (img.height * maxWidth) / img.width;
+              
+              if (imgHeight > maxHeight) {
+                imgHeight = maxHeight;
+                imgWidth = (img.width * maxHeight) / img.height;
+              }
+              
+              // Center the image
+              const imgX = (pageWidth - imgWidth) / 2;
+              
+              console.log(`Adding URL image to PDF: ${imgWidth}x${imgHeight} at position (${imgX}, ${yPos})`);
+              
+              doc.addImage(
+                img,
+                'JPEG',
+                imgX,
+                yPos,
+                imgWidth,
+                imgHeight,
+                undefined,
+                'FAST'
+              );
+              
+              yPos += imgHeight + 10;
+            }
+            
+          } catch (error) {
+            console.error(`❌ Error loading body annotation image for session ${index + 1}:`, error);
+            
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('(Body annotation image unavailable - CORS blocked or image not found)', 20, yPos);
+            doc.setTextColor(0, 0, 0);
+            yPos += 10;
+          }
+        } else {
+          // No body_annotation data for this session
+          console.log(`Session ${index + 1}: No body annotation image found`);
+        }
+      }
       
       // Save PDF
       const safeName = patient.name ? patient.name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-') : 'patient';
@@ -424,94 +596,20 @@ export default class MedicalHistoryModel {
       
     } catch (error) {
       console.error("Error generating PDF:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Helper function to truncate text
-   */
-  static truncateText = (text, maxLength) => {
-    if (!text) return '';
-    const stringText = String(text);
-    if (stringText.length <= maxLength) return stringText;
-    return stringText.substring(0, maxLength) + '...';
-  }
-
-  /**
-   * Get medical history statistics
-   */
-  static getMedicalHistoryStats = async (dateFrom = null, dateTo = null) => {
-    try {
-      const queryParams = new URLSearchParams();
       
-      if (dateFrom) queryParams.append('dateFrom', dateFrom);
-      if (dateTo) queryParams.append('dateTo', dateTo);
-      
-      const queryString = queryParams.toString();
-      const url = queryString 
-        ? `v1/medical-history/stats?${queryString}`
-        : 'v1/medical-history/stats';
-      
-      return await ApiRequest.set(url, "GET");
-    } catch (error) {
-      console.error("Error fetching medical history stats:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Search medical histories
-   */
-  static searchMedicalHistories = async (query) => {
-    try {
-      return await ApiRequest.set(`v1/medical-history/search?query=${encodeURIComponent(query)}`, "GET");
-    } catch (error) {
-      console.error("Error searching medical histories:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get recent medical histories
-   */
-  static getRecentMedicalHistories = async (limit = 10) => {
-    try {
-      return await ApiRequest.set(`v1/medical-history/recent?limit=${limit}`, "GET");
-    } catch (error) {
-      console.error("Error fetching recent medical histories:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get upcoming appointments
-   */
-  static getUpcomingAppointments = async (days = 7) => {
-    try {
-      return await ApiRequest.set(`v1/medical-history/upcoming?days=${days}`, "GET");
-    } catch (error) {
-      console.error("Error fetching upcoming appointments:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get medical histories by date range
-   */
-  static getMedicalHistoriesByDateRange = async (startDate, endDate) => {
-    try {
-      return await ApiRequest.set(`v1/medical-history/date-range?startDate=${startDate}&endDate=${endDate}`, "GET");
-    } catch (error) {
-      console.error("Error fetching medical histories by date range:", error);
-      throw error;
+      // Re-throw with user-friendly message
+      if (error.message) {
+        throw error;
+      } else {
+        throw new Error('Failed to generate PDF report. Please try again.');
+      }
     }
   }
 
   /**
    * Export medical histories to CSV
    */
-  static exportMedicalHistoriesCSV = async (filters = {}) => {
+  static exportMedicalHistoriesToCSV = async (filters = {}) => {
     try {
       const queryParams = new URLSearchParams();
       
@@ -521,13 +619,13 @@ export default class MedicalHistoryModel {
       if (filters.service_type) queryParams.append('service_type', filters.service_type);
       if (filters.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
       if (filters.dateTo) queryParams.append('dateTo', filters.dateTo);
-      if (filters.search) queryParams.append('search', filters.search);
       
       const queryString = queryParams.toString();
       const url = queryString 
-        ? `v1/medical-history/export/csv?${queryString}`
-        : 'v1/medical-history/export/csv';
+        ? `v1/medical-history/export-csv?${queryString}` 
+        : 'v1/medical-history/export-csv';
       
+      // Note: This should return a blob/file download
       return await ApiRequest.set(url, "GET", null, {
         responseType: 'blob'
       });

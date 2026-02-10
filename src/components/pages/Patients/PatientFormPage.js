@@ -12,7 +12,8 @@ import {
   Row,
   Col,
   Card,
-  Space
+  Space,
+  InputNumber
 } from 'antd';
 import { Container } from 'reactstrap';
 import swal from '../../reusable/CustomSweetAlert';
@@ -146,6 +147,35 @@ const customStyles = `
   .patient-textarea .ant-input::placeholder {
     color: rgba(0, 0, 0, 0.4) !important;
   }
+
+  /* InputNumber styling */
+  .patient-input-number .ant-input-number {
+    background-color: #FFFFFF !important;
+    border: 1px solid #d9d9d9 !important;
+    color: #000000 !important;
+    border-radius: 4px !important;
+    width: 100% !important;
+    height: 34px !important;
+  }
+
+  .patient-input-number .ant-input-number-input {
+    color: #000000 !important;
+    font-size: 14px !important;
+    height: 32px !important;
+  }
+
+  .patient-input-number .ant-input-number-input::placeholder {
+    color: rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .patient-input-number .ant-input-number:hover {
+    border-color: #666666 !important;
+  }
+
+  .patient-input-number .ant-input-number-focused {
+    border-color: #000000 !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+  }
   
   /* Tablet responsive */
   @media (min-width: 768px) and (max-width: 1024px) {
@@ -187,6 +217,15 @@ const customStyles = `
       min-height: 100px !important;
       font-size: 16px !important;
     }
+
+    .patient-input-number .ant-input-number {
+      height: 40px !important;
+    }
+
+    .patient-input-number .ant-input-number-input {
+      font-size: 16px !important;
+      height: 38px !important;
+    }
   }
 `;
 
@@ -204,8 +243,24 @@ export default function PatientFormPage({
   const [formDisabled, setFormDisabled] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [formKey, setFormKey] = useState(0);
+  const [bmi, setBmi] = useState(null);
+
+  const calculateBMI = (height, weight) => {
+    if (height && weight && height > 0 && weight > 0) {
+      const heightInMeters = height / 100;
+      const bmiValue = weight / (heightInMeters * heightInMeters);
+      return Math.round(bmiValue * 10) / 10;
+    }
+    return null;
+  };
 
   const onValuesChanged = (changedValues, allValues) => {
+    // Update BMI calculation when height or weight changes
+    if (changedValues.height !== undefined || changedValues.weight !== undefined) {
+      const newBMI = calculateBMI(allValues.height, allValues.weight);
+      setBmi(newBMI);
+    }
+
     if (!patientData) {
       const changed = Object.keys(allValues).some(key => {
         const value = allValues[key];
@@ -282,6 +337,7 @@ export default function PatientFormPage({
         if (isStandalone && onSubmitSuccess) {
           form.resetFields();
           setHasChanges(false);
+          setBmi(null);
           setFormKey(prev => prev + 1);
           
           setTimeout(() => {
@@ -359,7 +415,8 @@ export default function PatientFormPage({
         gender: patientData.gender,
         phone: patientData.phone,
         email: patientData.email,
-        blood_type: patientData.blood_type,
+        height: patientData.height,
+        weight: patientData.weight,
         address: patientData.address,
         medical_notes: patientData.medical_notes || '',
         allergies: patientData.allergies || '',
@@ -367,10 +424,16 @@ export default function PatientFormPage({
       
       console.log('Form values to set:', formValues);
       form.setFieldsValue(formValues);
+      
+      // Calculate initial BMI
+      const initialBMI = calculateBMI(patientData.height, patientData.weight);
+      setBmi(initialBMI);
+      
       setHasChanges(false);
     } else {
       console.log('Resetting form for new patient');
       form.resetFields();
+      setBmi(null);
       setHasChanges(false);
     }
     
@@ -570,9 +633,36 @@ export default function PatientFormPage({
                         />
                       </Form.Item>
 
+                      {/* Gender */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Gender
+                          </span>
+                        }
+                        name="gender"
+                        rules={[
+                          { required: true, message: 'Required!' }
+                        ]}
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <Select
+                          className="patient-select"
+                          placeholder="Select gender"
+                          allowClear
+                        >
+                          <Option value="MALE">Male</Option>
+                          <Option value="FEMALE">Female</Option>
+                        </Select>
+                      </Form.Item>
+
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
-                          {/* Gender */}
+                          {/* Height */}
                           <Form.Item
                             label={
                               <span style={{ 
@@ -580,28 +670,28 @@ export default function PatientFormPage({
                                 fontWeight: 600, 
                                 fontSize: '14px' 
                               }}>
-                                Gender
+                                Height (cm)
                               </span>
                             }
-                            name="gender"
+                            name="height"
                             rules={[
-                              { required: true, message: 'Required!' }
+                              { type: 'number', min: 1, max: 300, message: 'Height must be between 1-300 cm' }
                             ]}
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select
-                              className="patient-select"
-                              placeholder="Select gender"
-                              allowClear
-                            >
-                              <Option value="MALE">Male</Option>
-                              <Option value="FEMALE">Female</Option>
-                            </Select>
+                            <InputNumber
+                              className="patient-input-number"
+                              placeholder="Enter height"
+                              min={1}
+                              max={300}
+                              precision={2}
+                              style={{ width: '100%' }}
+                            />
                           </Form.Item>
                         </Col>
                         
                         <Col xs={24} md={12}>
-                          {/* Blood Type */}
+                          {/* Weight */}
                           <Form.Item
                             label={
                               <span style={{ 
@@ -609,26 +699,54 @@ export default function PatientFormPage({
                                 fontWeight: 600, 
                                 fontSize: '14px' 
                               }}>
-                                Blood Type
+                                Weight (kg)
                               </span>
                             }
-                            name="blood_type"
+                            name="weight"
+                            rules={[
+                              { type: 'number', min: 1, max: 500, message: 'Weight must be between 1-500 kg' }
+                            ]}
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select
-                              className="patient-select"
-                              placeholder="Select blood type"
-                              allowClear
-                            >
-                              <Option value="">Unknown</Option>
-                              <Option value="A">A</Option>
-                              <Option value="B">B</Option>
-                              <Option value="AB">AB</Option>
-                              <Option value="O">O</Option>
-                            </Select>
+                            <InputNumber
+                              className="patient-input-number"
+                              placeholder="Enter weight"
+                              min={1}
+                              max={500}
+                              precision={2}
+                              style={{ width: '100%' }}
+                            />
                           </Form.Item>
                         </Col>
                       </Row>
+
+                      {/* BMI Display */}
+                      {bmi !== null && (
+                        <div style={{ 
+                          marginBottom: '10px', 
+                          padding: '8px 12px',
+                          backgroundColor: '#f0f5ff',
+                          border: '1px solid #adc6ff',
+                          borderRadius: '4px'
+                        }}>
+                          <Text style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px',
+                            marginRight: '8px'
+                          }}>
+                            BMI:
+                          </Text>
+                          <Text style={{ fontSize: '14px', color: '#1890ff', fontWeight: 500 }}>
+                            {bmi}
+                          </Text>
+                          <Text style={{ fontSize: '12px', color: '#666', marginLeft: '8px' }}>
+                            {bmi < 18.5 ? '(Underweight)' : 
+                             bmi < 25 ? '(Normal)' : 
+                             bmi < 30 ? '(Overweight)' : '(Obese)'}
+                          </Text>
+                        </div>
+                      )}
 
                       {/* Phone Number */}
                       <Form.Item

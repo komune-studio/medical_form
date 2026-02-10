@@ -40,6 +40,25 @@ function dataURLtoBlob(dataurl) {
   return new Blob([u8arr], {type:mime});
 }
 
+// Treatment options
+const TREATMENT_OPTIONS = [
+  'Tens',
+  'Ultrasound',
+  'Shockwave',
+  'Massage',
+  'Leg Massage',
+  'Ice'
+];
+
+// Recommended next session options
+const NEXT_SESSION_OPTIONS = [
+  'This week',
+  'Next Week',
+  'Next 2 Weeks',
+  'Next Month',
+  'Try pilates session'
+];
+
 // Custom styles matching the design
 const customStyles = `
   /* Custom styling untuk Select dropdown */
@@ -665,7 +684,8 @@ export default function MedicalHistoryFormPage({
                   backgroundColor: '#FFFFFF',
                   borderBottom: '1px solid #e0e0e0',
                   padding: '16px'
-                }} bodyStyle={{ padding: 20 }}>
+                }} 
+                bodyStyle={{ padding: 20 }}>
                 <Form
                   form={form}
                   onFinish={onSubmit}
@@ -759,13 +779,8 @@ export default function MedicalHistoryFormPage({
                               className="medical-history-select"
                               placeholder="Select service type"
                             >
-                              <Option value="Consultation">Consultation</Option>
-                              <Option value="Therapy">Therapy</Option>
-                              <Option value="Follow-up">Follow-up</Option>
-                              <Option value="Emergency">Emergency</Option>
-                              <Option value="Check-up">Check-up</Option>
-                              <Option value="Rehabilitation">Rehabilitation</Option>
-                              <Option value="Screening">Screening</Option>
+                              <Option value="Physiotherapy">Physiotherapy</Option>
+                              <Option value="Pilates">Pilates</Option>
                             </Select>
                           </Form.Item>
                         </Col>
@@ -887,7 +902,7 @@ export default function MedicalHistoryFormPage({
                         />
                       </Form.Item>
 
-                      {/* Treatments */}
+                      {/* Treatments - Now Dropdown */}
                       <Form.Item
                         label={
                           <span style={{ 
@@ -899,16 +914,19 @@ export default function MedicalHistoryFormPage({
                           </span>
                         }
                         name="treatments"
-                        rules={[
-                          { max: 1000, message: 'Max 1000 characters!' }
-                        ]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Enter treatments performed"
-                          className="medical-history-textarea"
-                          rows={3}
-                        />
+                        <Select
+                          className="medical-history-select"
+                          placeholder="Select treatment"
+                          allowClear
+                        >
+                          {TREATMENT_OPTIONS.map(treatment => (
+                            <Option key={treatment} value={treatment}>
+                              {treatment}
+                            </Option>
+                          ))}
+                        </Select>
                       </Form.Item>
 
                       {/* Exercise */}
@@ -959,7 +977,7 @@ export default function MedicalHistoryFormPage({
                         />
                       </Form.Item>
 
-                      {/* Recommended Next Session */}
+                      {/* Recommended Next Session - Updated Options */}
                       <Form.Item
                         label={
                           <span style={{ 
@@ -978,15 +996,11 @@ export default function MedicalHistoryFormPage({
                           placeholder="Select recommended next session"
                           allowClear
                         >
-                          <Option value="">Not specified</Option>
-                          <Option value="1 day">1 day</Option>
-                          <Option value="2 days">2 days</Option>
-                          <Option value="3 days">3 days</Option>
-                          <Option value="1 week">1 week</Option>
-                          <Option value="2 weeks">2 weeks</Option>
-                          <Option value="3 weeks">3 weeks</Option>
-                          <Option value="1 month">1 month</Option>
-                          <Option value="Follow-up as needed">Follow-up as needed</Option>
+                          {NEXT_SESSION_OPTIONS.map(option => (
+                            <Option key={option} value={option}>
+                              {option}
+                            </Option>
+                          ))}
                         </Select>
                       </Form.Item>
 

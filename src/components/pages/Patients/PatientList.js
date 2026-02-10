@@ -15,7 +15,6 @@ const useFilter = create((set) => ({
   search: "",
   timeRange: "all",
   gender: "",
-  bloodType: "",
 
   setSearch: (keyword) =>
     set((state) => ({
@@ -29,16 +28,11 @@ const useFilter = create((set) => ({
     set((state) => ({
       gender: gender,
     })),
-  setBloodType: (bloodType) =>
-    set((state) => ({
-      bloodType: bloodType,
-    })),
   resetSearch: () =>
     set((state) => ({
       search: "",
       timeRange: "all",
-      gender: "",
-      bloodType: ""
+      gender: ""
     })),
 }));
 
@@ -53,11 +47,9 @@ const PatientList = () => {
   const search = useFilter((state) => state.search);
   const timeRange = useFilter((state) => state.timeRange);
   const gender = useFilter((state) => state.gender);
-  const bloodType = useFilter((state) => state.bloodType);
   const setSearch = useFilter((state) => state.setSearch);
   const setTimeRange = useFilter((state) => state.setTimeRange);
   const setGender = useFilter((state) => state.setGender);
-  const setBloodType = useFilter((state) => state.setBloodType);
   const resetSearch = useFilter((state) => state.resetSearch);
 
   const handlePageChange = (event, newPage) => {
@@ -81,11 +73,6 @@ const PatientList = () => {
 
   const handleGenderChange = (value) => {
     setGender(value);
-    setPage(0);
-  };
-
-  const handleBloodTypeChange = (value) => {
-    setBloodType(value);
     setPage(0);
   };
 
@@ -135,7 +122,7 @@ const PatientList = () => {
         <div>
           <div style={{ fontWeight: 500, color: '#333' }}>{row.name}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>
-            {row.gender}
+            {row.gender} {row.age ? `• ${row.age} years` : ''}
           </div>
         </div>
       )
@@ -152,14 +139,35 @@ const PatientList = () => {
       )
     },
     {
-      id: 'blood_type',
-      label: 'Blood Type',
-      filter: true,
-      render: (row) => (
-        <span className={`ant-tag blood-tag blood-${row.blood_type?.toLowerCase() || 'unknown'}`}>
-          {row.blood_type || 'Unknown'}
-        </span>
-      )
+      id: 'body_metrics',
+      label: 'Body Metrics',
+      filter: false,
+      render: (row) => {
+        const hasMetrics = row.height || row.weight || row.bmi;
+        if (!hasMetrics) {
+          return <span style={{ color: '#999', fontSize: '12px' }}>No data</span>;
+        }
+        
+        return (
+          <div>
+            {row.height && (
+              <div style={{ fontSize: '12px', color: '#333' }}>
+                H: {row.height} cm
+              </div>
+            )}
+            {row.weight && (
+              <div style={{ fontSize: '12px', color: '#333' }}>
+                W: {row.weight} kg
+              </div>
+            )}
+            {row.bmi && (
+              <div style={{ fontSize: '12px', color: '#1890ff', fontWeight: 500 }}>
+                BMI: {row.bmi}
+              </div>
+            )}
+          </div>
+        );
+      }
     },
     {
       id: 'created_at',
@@ -260,7 +268,6 @@ const PatientList = () => {
       const filters = {};
       if (search) filters.search = search;
       if (gender) filters.gender = gender;
-      if (bloodType) filters.blood_type = bloodType;
       if (timeRange && timeRange !== "all") filters.timeRange = timeRange;
       
       const result = await PatientModel.getAllPatients(filters);
@@ -282,10 +289,13 @@ const PatientList = () => {
         'Patient Code',
         'Full Name',
         'Date of Birth',
+        'Age',
         'Gender',
+        'Height (cm)',
+        'Weight (kg)',
+        'BMI',
         'Phone Number',
         'Email',
-        'Blood Type',
         'Address',
         'Registration Date'
       ];
@@ -302,10 +312,13 @@ const PatientList = () => {
           patient.patient_code || '',
           patient.name || '',
           dob,
+          patient.age || '',
           patient.gender || '',
+          patient.height || '',
+          patient.weight || '',
+          patient.bmi || '',
           patient.phone || '',
           patient.email || '',
-          patient.blood_type || 'Unknown',
           patient.address || '',
           regDate
         ];
@@ -360,7 +373,6 @@ const PatientList = () => {
       
       if (search) filters.search = search;
       if (gender) filters.gender = gender;
-      if (bloodType) filters.blood_type = bloodType;
       if (timeRange && timeRange !== "all") {
         filters.timeRange = timeRange;
       }
@@ -391,7 +403,7 @@ const PatientList = () => {
 
   useEffect(() => {
     initializeData(page, rowsPerPage);
-  }, [page, rowsPerPage, search, timeRange, gender, bloodType]);
+  }, [page, rowsPerPage, search, timeRange, gender]);
 
   return (
     <>
@@ -493,44 +505,6 @@ const PatientList = () => {
         .filter-select.ant-select-focused .ant-select-selector {
           border-color: #1890ff !important;
           box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
-        }
-        
-        /* Blood type tags */
-        .blood-tag {
-          padding: 4px 12px;
-          border-radius: 4px;
-          font-size: 13px;
-          display: inline-block;
-        }
-        
-        .blood-tag.blood-a {
-          background: #fff1f0 !important;
-          color: #cf1322 !important;
-          border: 1px solid #ffa39e !important;
-        }
-        
-        .blood-tag.blood-b {
-          background: #f6ffed !important;
-          color: #389e0d !important;
-          border: 1px solid #b7eb8f !important;
-        }
-        
-        .blood-tag.blood-ab {
-          background: #f0f5ff !important;
-          color: #1d39c4 !important;
-          border: 1px solid #adc6ff !important;
-        }
-        
-        .blood-tag.blood-o {
-          background: #fff7e6 !important;
-          color: #d46b08 !important;
-          border: 1px solid #ffd591 !important;
-        }
-        
-        .blood-tag.blood-unknown {
-          background: #f5f5f5 !important;
-          color: #8c8c8c !important;
-          border: 1px solid #d9d9d9 !important;
         }
         
         /* Modal styling */
@@ -691,11 +665,6 @@ const PatientList = () => {
             padding: 18px 16px !important;
           }
           
-          .blood-tag {
-            font-size: 15px !important;
-            padding: 6px 14px !important;
-          }
-          
           .ant-btn-circle {
             font-size: 22px !important;
             width: 40px !important;
@@ -779,7 +748,7 @@ const PatientList = () => {
             </Row>
 
             <Row style={{ marginBottom: 24, alignItems: 'center' }}>
-              <Col xl={4} lg={4} md={12} className="mb-3 mb-lg-0">
+              <Col xl={6} lg={6} md={12} className="mb-3 mb-lg-0">
                 <Input
                   className="patient-search"
                   placeholder="Search by name, ID, or phone"
@@ -796,8 +765,8 @@ const PatientList = () => {
                   style={{ width: '100%' }}
                 />
               </Col>
-              <Col xl={2} lg={2} className="d-none d-lg-block"></Col>
-              <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0 pe-md-2">
+              <Col xl={3} lg={3} className="d-none d-lg-block"></Col>
+              <Col xl={1} lg={1} md={6} xs={6} className="mb-3 mb-lg-0 pe-md-2">
                 <Select
                   className="filter-select"
                   placeholder="Gender"
@@ -807,27 +776,9 @@ const PatientList = () => {
                   allowClear
                   onClear={() => handleGenderChange("")}
                 >
-                  <Select.Option value="">All Gender</Select.Option>
+                  <Select.Option value="">All</Select.Option>
                   <Select.Option value="MALE">Male</Select.Option>
                   <Select.Option value="FEMALE">Female</Select.Option>
-                 
-                </Select>
-              </Col>
-              <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0">
-                <Select
-                  className="filter-select"
-                  placeholder="Blood Type"
-                  style={{ width: '100%' }}
-                  value={bloodType || undefined}
-                  onChange={handleBloodTypeChange}
-                  allowClear
-                  onClear={() => handleBloodTypeChange("")}
-                >
-                  <Select.Option value="">All Blood Types</Select.Option>
-                  <Select.Option value="A">A</Select.Option>
-                  <Select.Option value="B">B</Select.Option>
-                  <Select.Option value="AB">AB</Select.Option>
-                  <Select.Option value="O">O</Select.Option>
                 </Select>
               </Col>
               <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0 ps-md-2">
