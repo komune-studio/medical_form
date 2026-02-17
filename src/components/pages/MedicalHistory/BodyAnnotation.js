@@ -100,8 +100,6 @@ const BodyAnnotation = forwardRef(({
         setCanvasInitialized(true);
       };
       
-      
-      
       img.src = imageUrl;
     }
   }, [imageUrl]);
@@ -269,6 +267,7 @@ const BodyAnnotation = forwardRef(({
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', marginRight: '4px' }}>Color:</span>
                 <button
+                  type="button"
                   onClick={() => setColor('#FF0000')}
                   style={{
                     width: '28px',
@@ -281,6 +280,7 @@ const BodyAnnotation = forwardRef(({
                   title="Red (Pain)"
                 />
                 <button
+                  type="button"
                   onClick={() => setColor('#0000FF')}
                   style={{
                     width: '28px',
@@ -293,6 +293,7 @@ const BodyAnnotation = forwardRef(({
                   title="Blue (Treated)"
                 />
                 <button
+                  type="button"
                   onClick={() => setColor('#00FF00')}
                   style={{
                     width: '28px',
@@ -305,6 +306,7 @@ const BodyAnnotation = forwardRef(({
                   title="Green (Improved)"
                 />
                 <button
+                  type="button"
                   onClick={() => setColor('#FFA500')}
                   style={{
                     width: '28px',
@@ -317,6 +319,7 @@ const BodyAnnotation = forwardRef(({
                   title="Orange (Mild)"
                 />
                 <button
+                  type="button"
                   onClick={() => setColor('#000000')}
                   style={{
                     width: '28px',
@@ -333,6 +336,7 @@ const BodyAnnotation = forwardRef(({
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', marginRight: '4px' }}>Size:</span>
                 <button
+                  type="button"
                   onClick={() => setLineWidth(2)}
                   style={{
                     width: '28px',
@@ -350,6 +354,7 @@ const BodyAnnotation = forwardRef(({
                   S
                 </button>
                 <button
+                  type="button"
                   onClick={() => setLineWidth(5)}
                   style={{
                     width: '28px',
@@ -367,6 +372,7 @@ const BodyAnnotation = forwardRef(({
                   M
                 </button>
                 <button
+                  type="button"
                   onClick={() => setLineWidth(8)}
                   style={{
                     width: '28px',

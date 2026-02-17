@@ -59,6 +59,17 @@ const NEXT_SESSION_OPTIONS = [
   'Try pilates session'
 ];
 
+// Injury Type Options
+const INJURY_TYPE_OPTIONS = [
+  'Acute Injury',
+  'Chronic Injury',
+  'Overuse Injury',
+  'Sports Injury',
+  'Work-Related Injury',
+  'Post-Surgery',
+  'Other'
+];
+
 // Custom styles matching the design
 const customStyles = `
   /* Custom styling untuk Select dropdown */
@@ -340,14 +351,20 @@ export default function MedicalHistoryFormPage({
         patient_id: medicalHistoryData.patient_id,
         staff_id: medicalHistoryData.staff_id || undefined,
         service_type: medicalHistoryData.service_type || '',
+        injury_type: medicalHistoryData.injury_type || '',
+        area_concern: medicalHistoryData.area_concern || '',
         diagnosis_result: medicalHistoryData.diagnosis_result || '',
+        expected_recovery_time: medicalHistoryData.expected_recovery_time || '',
+        recovery_goals: medicalHistoryData.recovery_goals || '', // BARU
+        objective_progress: medicalHistoryData.objective_progress || '',
         pain_before: medicalHistoryData.pain_before || '',
         pain_after: medicalHistoryData.pain_after || '',
+        range_of_motion_impact: medicalHistoryData.range_of_motion_impact || '',
         treatments: medicalHistoryData.treatments || '',
         exercise: medicalHistoryData.exercise || '',
         homework: medicalHistoryData.homework || '',
+        recovery_tips: medicalHistoryData.recovery_tips || '',
         recommended_next_session: medicalHistoryData.recommended_next_session || '',
-        additional_notes: medicalHistoryData.additional_notes || '',
         body_annotation: medicalHistoryData.body_annotation || '',
       };
       
@@ -416,12 +433,11 @@ export default function MedicalHistoryFormPage({
       let body = form.getFieldsValue();
       console.log('Form data before processing:', body);
       
-      // 👇 SIMPLE LOGIC: UPLOAD GAMBAR + ANNOTATION
+      // Upload gambar + annotation
       if (bodyAnnotationRef.current) {
         const hasLocalFile = bodyAnnotationRef.current.hasLocalFile();
         const hasAnnotations = bodyAnnotationRef.current.hasAnnotations();
         
-        // Jika ada gambar baru atau ada annotation
         if (hasLocalFile || hasAnnotations) {
           try {
             setUploadingImage(true);
@@ -429,18 +445,15 @@ export default function MedicalHistoryFormPage({
             
             let fileToUpload;
             
-            // Jika ada annotation, export canvas sebagai gambar
             if (hasAnnotations) {
               const imageDataUrl = bodyAnnotationRef.current.exportAsImage();
               
               if (imageDataUrl) {
-                // Convert base64 to File
                 const blob = dataURLtoBlob(imageDataUrl);
                 const fileName = hasLocalFile ? bodyAnnotationRef.current.getLocalFile().name : 'body-annotation.jpg';
                 fileToUpload = new File([blob], fileName, { type: 'image/jpeg' });
               }
             } 
-            // Jika hanya upload gambar baru tanpa annotation
             else if (hasLocalFile) {
               fileToUpload = bodyAnnotationRef.current.getLocalFile();
             }
@@ -453,11 +466,9 @@ export default function MedicalHistoryFormPage({
               
               message.success({ content: 'Image uploaded!', key: 'uploadImage', duration: 2 });
               
-              // Update BodyAnnotation component
               bodyAnnotationRef.current.setUploadedImageUrl(uploadedUrl);
               
-              // 👇 SIMPLE: Simpan HANYA URL-nya aja (string), bukan JSON!
-              body.body_annotation = uploadedUrl; // Langsung string URL
+              body.body_annotation = uploadedUrl;
             }
             
           } catch (uploadError) {
@@ -467,15 +478,11 @@ export default function MedicalHistoryFormPage({
             setUploadingImage(false);
           }
         } else {
-          // Jika tidak ada perubahan gambar/annotation, tetap simpan data yang ada
           if (body.body_annotation) {
             try {
-              // Coba parse dulu, mungkin masih JSON
               const parsed = JSON.parse(body.body_annotation);
-              // Ambil URL-nya aja
               body.body_annotation = parsed.imageUrl || body.body_annotation;
             } catch (e) {
-              // Kalo udah string URL, biarin aja
               console.log('body_annotation is already a string URL');
             }
           }
@@ -821,6 +828,70 @@ export default function MedicalHistoryFormPage({
                         </Col>
                       </Row>
 
+                      <Row gutter={16}>
+                        <Col xs={24} md={12}>
+                          {/* Injury Type */}
+                          <Form.Item
+                            label={
+                              <span style={{ 
+                                color: '#000000',
+                                fontWeight: 600, 
+                                fontSize: '14px' 
+                              }}>
+                                Injury Type
+                              </span>
+                            }
+                            name="injury_type"
+                            style={{ marginBottom: '10px' }}
+                          >
+                            <Select
+                              className="medical-history-select"
+                              placeholder="Select injury type"
+                              allowClear
+                            >
+                              {INJURY_TYPE_OPTIONS.map(type => (
+                                <Option key={type} value={type}>
+                                  {type}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        </Col>
+
+                        <Col xs={24} md={12}>
+                          {/* Area of Concern */}
+                          <Form.Item
+                            label={
+                              <span style={{ 
+                                color: '#000000',
+                                fontWeight: 600, 
+                                fontSize: '14px' 
+                              }}>
+                                Area of Concern
+                              </span>
+                            }
+                            name="area_concern"
+                            rules={[
+                              { max: 255, message: 'Max 255 characters!' }
+                            ]}
+                            style={{ marginBottom: '10px' }}
+                          >
+                            <Input 
+                              placeholder="e.g., Lower back, Right shoulder"
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #d9d9d9',
+                                color: '#000000',
+                                borderRadius: '4px',
+                                height: '34px',
+                                padding: '4px 11px',
+                                fontSize: '14px'
+                              }}
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+
                       {/* Pain Levels */}
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
@@ -902,7 +973,101 @@ export default function MedicalHistoryFormPage({
                         />
                       </Form.Item>
 
-                      {/* Treatments - Now Dropdown */}
+                      {/* Expected Recovery Time */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Expected Recovery Time
+                          </span>
+                        }
+                        name="expected_recovery_time"
+                        rules={[
+                          { max: 100, message: 'Max 100 characters!' }
+                        ]}
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <Input 
+                          placeholder="e.g., 2-4 weeks, 3 months"
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #d9d9d9',
+                            color: '#000000',
+                            borderRadius: '4px',
+                            height: '34px',
+                            padding: '4px 11px',
+                            fontSize: '14px'
+                          }}
+                        />
+                      </Form.Item>
+
+                      {/* BARU: Recovery Goals */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Recovery Goals
+                          </span>
+                        }
+                        name="recovery_goals"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea 
+                          placeholder="Enter specific recovery goals and milestones (e.g., return to running, lift 20kg without pain)"
+                          className="medical-history-textarea"
+                          rows={3}
+                        />
+                      </Form.Item>
+
+                      {/* Objective Progress */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Objective Progress
+                          </span>
+                        }
+                        name="objective_progress"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea 
+                          placeholder="Describe objective measurable progress (e.g., increased ROM from 45° to 60°, reduced pain from 7/10 to 4/10)"
+                          className="medical-history-textarea"
+                          rows={3}
+                        />
+                      </Form.Item>
+
+                      {/* Range of Motion Impact */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Range of Motion Impact
+                          </span>
+                        }
+                        name="range_of_motion_impact"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea 
+                          placeholder="Describe range of motion limitations or improvements"
+                          className="medical-history-textarea"
+                          rows={2}
+                        />
+                      </Form.Item>
+
+                      {/* Treatments - Dropdown */}
                       <Form.Item
                         label={
                           <span style={{ 
@@ -977,7 +1142,28 @@ export default function MedicalHistoryFormPage({
                         />
                       </Form.Item>
 
-                      {/* Recommended Next Session - Updated Options */}
+                      {/* Recovery Tips */}
+                      <Form.Item
+                        label={
+                          <span style={{ 
+                            color: '#000000',
+                            fontWeight: 600, 
+                            fontSize: '14px' 
+                          }}>
+                            Recovery Tips
+                          </span>
+                        }
+                        name="recovery_tips"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea 
+                          placeholder="Enter recovery tips and recommendations"
+                          className="medical-history-textarea"
+                          rows={2}
+                        />
+                      </Form.Item>
+
+                      {/* Recommended Next Session */}
                       <Form.Item
                         label={
                           <span style={{ 
@@ -1002,30 +1188,6 @@ export default function MedicalHistoryFormPage({
                             </Option>
                           ))}
                         </Select>
-                      </Form.Item>
-
-                      {/* Additional Notes */}
-                      <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Additional Notes
-                          </span>
-                        }
-                        name="additional_notes"
-                        rules={[
-                          { max: 1000, message: 'Max 1000 characters!' }
-                        ]}
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <TextArea 
-                          placeholder="Enter additional notes"
-                          className="medical-history-textarea"
-                          rows={2}
-                        />
                       </Form.Item>
 
                       {/* Body Annotation */}
