@@ -283,7 +283,6 @@ export default class MedicalHistoryPDFGenerator {
         margin: { left: 12, right: 12 },
         tableWidth: 'auto',
         didDrawCell: (data) => {
-          // Add colored status dot for Pre/Post treatment based on pain level
           if ((data.column.index === 6 || data.column.index === 7) && data.section === 'body') {
             const cellValue = data.cell.raw;
             if (cellValue !== '-' && cellValue !== undefined && cellValue !== null) {
@@ -291,18 +290,22 @@ export default class MedicalHistoryPDFGenerator {
                 const painValue = parseFloat(cellValue);
                 if (!isNaN(painValue)) {
                   let color;
-                  if (painValue <= 3) color = [76, 175, 80]; // Green
-                  else if (painValue <= 6) color = [255, 193, 7]; // Yellow
-                  else color = [255, 77, 77]; // Red
-                  
-                  doc.setFillColor(...color);
-                  
+                  if (painValue <= 3) color = [76, 175, 80];
+                  else if (painValue <= 6) color = [255, 193, 7];
+                  else color = [255, 77, 77];
+        
+                  // ✅ Ikut posisi TEKS, bukan tengah cell
+                  const paddingTop = data.cell.padding('top');
+                  const fontSize = 7;
+                  const textY = data.cell.y + paddingTop + (fontSize * 0.352778);
+        
+                  // Horizontal: angka sudah digambar autoTable di center
+                  // Kita tinggal taruh dot di kanannya
                   const textWidth = doc.getTextWidth(cellValue.toString());
-                  const cellPadding = 3;
-                  
                   const circleX = data.cell.x + (data.cell.width / 2) + (textWidth / 2) + 2.5;
-                  const circleY = data.cell.y + cellPadding + 2.5;
-                  
+                  const circleY = textY - (fontSize * 0.352778) / 2; // ✅ sejajar tengah angka
+        
+                  doc.setFillColor(...color);
                   doc.circle(circleX, circleY, 1.1, 'F');
                 }
               } catch (e) {

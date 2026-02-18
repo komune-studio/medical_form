@@ -79,26 +79,26 @@ const PatientList = () => {
   const handleDownloadProgressPDF = async (patientId, patientName, patientCode) => {
     try {
       message.loading({ content: 'Generating PDF report...', key: 'pdf-gen', duration: 0 });
-      
+
       await MedicalHistoryModel.generateProgressPDF(patientId);
-      
-      message.success({ 
-        content: `Progress report for ${patientName} (${patientCode}) downloaded successfully!`, 
+
+      message.success({
+        content: `Progress report for ${patientName} (${patientCode}) downloaded successfully!`,
         key: 'pdf-gen',
         duration: 3
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
-      
+
       let errorMsg = 'Failed to generate PDF report';
       if (error.message.includes('No medical history')) {
         errorMsg = 'No medical history records found for this patient';
       } else if (error.message) {
         errorMsg = error.message;
       }
-      
-      message.error({ 
-        content: errorMsg, 
+
+      message.error({
+        content: errorMsg,
         key: 'pdf-gen',
         duration: 5
       });
@@ -147,7 +147,7 @@ const PatientList = () => {
         if (!hasMetrics) {
           return <span style={{ color: '#999', fontSize: '12px' }}>No data</span>;
         }
-        
+
         return (
           <div>
             {row.height && (
@@ -200,7 +200,7 @@ const PatientList = () => {
                 />
               </Link>
             </Tooltip>
-    
+
             <Tooltip title="Edit Patient">
               <Link to={`/patients/${row.id}/edit`}>
                 <AntButton
@@ -212,7 +212,7 @@ const PatientList = () => {
                 />
               </Link>
             </Tooltip>
-    
+
             <Tooltip title="Download Progress Report (PDF)">
               <AntButton
                 type={'link'}
@@ -223,7 +223,7 @@ const PatientList = () => {
                 icon={<Iconify icon={"mdi:file-pdf-box"} />}
               />
             </Tooltip>
-    
+
             <Tooltip title="Delete Patient">
               <AntButton
                 type={'link'}
@@ -269,21 +269,21 @@ const PatientList = () => {
       if (search) filters.search = search;
       if (gender) filters.gender = gender;
       if (timeRange && timeRange !== "all") filters.timeRange = timeRange;
-      
+
       const result = await PatientModel.getAllPatients(filters);
-      
+
       if (!result || result.http_code !== 200) {
         throw new Error("Failed to fetch data");
       }
-      
+
       let data = result.data || [];
-      
+
       data = data.sort((a, b) => {
         const idA = parseInt(a.id) || 0;
         const idB = parseInt(b.id) || 0;
         return idA - idB;
       });
-      
+
       const headers = [
         'ID',
         'Patient Code',
@@ -299,14 +299,14 @@ const PatientList = () => {
         'Address',
         'Registration Date'
       ];
-      
+
       const rows = data.map(patient => {
-        const dob = patient.date_of_birth ? 
+        const dob = patient.date_of_birth ?
           moment(patient.date_of_birth).format('DD/MM/YYYY') : '';
-        
-        const regDate = patient.created_at ? 
+
+        const regDate = patient.created_at ?
           moment(patient.created_at).format('DD/MM/YYYY HH:mm') : '';
-        
+
         return [
           patient.id || '',
           patient.patient_code || '',
@@ -323,11 +323,11 @@ const PatientList = () => {
           regDate
         ];
       });
-      
+
       const allRows = [headers, ...rows];
-      
+
       const csvContent = allRows
-        .map(row => 
+        .map(row =>
           row
             .map(cell => {
               const cellStr = String(cell || '');
@@ -339,25 +339,25 @@ const PatientList = () => {
             .join(';')
         )
         .join('\n');
-      
+
       const BOM = '\uFEFF';
       const finalContent = BOM + csvContent;
-      
+
       const blob = new Blob([finalContent], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      
+
       const timestamp = moment().format('YYYY-MM-DD_HH-mm');
       link.download = `patients_${timestamp}.csv`;
-      
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       message.success(`CSV exported! ${data.length} patients exported.`);
-      
+
     } catch (error) {
       console.error('Error exporting CSV:', error);
       message.error('Failed to export CSV: ' + error.message);
@@ -370,22 +370,22 @@ const PatientList = () => {
     setLoading(true);
     try {
       const filters = {};
-      
+
       if (search) filters.search = search;
       if (gender) filters.gender = gender;
       if (timeRange && timeRange !== "all") {
         filters.timeRange = timeRange;
       }
-      
+
       const result = await PatientModel.getAllPatients(filters);
-      
+
       if (result && result.http_code === 200) {
         const allData = Array.isArray(result.data) ? result.data : [];
-        
+
         const startIndex = currentPage * currentRowsPerPage;
         const endIndex = startIndex + currentRowsPerPage;
         const paginatedData = allData.slice(startIndex, endIndex);
-        
+
         setDataSource(paginatedData);
         setTotalCount(allData.length);
       } else {
@@ -484,14 +484,31 @@ const PatientList = () => {
           border: 1px solid #d9d9d9 !important;
           color: #333 !important;
           border-radius: 6px !important;
+          height: 40px !important; /* Fixed height for alignment */
+          display: flex !important;
+          align-items: center !important;
+        }
+        
+        /* Ensure search input matches height */
+        .patient-search.ant-input-affix-wrapper {
+          height: 40px !important;
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .filter-select {
+          min-width: 150px !important; /* Ensure minimum width as requested */
+          width: 100%;
         }
         
         .filter-select .ant-select-selection-placeholder {
           color: rgba(0, 0, 0, 0.25) !important;
+          line-height: 38px !important; /* Vertically center placeholder */
         }
         
         .filter-select .ant-select-selection-item {
           color: #333 !important;
+          line-height: 38px !important; /* Vertically center text */
         }
         
         .filter-select .ant-select-arrow {
@@ -706,8 +723,8 @@ const PatientList = () => {
         }
       `}</style>
       <Container fluid>
-        <Card style={{ 
-          background: '#FFFFFF', 
+        <Card style={{
+          background: '#FFFFFF',
           color: "#333",
           border: '1px solid #f0f0f0',
           boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 6px -1px rgba(0,0,0,0.02), 0 2px 4px 0 rgba(0,0,0,0.02)'
@@ -732,7 +749,7 @@ const PatientList = () => {
                       Add Patient
                     </AntButton>
                   </Link>
-                  
+
                   <AntButton
                     size={'middle'}
                     type={'primary'}
@@ -748,7 +765,7 @@ const PatientList = () => {
             </Row>
 
             <Row style={{ marginBottom: 24, alignItems: 'center' }}>
-              <Col xl={6} lg={6} md={12} className="mb-3 mb-lg-0">
+              <Col xl={6} lg={5} md={12} className="mb-3 mb-lg-0">
                 <Input
                   className="patient-search"
                   placeholder="Search by name, ID, or phone"
@@ -765,8 +782,8 @@ const PatientList = () => {
                   style={{ width: '100%' }}
                 />
               </Col>
-              <Col xl={3} lg={3} className="d-none d-lg-block"></Col>
-              <Col xl={1} lg={1} md={6} xs={6} className="mb-3 mb-lg-0 pe-md-2">
+              <Col xl={2} lg={1} className="d-none d-lg-block"></Col>
+              <Col xl={2} lg={3} md={6} xs={6} className="mb-3 mb-lg-0 pe-md-2">
                 <Select
                   className="filter-select"
                   placeholder="Gender"
@@ -781,7 +798,7 @@ const PatientList = () => {
                   <Select.Option value="FEMALE">Female</Select.Option>
                 </Select>
               </Col>
-              <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0 ps-md-2">
+              <Col xl={2} lg={3} md={6} xs={6} className="mb-3 mb-lg-0 ps-md-2">
                 <Select
                   className="filter-select"
                   placeholder="Time Range"
