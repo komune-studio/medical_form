@@ -7,6 +7,7 @@ import StaffEdit from "components/pages/Staff/StaffEdit";
 import PatientList from "components/pages/Patients/PatientList";
 import PatientCreate from "components/pages/Patients/PatientCreate";
 import PatientEdit from "components/pages/Patients/PatientEdit";
+import PatientDetail from "components/pages/Patients/PatientDetail";
 import MedicalHistoryList from "components/pages/MedicalHistory/MedicalHistoryList";
 import MedicalHistoryCreate from "components/pages/MedicalHistory/MedicalHistoryCreate";
 import MedicalHistoryEdit from "components/pages/MedicalHistory/MedicalHistoryEdit";
@@ -26,6 +27,12 @@ var routes = [
         path: "/patients/:id/edit",
         name: "Patient Edit",
         component: PatientEdit,
+        layout: "/admin",
+    },
+    {
+        path: "/patients/:id",
+        name: "Patient Detail",
+        component: PatientDetail,
         layout: "/admin",
     },
     {

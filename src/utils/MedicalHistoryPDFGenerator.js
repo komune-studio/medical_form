@@ -1,474 +1,362 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import LogoRangka from 'assets/img/Logo_rangka.png';
+import Mascot from 'assets/img/Mascot.png';
 
 export default class MedicalHistoryPDFGenerator {
-  /**
-   * Helper: Calculate age from date of birth
-   */
+
   static calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A';
     const dob = new Date(dateOfBirth);
     if (isNaN(dob.getTime())) return 'Invalid date';
-    
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
-    const monthDiff = today.getMonth() - dob.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-      age--;
-    }
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
     return age;
   }
 
   /**
-   * Generate Progress Report PDF - Rangka Style (Improved Layout)
-   * ✅ UPDATED: Now uses base64 images from backend (NO CORS ISSUES!)
-   * ✅ UPDATED: Added 4 new fields (injury_type, expected_recovery_time, objective_progress, recovery_goals)
-   * ✅ REMOVED: additional_notes
+   * ✅ KEY FIX: Use JPEG + low quality → keeps file tiny (same as original ~40KB)
+   * Canvas draws image scaled DOWN before encoding → massive size reduction
    */
+  static loadImageAsBase64 = (src, maxPx = 300, useJpeg = false) => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        try {
+          const scale  = Math.min(1, maxPx / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width  = Math.round(img.naturalWidth  * scale);
+          canvas.height = Math.round(img.naturalHeight * scale);
+          const ctx = canvas.getContext('2d');
+          // For PNG (logos with transparency): fill white background first when using JPEG
+          // For PNG assets: always use PNG format to preserve transparency
+          if (useJpeg) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL('image/jpeg', 0.75);
+            resolve({ base64, width: img.naturalWidth, height: img.naturalHeight });
+          } else {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const base64 = canvas.toDataURL('image/png');
+            resolve({ base64, width: img.naturalWidth, height: img.naturalHeight });
+          }
+        } catch (e) {
+          console.warn('Canvas error:', e);
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
+
   static generateProgressPDF = async (reportData) => {
     try {
-      // Validate data
-      if (!reportData) {
-        throw new Error('Invalid report data provided.');
-      }
-      
-      const patient = reportData.patient;
-      const sessions = reportData.sessions;
-      
-      // Check if patient data exists
-      if (!patient) {
-        throw new Error('Patient information not found. Please contact support.');
+      if (!reportData) throw new Error('Invalid report data provided.');
+      const { patient, sessions } = reportData;
+      if (!patient)                          throw new Error('Patient information not found.');
+      if (!sessions || sessions.length === 0) throw new Error('No medical history records found for this patient. Please add treatment records first.');
+
+      // Pre-load brand images (scaled down → small file)
+      const [logoResult, mascotResult] = await Promise.all([
+        this.loadImageAsBase64(LogoRangka, 400, false),  // PNG — preserve transparency
+        this.loadImageAsBase64(Mascot,     300, true),   // JPEG — no transparency needed
+      ]);
+
+      const doc        = new jsPDF();
+      const pageWidth  = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      // ══════════════════════════════════════════════════════════
+      // HEADER — Logo left · Title right of logo
+      // ══════════════════════════════════════════════════════════
+      const LOGO_X = 10;
+      const LOGO_Y = 7;
+      const LOGO_W = 40;   // bigger logo
+      const LOGO_H = 20;
+
+      if (logoResult) {
+        const ratio = logoResult.width / logoResult.height;
+        let lw = LOGO_W, lh = LOGO_W / ratio;
+        if (lh > LOGO_H) { lh = LOGO_H; lw = LOGO_H * ratio; }
+        doc.addImage(logoResult.base64, 'PNG', LOGO_X, LOGO_Y, lw, lh);
       }
 
-      // Check if sessions exist
-      if (!sessions || sessions.length === 0) {
-        throw new Error('No medical history records found for this patient. Please add treatment records first.');
-      }
-      
-      // Create PDF
-      const doc = new jsPDF();
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      
-      // ========================================
-      // HEADER SECTION
-      // ========================================
-      
-      // Title (centered, bold, large)
+      // Title starts right of logo, centred in remaining width
+      const titleStartX  = LOGO_X + LOGO_W + 6;
+      const titleCenterX = titleStartX + (pageWidth - titleStartX - 10) / 2;
+      const titleY       = LOGO_Y + LOGO_H / 2 + 3;
+
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Treatment Plan & Progress Report:', pageWidth / 2, 18, { align: 'center' });
-      
-      // Underline below title
-      doc.setLineWidth(1);
-      doc.line(20, 22, pageWidth - 20, 22);
-      
-      // ========================================
-      // TWO COLUMN LAYOUT
-      // ========================================
-      
-      let leftX = 20;
-      let rightX = 112;
-      let yPos = 32;
-      
-      // ========== LEFT COLUMN: CLIENT'S DATA ==========
+      doc.text('Treatment Plan & Progress Report:', titleCenterX, titleY, { align: 'center' });
+
+      // Underline
+      const lineY = LOGO_Y + LOGO_H + 5;
+      doc.setLineWidth(0.8);
+      doc.line(10, lineY, pageWidth - 10, lineY);
+
+      // ══════════════════════════════════════════════════════════
+      // INFO BLOCK — 3 columns (spacious layout like Image 2)
+      //
+      //  A: Client's Data   x=12,  width ~85mm
+      //  B: Assessment      x=105, width ~75mm
+      //  C: Mascot+quote    x=168
+      // ══════════════════════════════════════════════════════════
+      const A_X       = 12;
+      const A_LBL_W   = 38;   // wider label col → value starts further right
+      const A_VAL_MAX = 52;   // max wrap width for col A values
+      const B_X       = 105;  // assessment starts at ~half page
+      const B_LBL_W   = 50;   // wider label col B
+      const B_VAL_MAX = 38;   // max wrap width for col B values
+      const C_X       = 168;
+
+      const ROW_H     = 7;    // row height — more breathing room
+      const FONT_LBL  = 9.5;  // label font size
+      const FONT_VAL  = 9.5;  // value font size
+
+      let startY = lineY + 10;
+
+      // — Column headings —
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
-      doc.text("Client's Data:", leftX, yPos);
-      
-      yPos += 7;
-      doc.setFontSize(9);
-      
-      // Client info with better spacing
-      const clientInfo = [
-        ['Patient Name:', patient.name || '-'],
-        ['Phone Number:', patient.phone || '-'],
+      doc.text("Client's Data:",     A_X, startY);
+      doc.text("Rangka Assessment:", B_X, startY);
+
+      let aY = startY + 8;
+      let bY = startY + 8;
+
+      // — Col A: Client rows —
+      const clientRows = [
+        ['Patient Name:',  patient.name  || '-'],
+        ['Phone Number:',  patient.phone || '-'],
         ['Email Address:', patient.email || '-'],
-        ['Age:', patient.date_of_birth ? this.calculateAge(patient.date_of_birth) + ' years' : '-'],
-        ['Height (cm):', patient.height || '-'],
-        ['Weight (kg):', patient.weight || '-']
+        ['Age:',           patient.date_of_birth ? `${this.calculateAge(patient.date_of_birth)} years` : '-'],
+        ['Height (cm):',   patient.height ? String(patient.height) : '-'],
+        ['Weight (kg):',   patient.weight ? String(patient.weight) : '-'],
       ];
-      
-      clientInfo.forEach(([label, value]) => {
+
+      clientRows.forEach(([lbl, val]) => {
+        doc.setFontSize(FONT_LBL);
         doc.setFont('helvetica', 'bold');
-        doc.text(label, leftX, yPos);
+        doc.text(lbl, A_X, aY);
+        doc.setFontSize(FONT_VAL);
         doc.setFont('helvetica', 'normal');
-        doc.text(value, leftX + 32, yPos);
-        yPos += 5.5;
+        const valLines = doc.splitTextToSize(String(val), A_VAL_MAX);
+        valLines.forEach((line, i) => doc.text(line, A_X + A_LBL_W, aY + i * 5));
+        aY += Math.max(ROW_H, valLines.length * 5);
       });
-      
-      // ========== RIGHT COLUMN: RANGKA ASSESSMENT ==========
-      yPos = 32;
 
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text("Rangka Assessment:", rightX, yPos);
-
-      yPos += 7;
-      doc.setFontSize(9);
-
-      // Get first session for assessment data
+      // — Col B: Assessment rows —
       const firstSession = sessions[0] || {};
-
-      const assessmentInfo = [
-        ['Assessment Date:', firstSession.appointment_date ? new Date(firstSession.appointment_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'],
-        ['Assessment Therapist:', firstSession.staff_name || '-'],
-        ['Service Type:', firstSession.service_type || '-'],
-        ['Injury Type:', firstSession.injury_type || '-'],
-        ['Area Concern:', firstSession.area_concern || '-'],
-        ['Diagnosis:', firstSession.diagnosis_result || '-'],
-        ['Range of Motion Impact:', firstSession.range_of_motion_impact || '-'],
-        ['Recovery Goals:', firstSession.recovery_goals || '-'],
-        ['Expected Recovery Time:', firstSession.expected_recovery_time || '-']
+      const assessRows = [
+        ['Assessment Date:',        firstSession.appointment_date
+          ? new Date(firstSession.appointment_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+          : '-'],
+        ['Assessment Therapist:',   firstSession.staff_name              || '-'],
+        ['Service Type:',           firstSession.service_type            || '-'],
+        ['Injury Type:',            firstSession.injury_type             || '-'],
+        ['Area Concern:',           firstSession.area_concern            || '-'],
+        ['Diagnosis:',              firstSession.diagnosis_result        || '-'],
+        ['Range of Motion Impact:', firstSession.range_of_motion_impact  || '-'],
+        ['Recovery Goals:',         firstSession.recovery_goals          || '-'],
+        ['Expected Recovery Time:', firstSession.expected_recovery_time  || '-'],
       ];
 
-      // Maximum width for value text (in mm)
-      const maxValueWidth = 40;
-
-      assessmentInfo.forEach(([label, value]) => {
+      assessRows.forEach(([lbl, val]) => {
+        doc.setFontSize(FONT_LBL);
         doc.setFont('helvetica', 'bold');
-        doc.text(label, rightX, yPos);
-        
+        doc.text(lbl, B_X, bY);
+        doc.setFontSize(FONT_VAL);
         doc.setFont('helvetica', 'normal');
-        
-        // Split text if too long
-        const splitValue = doc.splitTextToSize(value, maxValueWidth);
-        
-        // Print each line
-        splitValue.forEach((line, index) => {
-          doc.text(line, rightX + 42, yPos + (index * 4.5));
-        });
-        
-        // Update yPos based on number of lines
-        yPos += Math.max(5.5, splitValue.length * 4.5);
+        const lines = doc.splitTextToSize(String(val), B_VAL_MAX);
+        lines.forEach((line, i) => doc.text(line, B_X + B_LBL_W, bY + i * 5));
+        bY += Math.max(ROW_H, lines.length * 5);
       });
 
-      yPos = Math.max(yPos, 98);
-      
-      // ========================================
-      // HORIZONTAL LINE BEFORE PROGRESS TABLE
-      // ========================================
-      doc.setLineWidth(0.5);
-      doc.line(20, yPos, pageWidth - 20, yPos);
-      
-      yPos += 6; // Move table UP
-      
-      // ========================================
-      // PROGRESS TABLE SECTION - CENTERED
-      // ========================================
-      
-      // Progress Table Title (centered)
+      // — Col C: Mascot + quote —
+      if (mascotResult) {
+        const MW = 28, MH = 38;
+        const ratio = mascotResult.width / mascotResult.height;
+        let mw = MW, mh = MW / ratio;
+        if (mh > MH) { mh = MH; mw = MH * ratio; }
+        doc.addImage(mascotResult.base64, 'JPEG', C_X, startY, mw, mh);
+
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(80);
+        let qy = startY + mh + 3;
+        ["Stay focused, stay strong.", "We've Got Your Back!"].forEach(line => {
+          doc.text(line, C_X, qy); qy += 4;
+        });
+        doc.setTextColor(0);
+      }
+
+      let yPos = Math.max(aY, bY) + 6;
+
+      // ══════════════════════════════════════════════════════════
+      // HORIZONTAL RULE
+      // ══════════════════════════════════════════════════════════
+      doc.setLineWidth(0.4);
+      doc.line(10, yPos, pageWidth - 10, yPos);
+      yPos += 7;
+
+      // ══════════════════════════════════════════════════════════
+      // PROGRESS TABLE TITLE + LEGEND
+      // ══════════════════════════════════════════════════════════
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.text('The Progress Table', pageWidth / 2, yPos, { align: 'center' });
-      
-      yPos += 5; // Move subtitle DOWN
+      yPos += 5;
+
       doc.setFontSize(8);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(80);
       doc.text('see how you progress over the week', pageWidth / 2, yPos, { align: 'center' });
       doc.setTextColor(0);
-      
-      // Legend (colored dots) - ON RIGHT
-      const legendY = yPos + 4;
+
+      const legendY = yPos + 3;
+      const legendX = pageWidth - 52;
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-      
-      // Legend items - positioned on right side
-      const legendItems = [
-        { color: [255, 77, 77], label: ': Treatment + Rest' },
-        { color: [255, 193, 7], label: ': Treatment + Exercise' },
-        { color: [76, 175, 80], label: ': Back to Sports Preparation' }
-      ];
-      
-      // Position legend on the right side
-      const legendStartX = pageWidth - 50;
-      
-      // Draw legend items on right side
-      legendItems.forEach((item, index) => {
-        const itemY = legendY + (index * 4);
-        
-        // Draw colored dot
+      [
+        { color: [255,77,77],  label: ': Treatment + Rest' },
+        { color: [255,193,7],  label: ': Treatment + Exercise' },
+        { color: [76,175,80],  label: ': Back to Sports Preparation' },
+      ].forEach((item, i) => {
+        const ly = legendY + i * 4;
         doc.setFillColor(...item.color);
-        doc.circle(legendStartX - 3, itemY - 0.5, 1.2, 'F');
-        
-        // Draw text
-        doc.text(item.label, legendStartX, itemY);
+        doc.circle(legendX - 2.5, ly - 0.8, 1.2, 'F');
+        doc.text(item.label, legendX, ly);
       });
-      
-      yPos = legendY + 15;
-      
-      // ========================================
-      // TABLE WITH CENTERED LAYOUT - UPDATED COLUMNS
-      // ========================================
-      
-      const tableHeaders = [
-        'Session\n#',
-        'Session\nDate',
-        'Rangka\nTherapist',
-        'Objective\nProgress',
-        'Home\nExercise',
-        'Recovery\nTips',
-        'Pre-\nTreatment',
-        'Post-\nTreatment'
-      ];
-      
-      const tableData = sessions.map((session, index) => {
-        let formattedDate = '-';
-        if (session.appointment_date) {
-          try {
-            const sessionDate = new Date(session.appointment_date);
-            if (!isNaN(sessionDate.getTime())) {
-              formattedDate = sessionDate.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-              });
-            }
-          } catch (e) {
-            console.warn('Invalid date format:', session.appointment_date);
-          }
-        }
-      
+
+      yPos = legendY + 14;
+
+      // ══════════════════════════════════════════════════════════
+      // PROGRESS TABLE
+      // ══════════════════════════════════════════════════════════
+      const tableData = sessions.map((s, idx) => {
+        let fmtDate = '-';
+        try {
+          const d = new Date(s.appointment_date);
+          if (!isNaN(d.getTime())) fmtDate = d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+        } catch (_) {}
         return [
-          (index + 1).toString(),
-          formattedDate,
-          session.staff_name || '-',
-          session.objective_progress || '-',
-          session.exercise || '-',
-          session.recovery_tips || '-',
-          session.pain_before !== null && session.pain_before !== undefined ? session.pain_before.toString() : '-',
-          session.pain_after !== null && session.pain_after !== undefined ? session.pain_after.toString() : '-'
+          String(idx + 1),
+          fmtDate,
+          s.staff_name         || '-',
+          s.objective_progress || '-',
+          s.exercise           || '-',
+          s.recovery_tips      || '-',
+          s.pain_before != null ? String(s.pain_before) : '-',
+          s.pain_after  != null ? String(s.pain_after)  : '-',
         ];
       });
-      
+
       autoTable(doc, {
         startY: yPos,
-        head: [tableHeaders],
+        head: [[
+          'Session\n#', 'Session\nDate', 'Rangka\nTherapist',
+          'Objective\nProgress', 'Home\nExercise', 'Recovery\nTips',
+          'Pre-\nTreatment', 'Post-\nTreatment',
+        ]],
         body: tableData,
         theme: 'grid',
         styles: {
-          font: 'helvetica',
-          fontSize: 7.5,
-          cellPadding: { top: 3, right: 2, bottom: 3, left: 2 },
-          lineColor: [220, 220, 220],
-          lineWidth: 0.3,
-          overflow: 'linebreak',
-          cellWidth: 'wrap'
+          font: 'helvetica', fontSize: 7.5,
+          cellPadding: { top:3, right:2, bottom:3, left:2 },
+          lineColor: [220,220,220], lineWidth: 0.3, overflow: 'linebreak',
         },
         headStyles: {
-          fillColor: [250, 250, 250],
-          textColor: [0, 0, 0],
-          fontStyle: 'bold',
-          fontSize: 7.5,
-          halign: 'center',
-          valign: 'middle',
-          minCellHeight: 10
+          fillColor:[250,250,250], textColor:[0,0,0], fontStyle:'bold',
+          fontSize:7.5, halign:'center', valign:'middle', minCellHeight:10,
         },
-        bodyStyles: {
-          fontSize: 7,
-          textColor: [40, 40, 40],
-          valign: 'top'
-        },
+        bodyStyles: { fontSize:7, textColor:[40,40,40], valign:'top' },
         columnStyles: {
-          0: { cellWidth: 12, halign: 'center', fontStyle: 'bold' },
-          1: { cellWidth: 20, halign: 'center' },
-          2: { cellWidth: 22, halign: 'left' },
-          3: { cellWidth: 38, halign: 'left' },
-          4: { cellWidth: 32, halign: 'left' },
-          5: { cellWidth: 30, halign: 'left' },
-          6: { cellWidth: 14, halign: 'center', fillColor: [255, 250, 235] },
-          7: { cellWidth: 14, halign: 'center', fillColor: [240, 255, 245] }
+          0: { cellWidth:12, halign:'center', fontStyle:'bold' },
+          1: { cellWidth:20, halign:'center' },
+          2: { cellWidth:22, halign:'left' },
+          3: { cellWidth:38, halign:'left' },
+          4: { cellWidth:32, halign:'left' },
+          5: { cellWidth:30, halign:'left' },
+          6: { cellWidth:14, halign:'center', fillColor:[255,250,235] },
+          7: { cellWidth:14, halign:'center', fillColor:[240,255,245] },
         },
-        margin: { left: 12, right: 12 },
+        margin: { left:12, right:12 },
         tableWidth: 'auto',
         didDrawCell: (data) => {
           if ((data.column.index === 6 || data.column.index === 7) && data.section === 'body') {
-            const cellValue = data.cell.raw;
-            if (cellValue !== '-' && cellValue !== undefined && cellValue !== null) {
-              try {
-                const painValue = parseFloat(cellValue);
-                if (!isNaN(painValue)) {
-                  let color;
-                  if (painValue <= 3) color = [76, 175, 80];
-                  else if (painValue <= 6) color = [255, 193, 7];
-                  else color = [255, 77, 77];
-        
-                  // ✅ Ikut posisi TEKS, bukan tengah cell
-                  const paddingTop = data.cell.padding('top');
-                  const fontSize = 7;
-                  const textY = data.cell.y + paddingTop + (fontSize * 0.352778);
-        
-                  // Horizontal: angka sudah digambar autoTable di center
-                  // Kita tinggal taruh dot di kanannya
-                  const textWidth = doc.getTextWidth(cellValue.toString());
-                  const circleX = data.cell.x + (data.cell.width / 2) + (textWidth / 2) + 2.5;
-                  const circleY = textY - (fontSize * 0.352778) / 2; // ✅ sejajar tengah angka
-        
-                  doc.setFillColor(...color);
-                  doc.circle(circleX, circleY, 1.1, 'F');
-                }
-              } catch (e) {
-                console.warn('Error parsing pain value:', cellValue);
-              }
-            }
+            const cv = data.cell.raw;
+            if (cv === '-' || cv == null) return;
+            const v = parseFloat(cv);
+            if (isNaN(v)) return;
+            const color = v <= 3 ? [76,175,80] : v <= 6 ? [255,193,7] : [255,77,77];
+            const pt  = data.cell.padding('top');
+            const fs  = 7;
+            const ty  = data.cell.y + pt + fs * 0.352778;
+            const tw  = doc.getTextWidth(String(cv));
+            const cx  = data.cell.x + data.cell.width / 2 + tw / 2 + 2.5;
+            const cy  = ty - (fs * 0.352778) / 2;
+            doc.setFillColor(...color);
+            doc.circle(cx, cy, 1.1, 'F');
           }
         },
-        didDrawPage: (data) => {
-          // No footer
-        }
       });
-      
-      // ========================================
-      // BODY ANNOTATION IMAGES - AFTER TABLE
-      // ✅ UPDATED: Uses base64 images from backend
-      // ========================================
-      
+
+      // ══════════════════════════════════════════════════════════
+      // BODY ANNOTATION IMAGES
+      // ══════════════════════════════════════════════════════════
       yPos = doc.lastAutoTable.finalY + 15;
-      
-      // Process each session's body annotation
-      for (let index = 0; index < sessions.length; index++) {
-        const session = sessions[index];
-        
-        // ✅ USE BASE64 IMAGE FROM BACKEND (No CORS issues!)
-        const imageData = session.body_annotation_base64 || session.body_annotation_url;
-        
-        console.log(`Session ${index + 1}:`, {
-          hasBase64: !!session.body_annotation_base64,
-          hasUrl: !!session.body_annotation_url,
-          imageDataLength: imageData ? imageData.length : 0
-        });
-        
-        if (imageData && imageData.trim() !== '') {
-          try {
-            // Check if we need a new page for the image
-            if (yPos > pageHeight - 80) {
-              doc.addPage();
-              yPos = 20;
-            }
-            
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text(`Session ${index + 1} - Body Annotation:`, 20, yPos);
-            yPos += 7;
-            
-            // Check if it's base64 or URL
-            const isBase64 = imageData.startsWith('data:image');
-            
-            if (isBase64) {
-              // ✅ DIRECT USE - Base64 image (recommended)
-              console.log(`✅ Using base64 image for session ${index + 1}`);
-              
-              // Calculate image dimensions (default size)
-              const maxWidth = 120;
-              const maxHeight = 100;
-              
-              // For base64, we use default dimensions
-              const imgWidth = maxWidth;
-              const imgHeight = maxHeight;
-              
-              // Center the image
-              const imgX = (pageWidth - imgWidth) / 2;
-              
-              console.log(`Adding base64 image to PDF: ${imgWidth}x${imgHeight} at position (${imgX}, ${yPos})`);
-              
-              // Add base64 image directly to PDF
-              doc.addImage(
-                imageData,
-                'JPEG',
-                imgX,
-                yPos,
-                imgWidth,
-                imgHeight,
-                undefined,
-                'FAST'
-              );
-              
-              yPos += imgHeight + 10;
-              
-            } else {
-              // ⚠️ FALLBACK - URL image (might have CORS issues)
-              console.warn(`⚠️ Falling back to URL image for session ${index + 1} (CORS might fail)`);
-              
-              const img = await new Promise((resolve, reject) => {
-                const image = new window.Image();
-                image.crossOrigin = 'Anonymous';
-                
-                image.onload = () => {
-                  console.log(`URL image loaded successfully for session ${index + 1}`);
-                  resolve(image);
-                };
-                image.onerror = (err) => {
-                  console.error(`Failed to load URL image for session ${index + 1}:`, err);
-                  reject(new Error('Failed to load image - CORS blocked or image not found'));
-                };
-                
-                image.src = imageData;
-              });
-              
-              // Calculate image dimensions
-              const maxWidth = 120;
-              const maxHeight = 100;
-              
-              let imgWidth = maxWidth;
-              let imgHeight = (img.height * maxWidth) / img.width;
-              
-              if (imgHeight > maxHeight) {
-                imgHeight = maxHeight;
-                imgWidth = (img.width * maxHeight) / img.height;
-              }
-              
-              // Center the image
-              const imgX = (pageWidth - imgWidth) / 2;
-              
-              console.log(`Adding URL image to PDF: ${imgWidth}x${imgHeight} at position (${imgX}, ${yPos})`);
-              
-              doc.addImage(
-                img,
-                'JPEG',
-                imgX,
-                yPos,
-                imgWidth,
-                imgHeight,
-                undefined,
-                'FAST'
-              );
-              
-              yPos += imgHeight + 10;
-            }
-            
-          } catch (error) {
-            console.error(`❌ Error loading body annotation image for session ${index + 1}:`, error);
-            
-            doc.setFont('helvetica', 'italic');
-            doc.setFontSize(8);
-            doc.setTextColor(150, 150, 150);
-            doc.text('(Body annotation image unavailable - CORS blocked or image not found)', 20, yPos);
-            doc.setTextColor(0, 0, 0);
-            yPos += 10;
+
+      for (let i = 0; i < sessions.length; i++) {
+        const imageData = sessions[i].body_annotation_base64 || sessions[i].body_annotation_url;
+        if (!imageData || !imageData.trim()) continue;
+
+        try {
+          if (yPos > pageHeight - 80) { doc.addPage(); yPos = 20; }
+
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.text(`Session ${i + 1} - Body Annotation:`, 20, yPos);
+          yPos += 7;
+
+          if (imageData.startsWith('data:image')) {
+            const imgX = (pageWidth - 120) / 2;
+            doc.addImage(imageData, 'JPEG', imgX, yPos, 120, 100, undefined, 'FAST');
+            yPos += 110;
+          } else {
+            const img = await new Promise((res, rej) => {
+              const el = new window.Image();
+              el.crossOrigin = 'Anonymous';
+              el.onload  = () => res(el);
+              el.onerror = () => rej(new Error('load failed'));
+              el.src = imageData;
+            });
+            let iw = 120, ih = (img.height * 120) / img.width;
+            if (ih > 100) { ih = 100; iw = (img.width * 100) / img.height; }
+            doc.addImage(img, 'JPEG', (pageWidth - iw) / 2, yPos, iw, ih, undefined, 'FAST');
+            yPos += ih + 10;
           }
-        } else {
-          // No body_annotation data for this session
-          console.log(`Session ${index + 1}: No body annotation image found`);
+        } catch (err) {
+          doc.setFontSize(8); doc.setFont('helvetica','italic'); doc.setTextColor(150,150,150);
+          doc.text('(Body annotation image unavailable)', 20, yPos);
+          doc.setTextColor(0); yPos += 10;
         }
       }
-      
-      // Save PDF
-      const safeName = patient.name ? patient.name.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-') : 'patient';
-      const fileName = `progress-report-${patient.patient_code || safeName}-${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
-      
-      return { success: true, fileName };
-      
+
+      // ── Save ──────────────────────────────────────────────────
+      const safeName = (patient.name || 'patient').replace(/[^a-zA-Z0-9\s-]/g,'').replace(/\s+/g,'-');
+      doc.save(`progress-report-${patient.patient_code || safeName}-${new Date().toISOString().split('T')[0]}.pdf`);
+      return { success: true };
+
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      
-      // Re-throw with user-friendly message
-      if (error.message) {
-        throw error;
-      } else {
-        throw new Error('Failed to generate PDF report. Please try again.');
-      }
+      console.error('Error generating PDF:', error);
+      if (error.message) throw error;
+      throw new Error('Failed to generate PDF report. Please try again.');
     }
   }
 }
