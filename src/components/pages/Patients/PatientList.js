@@ -7,6 +7,10 @@ import { Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import PatientModel from 'models/PatientModel';
 import MedicalHistoryModel from 'models/MedicalHistoryModel';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import LogoRangka from 'assets/img/Logo_rangka.png';
+import Mascot from 'assets/img/Mascot.png';
 
 import moment from 'moment';
 import create from 'zustand';
@@ -80,7 +84,236 @@ const PatientList = () => {
     try {
       message.loading({ content: 'Generating PDF report...', key: 'pdf-gen', duration: 0 });
 
-      await MedicalHistoryModel.generateProgressPDF(patientId);
+      // 1. Fetch report data
+      const response = await MedicalHistoryModel.getProgressReport(patientId);
+      const reportData = response?.data;
+      if (!reportData) throw new Error('Failed to load patient data');
+      if (!reportData.sessions || reportData.sessions.length === 0) throw new Error('No medical history records found for this patient');
+
+      const { patient, sessions } = reportData;
+      const firstSession = sessions[0] || {};
+
+      // helper
+      const fmtDate = (dateStr) => {
+        if (!dateStr) return '-';
+        try {
+          const d = new Date(dateStr);
+          if (isNaN(d.getTime())) return '-';
+          return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        } catch { return '-'; }
+      };
+      const calcAge = (dob) => {
+        if (!dob) return 'N/A';
+        const d = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - d.getFullYear();
+        const m = today.getMonth() - d.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+        return age;
+      };
+      const painColor = (val) => {
+        const v = parseFloat(val);
+        if (isNaN(v)) return null;
+        if (v <= 3) return '#4caf50';
+        if (v <= 6) return '#ffc107';
+        return '#ff4d4f';
+      };
+
+      // 2. Build hidden paper element — same HTML as PatientDetail
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:820px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;box-sizing:border-box;';
+      wrapper.innerHTML = `
+        <div id="pdf-paper-tmp" style="background:#fff;width:820px;padding:18px 24px 28px;box-sizing:border-box;">
+          <!-- ROW 1: Logo + Title -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+            <img src="${LogoRangka}" alt="Rangka" style="width:110px;object-fit:contain;flex-shrink:0;" crossorigin="anonymous" />
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:#111;line-height:1.2;">Treatment Plan &amp; Progress Report</div>
+            </div>
+          </div>
+          <div style="height:1px;background:#111;margin:3px 0 10px;"></div>
+
+          <!-- ROW 2: 3 columns -->
+          <div style="display:flex;gap:0;margin-bottom:10px;align-items:flex-start;">
+            <!-- Col 1 Client Data -->
+            <div style="flex:0 0 28%;padding-right:12px;">
+              <div style="font-size:10px;font-weight:700;color:#111;margin-bottom:4px;">Client's Data:</div>
+              <table style="border-collapse:collapse;width:100%;">
+                <tbody>
+                  ${[
+                    ['Patient Name:', patient.name],
+                    ['Phone Number:', patient.phone],
+                    ['Email Address:', patient.email],
+                    ['Age:', patient.date_of_birth ? calcAge(patient.date_of_birth) + ' years' : null],
+                    ['Height (cm):', patient.height],
+                    ['Weight (kg):', patient.weight],
+                  ].map(([lbl, val]) => `
+                    <tr>
+                      <td style="font-weight:700;font-size:9px;color:#111;padding:2.5px 8px 2.5px 0;vertical-align:top;white-space:nowrap;line-height:1.5;">${lbl}</td>
+                      <td style="font-size:9px;color:#333;padding:2.5px 0;vertical-align:top;line-height:1.5;word-break:break-word;">${val || '-'}</td>
+                    </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Col 2 Assessment -->
+            <div style="flex:0 0 47%;padding-right:12px;padding-left:12px;">
+              <div style="font-size:10px;font-weight:700;color:#111;margin-bottom:4px;">Rangka Assessment:</div>
+              <table style="border-collapse:collapse;width:100%;">
+                <tbody>
+                  ${[
+                    ['Assessment Date:', fmtDate(firstSession.appointment_date)],
+                    ['Assessment Therapist:', firstSession.staff_name],
+                    ['Service Type:', firstSession.service_type],
+                    ['Injury Type:', firstSession.injury_type],
+                    ['Area Concern:', firstSession.area_concern],
+                    ['Diagnosis:', firstSession.diagnosis_result],
+                    ['Range of Motion Impact:', firstSession.range_of_motion_impact],
+                    ['Recovery Goals:', firstSession.recovery_goals],
+                    ['Expected Recovery Time:', firstSession.expected_recovery_time],
+                  ].map(([lbl, val]) => `
+                    <tr>
+                      <td style="font-weight:700;font-size:9px;color:#111;padding:2.5px 8px 2.5px 0;vertical-align:top;white-space:nowrap;line-height:1.5;">${lbl}</td>
+                      <td style="font-size:9px;color:#333;padding:2.5px 0;vertical-align:top;line-height:1.5;word-break:break-word;">${val || '-'}</td>
+                    </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Col 3 Mascot -->
+            <div style="flex:0 0 25%;display:flex;flex-direction:column;align-items:center;padding-left:8px;">
+              <img src="${Mascot}" alt="Mascot" style="width:100%;max-width:100px;object-fit:contain;" crossorigin="anonymous" />
+              <div style="margin-top:6px;font-size:8px;font-style:italic;color:#666;text-align:center;line-height:1.5;">Stay focused, stay strong.<br/>We've Got Your Back!</div>
+            </div>
+          </div>
+
+          <!-- DIVIDER -->
+          <div style="height:1px;background:#bbb;margin:6px 0 12px;"></div>
+
+          <!-- TABLE TITLE -->
+          <div style="text-align:center;margin-bottom:5px;">
+            <div style="font-size:17px;font-weight:700;color:#111;">The Progress Table</div>
+            <div style="font-size:8px;color:#777;font-style:italic;margin-top:1px;">see how you progress over the week</div>
+          </div>
+
+          <!-- LEGEND -->
+          <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:6px;flex-wrap:wrap;">
+            ${[['#ff4d4f',': Treatment + Rest'],['#ffc107',': Treatment + Exercise'],['#4caf50',': Back to Sports Preparation']].map(([c,l]) =>
+              `<div style="display:flex;align-items:center;gap:4px;font-size:8px;color:#444;">
+                <span style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block;flex-shrink:0;"></span>
+                <span>${l}</span>
+              </div>`).join('')}
+          </div>
+
+          <!-- TABLE -->
+          <div style="width:100%;margin-bottom:18px;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;font-size:8px;table-layout:fixed;">
+              <colgroup>
+                <col style="width:28px"/><col style="width:52px"/><col style="width:65px"/>
+                <col style="width:120px"/><col style="width:100px"/><col style="width:100px"/>
+                <col style="width:40px"/><col style="width:40px"/>
+              </colgroup>
+              <thead>
+                <tr>
+                  ${[['Session<br/>#','#fafafa'],['Session<br/>Date','#fafafa'],['Rangka<br/>Therapist','#fafafa'],['Objective<br/>Progress','#fafafa'],['Home<br/>Exercise','#fafafa'],['Recovery<br/>Tips','#fafafa'],['Pre-<br/>Treatment','#fffbee'],['Post-<br/>Treatment','#f0fff4']]
+                    .map(([lbl,bg]) => `<th style="border:0.5px solid #ccc;padding:5px 3px;font-size:8px;font-weight:700;text-align:center;vertical-align:middle;color:#111;line-height:1.3;background:${bg};overflow:hidden;word-break:break-word;">${lbl}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${sessions.map((s, i) => {
+                  const pb = s.pain_before != null ? s.pain_before.toString() : '-';
+                  const pa = s.pain_after != null ? s.pain_after.toString() : '-';
+                  const pbColor = painColor(pb);
+                  const paColor = painColor(pa);
+                  return `<tr>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;font-weight:700;background:#fafafa;vertical-align:top;">${i+1}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;vertical-align:top;color:#333;">${fmtDate(s.appointment_date)}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.staff_name||'-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.objective_progress||'-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.exercise||'-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.recovery_tips||'-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;background:#fffbee;vertical-align:top;">
+                      <span style="display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:9px;color:#111;">
+                        ${pb}${pbColor ? `<span style="width:7px;height:7px;border-radius:50%;background:${pbColor};display:inline-block;flex-shrink:0;"></span>` : ''}
+                      </span>
+                    </td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;background:#f0fff4;vertical-align:top;">
+                      <span style="display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:9px;color:#111;">
+                        ${pa}${paColor ? `<span style="width:7px;height:7px;border-radius:50%;background:${paColor};display:inline-block;flex-shrink:0;"></span>` : ''}
+                      </span>
+                    </td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- BODY ANNOTATIONS -->
+          ${sessions.map((s, i) => {
+            const img = s.body_annotation_base64 || s.body_annotation_url;
+            if (!img || !img.trim()) return '';
+            return `<div style="margin-bottom:18px;">
+              <div style="font-size:9px;font-weight:700;color:#111;margin-bottom:6px;">Session ${i+1} - Body Annotation:</div>
+              <div style="text-align:center;">
+                <img src="${img}" alt="body annotation" crossorigin="anonymous" style="max-width:280px;width:100%;display:block;margin:0 auto;" />
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      `;
+
+      document.body.appendChild(wrapper);
+
+      // 3. Wait for images to load
+      await document.fonts.ready;
+      const imgs = wrapper.querySelectorAll('img');
+      await Promise.all(Array.from(imgs).map(img =>
+        img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })
+      ));
+
+      // 4. html2canvas — same settings as PatientDetail
+      const paperEl = wrapper.querySelector('#pdf-paper-tmp');
+      const canvas = await html2canvas(paperEl, {
+        scale: 2.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        imageTimeout: 0,
+        removeContainer: true,
+        letterRendering: true,
+        foreignObjectRendering: false,
+      });
+
+      document.body.removeChild(wrapper);
+
+      // 5. Save PDF — same as PatientDetail
+      const pdf   = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 8;
+      const printW = pageW - margin * 2;
+      const ratio  = canvas.height / canvas.width;
+      const printH = printW * ratio;
+
+      let yOffset = 0;
+      let remainH = printH;
+      while (remainH > 0) {
+        if (yOffset > 0) pdf.addPage();
+        const sliceH = Math.min(pageH - margin * 2, remainH);
+        const srcY   = (yOffset / printH) * canvas.height;
+        const srcH   = (sliceH / printH) * canvas.height;
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width  = canvas.width;
+        sliceCanvas.height = Math.round(srcH);
+        sliceCanvas.getContext('2d').drawImage(canvas, 0, Math.round(srcY), canvas.width, Math.round(srcH), 0, 0, canvas.width, Math.round(srcH));
+        pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.97), 'JPEG', margin, margin, printW, sliceH);
+        yOffset += sliceH;
+        remainH -= sliceH;
+      }
+
+      const safeName = (patient.name || 'patient').replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-');
+      pdf.save(`progress-report-${patient.patient_code || safeName}-${new Date().toISOString().split('T')[0]}.pdf`);
 
       message.success({
         content: `Progress report for ${patientName} (${patientCode}) downloaded successfully!`,
@@ -89,19 +322,13 @@ const PatientList = () => {
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
-
       let errorMsg = 'Failed to generate PDF report';
-      if (error.message.includes('No medical history')) {
+      if (error.message?.includes('No medical history')) {
         errorMsg = 'No medical history records found for this patient';
       } else if (error.message) {
         errorMsg = error.message;
       }
-
-      message.error({
-        content: errorMsg,
-        key: 'pdf-gen',
-        duration: 5
-      });
+      message.error({ content: errorMsg, key: 'pdf-gen', duration: 5 });
     }
   };
 

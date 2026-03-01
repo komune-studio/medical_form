@@ -360,7 +360,9 @@ export default function MedicalHistoryFormPage({
         pain_before: medicalHistoryData.pain_before || '',
         pain_after: medicalHistoryData.pain_after || '',
         range_of_motion_impact: medicalHistoryData.range_of_motion_impact || '',
-        treatments: medicalHistoryData.treatments || '',
+       treatments: medicalHistoryData.treatments 
+  ? medicalHistoryData.treatments.split(',').map(t => t.trim()).filter(Boolean)
+  : [],
         exercise: medicalHistoryData.exercise || '',
         homework: medicalHistoryData.homework || '',
         recovery_tips: medicalHistoryData.recovery_tips || '',
@@ -1084,6 +1086,7 @@ export default function MedicalHistoryFormPage({
                         <Select
                           className="medical-history-select"
                           placeholder="Select treatment"
+                          mode = "multiple"
                           allowClear
                         >
                           {TREATMENT_OPTIONS.map(treatment => (
