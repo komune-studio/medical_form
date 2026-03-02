@@ -87,9 +87,12 @@ const BodyAnnotation = forwardRef(({
 
   useImperativeHandle(ref, () => ({
     getLocalFile: () => localFile,
+    // hasLocalFile: only true if user uploaded a CUSTOM image (not default template)
     hasLocalFile: () => !!localFile,
     getImageUrl: () => imageUrl,
     clearLocalFile: () => setLocalFile(null),
+    // isDefaultTemplate: true if using body.jpg with no user changes
+    isDefaultTemplate: () => imageUrl === defaultBodyImage,
     setUploadedImageUrl: (url) => {
       setImageUrl(url);
       setLocalFile(null);
@@ -102,7 +105,15 @@ const BodyAnnotation = forwardRef(({
       }
       return canvas.toDataURL('image/jpeg', 0.9);
     },
-    hasAnnotations: () => elements.length > 0
+    // hasAnnotations: only true if user actually drew something
+    hasAnnotations: () => elements.length > 0,
+    // needsUpload: true only if there is something worth uploading
+    // (custom file OR default template WITH drawings on top)
+    needsUpload: () => {
+      if (localFile) return true; // custom image uploaded
+      if (elements.length > 0) return true; // drew something on default template
+      return false; // default template, untouched — skip upload
+    }
   }));
 
   useEffect(() => {
@@ -125,16 +136,51 @@ const BodyAnnotation = forwardRef(({
   }, [value]);
 
   useEffect(() => {
-    if (imageUrl && canvasRef.current) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        setBackgroundImage(img);
+    if (!imageUrl) return;
+
+    let isCancelled = false; // prevent setState on unmounted component
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = () => {
+      if (isCancelled) return; // component unmounted, skip
+      if (!canvasRef.current) return; // canvas not in DOM yet, skip
+
+      setBackgroundImage(img);
+      const canvas = canvasRef.current;
+      // Safe parentElement check
+      const maxWidth = (canvas.parentElement ? canvas.parentElement.offsetWidth : 0) || 700;
+      const maxHeight = 600;
+      let width = img.width;
+      let height = img.height;
+      if (width > maxWidth) {
+        height = (maxWidth / width) * height;
+        width = maxWidth;
+      }
+      if (height > maxHeight) {
+        width = (maxHeight / height) * width;
+        height = maxHeight;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      redrawCanvas(elements, img, selectedElementIndex);
+      setCanvasInitialized(true);
+    };
+
+    img.onerror = () => {
+      if (isCancelled) return;
+      // If CORS fails, retry without crossOrigin (for viewing only, export will be tainted)
+      console.warn('Image load failed with CORS, retrying without crossOrigin...');
+      const imgFallback = new Image();
+      imgFallback.onload = () => {
+        if (isCancelled || !canvasRef.current) return;
+        setBackgroundImage(imgFallback);
         const canvas = canvasRef.current;
-        const maxWidth = canvas.parentElement.offsetWidth || 700;
+        const maxWidth = (canvas.parentElement ? canvas.parentElement.offsetWidth : 0) || 700;
         const maxHeight = 600;
-        let width = img.width;
-        let height = img.height;
+        let width = imgFallback.width;
+        let height = imgFallback.height;
         if (width > maxWidth) {
           height = (maxWidth / width) * height;
           width = maxWidth;
@@ -145,11 +191,18 @@ const BodyAnnotation = forwardRef(({
         }
         canvas.width = width;
         canvas.height = height;
-        redrawCanvas(elements, img, selectedElementIndex);
+        redrawCanvas(elements, imgFallback, selectedElementIndex);
         setCanvasInitialized(true);
       };
-      img.src = imageUrl;
-    }
+      imgFallback.src = imageUrl;
+    };
+
+    img.src = imageUrl;
+
+    // Cleanup: cancel setState when imageUrl changes or component unmounts
+    return () => {
+      isCancelled = true;
+    };
   }, [imageUrl]);
 
   useEffect(() => {

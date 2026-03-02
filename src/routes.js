@@ -11,11 +11,18 @@ import PatientDetail from "components/pages/Patients/PatientDetail";
 import MedicalHistoryList from "components/pages/MedicalHistory/MedicalHistoryList";
 import MedicalHistoryCreate from "components/pages/MedicalHistory/MedicalHistoryCreate";
 import MedicalHistoryEdit from "components/pages/MedicalHistory/MedicalHistoryEdit";
-
-
+import FormPage from "components/pages/Form/FormPage"; // ← TAMBAH INI
 
 var routes = [
-    
+
+    // ─── FORM (dengan auth, tanpa sidebar) ───────────────────────────────────
+    {
+        path: "/form",
+        name: "Medical Form",
+        component: FormPage,
+        layout: "/admin",
+    },
+
     // PATIENTS
     {
         path: "/patients/create",
@@ -81,7 +88,6 @@ var routes = [
         component: StaffList,
         layout: "/admin",
     },
-    
     
     // USERS
     {

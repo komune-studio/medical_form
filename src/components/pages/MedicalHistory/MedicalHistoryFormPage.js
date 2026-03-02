@@ -27,7 +27,6 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
-// Helper function untuk convert base64 ke Blob
 function dataURLtoBlob(dataurl) {
   const arr = dataurl.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -40,7 +39,6 @@ function dataURLtoBlob(dataurl) {
   return new Blob([u8arr], {type:mime});
 }
 
-// Treatment options
 const TREATMENT_OPTIONS = [
   'Tens',
   'Ultrasound',
@@ -50,7 +48,6 @@ const TREATMENT_OPTIONS = [
   'Ice'
 ];
 
-// Recommended next session options
 const NEXT_SESSION_OPTIONS = [
   'This week',
   'Next Week',
@@ -59,7 +56,6 @@ const NEXT_SESSION_OPTIONS = [
   'Try pilates session'
 ];
 
-// Injury Type Options
 const INJURY_TYPE_OPTIONS = [
   'Acute Injury',
   'Chronic Injury',
@@ -70,9 +66,7 @@ const INJURY_TYPE_OPTIONS = [
   'Other'
 ];
 
-// Custom styles matching the design
 const customStyles = `
-  /* Custom styling untuk Select dropdown */
   .medical-history-select .ant-select-selector {
     background-color: #FFFFFF !important;
     border: 1px solid #d9d9d9 !important;
@@ -97,18 +91,15 @@ const customStyles = `
     color: rgba(0, 0, 0, 0.25) !important;
   }
   
-  /* Hover state */
   .medical-history-select .ant-select-selector:hover {
     border-color: #666666 !important;
   }
   
-  /* Focus state */
   .medical-history-select.ant-select-focused .ant-select-selector {
     border-color: #000000 !important;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
   }
   
-  /* Dropdown menu styling */
   .medical-history-select .ant-select-dropdown {
     background-color: #FFFFFF !important;
     border: 1px solid #d9d9d9 !important;
@@ -140,7 +131,6 @@ const customStyles = `
     background-color: #f5f5f5 !important;
   }
   
-  /* Native DateTime Input styling */
   .native-datetime-input {
     width: 100%;
     background-color: #FFFFFF !important;
@@ -170,7 +160,6 @@ const customStyles = `
     cursor: not-allowed !important;
   }
   
-  /* InputNumber styling */
   .pain-level-input .ant-input-number {
     width: 100% !important;
     background-color: #FFFFFF !important;
@@ -185,14 +174,12 @@ const customStyles = `
     font-size: 14px !important;
   }
   
-  /* Readonly fields */
   .readonly-field .ant-input {
     background-color: #fafafa !important;
     color: #666666 !important;
     cursor: not-allowed !important;
   }
   
-  /* TextArea styling */
   .medical-history-textarea .ant-input {
     min-height: 80px !important;
     resize: vertical !important;
@@ -208,12 +195,10 @@ const customStyles = `
     color: rgba(0, 0, 0, 0.4) !important;
   }
   
-  /* Patient select specific */
   .patient-select .ant-select-selector {
     height: 40px !important;
   }
   
-  /* Tablet responsive */
   @media (min-width: 768px) and (max-width: 1024px) {
     .medical-history-form-item {
       margin-bottom: 14px !important;
@@ -280,22 +265,17 @@ export default function MedicalHistoryFormPage({
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [appointmentDateTime, setAppointmentDateTime] = useState('');
   
-  // Staff state
   const [staffList, setStaffList] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
   
-  // Body Annotation ref
   const bodyAnnotationRef = useRef(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  // Fetch staff data
   useEffect(() => {
     const fetchStaff = async () => {
       try {
         setStaffLoading(true);
         const response = await StaffModel.getActiveStaff();
-        console.log('Staff response:', response);
-        
         if (response && response.http_code === 200) {
           setStaffList(Array.isArray(response.data) ? response.data : []);
         } else if (Array.isArray(response.data)) {
@@ -308,11 +288,9 @@ export default function MedicalHistoryFormPage({
         setStaffLoading(false);
       }
     };
-
     fetchStaff();
   }, []);
 
-  // Fetch patients for dropdown
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -328,19 +306,12 @@ export default function MedicalHistoryFormPage({
         setPatientsLoading(false);
       }
     };
-
     fetchPatients();
   }, []);
 
-  // Initialize form data
   useEffect(() => {
-    console.log('MedicalHistoryFormPage useEffect triggered with medicalHistoryData:', medicalHistoryData);
-    
     if (medicalHistoryData) {
-      console.log('Setting form values for medical history:', medicalHistoryData);
-      
       let dateTimeValue = '';
-      
       if (medicalHistoryData.appointment_date) {
         const momentDate = moment(medicalHistoryData.appointment_date);
         dateTimeValue = momentDate.format('YYYY-MM-DDTHH:mm');
@@ -355,14 +326,14 @@ export default function MedicalHistoryFormPage({
         area_concern: medicalHistoryData.area_concern || '',
         diagnosis_result: medicalHistoryData.diagnosis_result || '',
         expected_recovery_time: medicalHistoryData.expected_recovery_time || '',
-        recovery_goals: medicalHistoryData.recovery_goals || '', // BARU
+        recovery_goals: medicalHistoryData.recovery_goals || '',
         objective_progress: medicalHistoryData.objective_progress || '',
         pain_before: medicalHistoryData.pain_before || '',
         pain_after: medicalHistoryData.pain_after || '',
         range_of_motion_impact: medicalHistoryData.range_of_motion_impact || '',
-       treatments: medicalHistoryData.treatments 
-  ? medicalHistoryData.treatments.split(',').map(t => t.trim()).filter(Boolean)
-  : [],
+        treatments: medicalHistoryData.treatments
+          ? medicalHistoryData.treatments.split(',').map(t => t.trim()).filter(Boolean)
+          : [],
         exercise: medicalHistoryData.exercise || '',
         homework: medicalHistoryData.homework || '',
         recovery_tips: medicalHistoryData.recovery_tips || '',
@@ -370,12 +341,9 @@ export default function MedicalHistoryFormPage({
         body_annotation: medicalHistoryData.body_annotation || '',
       };
       
-      console.log('Form values to set:', formValues);
-      console.log('DateTime value:', dateTimeValue);
       form.setFieldsValue(formValues);
       setHasChanges(false);
     } else {
-      console.log('Resetting form for new medical history');
       form.resetFields();
       setAppointmentDateTime('');
       setHasChanges(false);
@@ -390,9 +358,7 @@ export default function MedicalHistoryFormPage({
     if (!medicalHistoryData) {
       const changed = Object.keys(allValues).some(key => {
         const value = allValues[key];
-        if (value && value.toString().trim() !== '') {
-          return true;
-        }
+        if (value && value.toString().trim() !== '') return true;
         return false;
       }) || appointmentDateTime !== '';
       setHasChanges(changed);
@@ -402,11 +368,9 @@ export default function MedicalHistoryFormPage({
     const changed = Object.keys(allValues).some(key => {
       const currentValue = allValues[key];
       const originalValue = medicalHistoryData[key];
-      
       if (Array.isArray(currentValue) || Array.isArray(originalValue)) {
         return JSON.stringify(currentValue) !== JSON.stringify(originalValue);
       }
-      
       return currentValue !== originalValue;
     });
     
@@ -414,18 +378,14 @@ export default function MedicalHistoryFormPage({
   };
 
   const handleDateTimeChange = (e) => {
-    const value = e.target.value;
-    console.log('DateTime changed to:', value);
-    setAppointmentDateTime(value);
+    setAppointmentDateTime(e.target.value);
     setHasChanges(true);
   };
 
   const onSubmit = async () => {
-    console.log('Form submitted');
     setLoadingSubmit(true);
     
     try {
-      // Validate datetime first
       if (!appointmentDateTime) {
         throw new Error('Appointment date and time is required');
       }
@@ -433,46 +393,47 @@ export default function MedicalHistoryFormPage({
       await form.validateFields();
       
       let body = form.getFieldsValue();
-      console.log('Form data before processing:', body);
-      
-      // Upload gambar + annotation
+
+      // ─── UPLOAD LOGIC (FIXED) ────────────────────────────────────────────────
+      // needsUpload() = true hanya kalau:
+      //   1. User upload custom image (hasLocalFile)
+      //   2. User gambar sesuatu di atas template (hasAnnotations)
+      // Default template yang belum dicoret → skip upload, body_annotation = null
       if (bodyAnnotationRef.current) {
-        const hasLocalFile = bodyAnnotationRef.current.hasLocalFile();
-        const hasAnnotations = bodyAnnotationRef.current.hasAnnotations();
-        
-        if (hasLocalFile || hasAnnotations) {
+        const ref = bodyAnnotationRef.current;
+
+        const needsUpload = typeof ref.needsUpload === 'function'
+          ? ref.needsUpload()
+          : (ref.hasLocalFile() || ref.hasAnnotations());
+
+        if (needsUpload) {
           try {
             setUploadingImage(true);
             message.loading({ content: 'Processing anatomy image...', key: 'uploadImage', duration: 0 });
-            
+
             let fileToUpload;
-            
+            const hasAnnotations = ref.hasAnnotations();
+            const hasLocalFile = ref.hasLocalFile();
+
             if (hasAnnotations) {
-              const imageDataUrl = bodyAnnotationRef.current.exportAsImage();
-              
+              const imageDataUrl = ref.exportAsImage();
               if (imageDataUrl) {
                 const blob = dataURLtoBlob(imageDataUrl);
-                const fileName = hasLocalFile ? bodyAnnotationRef.current.getLocalFile().name : 'body-annotation.jpg';
+                const fileName = hasLocalFile ? ref.getLocalFile().name : 'body-annotation.jpg';
                 fileToUpload = new File([blob], fileName, { type: 'image/jpeg' });
               }
-            } 
-            else if (hasLocalFile) {
-              fileToUpload = bodyAnnotationRef.current.getLocalFile();
+            } else if (hasLocalFile) {
+              fileToUpload = ref.getLocalFile();
             }
-            
+
             if (fileToUpload) {
-              console.log('Uploading image with annotations:', fileToUpload.name);
-              
+              console.log('Uploading image:', fileToUpload.name);
               const uploadedUrl = await UploadService.uploadAnatomyImage(fileToUpload);
-              console.log('Image uploaded successfully:', uploadedUrl);
-              
+              console.log('Uploaded:', uploadedUrl);
               message.success({ content: 'Image uploaded!', key: 'uploadImage', duration: 2 });
-              
-              bodyAnnotationRef.current.setUploadedImageUrl(uploadedUrl);
-              
+              ref.setUploadedImageUrl(uploadedUrl);
               body.body_annotation = uploadedUrl;
             }
-            
           } catch (uploadError) {
             message.error({ content: 'Failed to upload image', key: 'uploadImage' });
             throw new Error('Image upload failed: ' + uploadError.message);
@@ -480,35 +441,34 @@ export default function MedicalHistoryFormPage({
             setUploadingImage(false);
           }
         } else {
+          // Tidak perlu upload
           if (body.body_annotation) {
             try {
               const parsed = JSON.parse(body.body_annotation);
               body.body_annotation = parsed.imageUrl || body.body_annotation;
             } catch (e) {
-              console.log('body_annotation is already a string URL');
+              // sudah plain URL string, biarkan apa adanya
             }
+          } else {
+            // Default template belum dicoret → jangan simpan
+            body.body_annotation = null;
           }
         }
       }
-      
-      // Convert datetime-local value to ISO string
+      // ─────────────────────────────────────────────────────────────────────────
+
       const appointmentMoment = moment(appointmentDateTime);
       if (!appointmentMoment.isValid()) {
         throw new Error('Invalid appointment date and time');
       }
-      
       body.appointment_date = appointmentMoment.toISOString();
-      console.log('Final appointment datetime:', body.appointment_date);
 
-      // Convert staff_id to integer
       if (body.staff_id !== undefined && body.staff_id !== null && body.staff_id !== '') {
         body.staff_id = parseInt(body.staff_id);
-        console.log('Converted staff_id to integer:', body.staff_id);
       } else {
         body.staff_id = null;
       }
 
-      // Format pain levels as integers
       if (body.pain_before !== undefined) {
         body.pain_before = body.pain_before ? parseInt(body.pain_before) : null;
       }
@@ -516,11 +476,13 @@ export default function MedicalHistoryFormPage({
         body.pain_after = body.pain_after ? parseInt(body.pain_after) : null;
       }
 
-      // Remove empty strings
+      // Convert treatments array to comma-separated string
+      if (Array.isArray(body.treatments)) {
+        body.treatments = body.treatments.join(', ');
+      }
+
       Object.keys(body).forEach(key => {
-        if (body[key] === '') {
-          body[key] = null;
-        }
+        if (body[key] === '') body[key] = null;
       });
 
       console.log('Data to be saved:', body);
@@ -530,15 +492,11 @@ export default function MedicalHistoryFormPage({
 
       if (!medicalHistoryData) {
         msg = 'Successfully added new Medical History';
-        console.log('Creating new medical history...');
         result = await MedicalHistoryModel.createMedicalHistory(body);
       } else {
         msg = 'Successfully updated Medical History';
-        console.log('Updating medical history ID:', medicalHistoryData.id);
         result = await MedicalHistoryModel.updateMedicalHistory(medicalHistoryData.id, body);
       }
-
-      console.log('API Response:', result);
 
       if (result && result.http_code === 200) {
         message.success(msg);
@@ -548,10 +506,7 @@ export default function MedicalHistoryFormPage({
           setAppointmentDateTime('');
           setHasChanges(false);
           setFormKey(prev => prev + 1);
-          
-          setTimeout(() => {
-            onSubmitSuccess();
-          }, 300);
+          setTimeout(() => { onSubmitSuccess(); }, 300);
         } else {
           history.push("/medical-history");
         }
@@ -562,7 +517,6 @@ export default function MedicalHistoryFormPage({
     } catch (error) {
       console.error("Error saving medical history:", error);
       let errorMessage = "An error occurred while saving medical history";
-      
       if (error.errorFields) {
         errorMessage = "Please check the form for errors";
       } else if (error.message) {
@@ -595,9 +549,7 @@ export default function MedicalHistoryFormPage({
       }).then(async (result) => {
         if (result.isConfirmed) {
           setLoading(true);
-          
           const deleteResult = await MedicalHistoryModel.deleteMedicalHistory(medicalHistoryData.id);
-          
           if (deleteResult && deleteResult.http_code === 200) {
             message.success('Medical history deleted successfully');
             history.push("/medical-history");
@@ -623,19 +575,14 @@ export default function MedicalHistoryFormPage({
     <div style={{ 
       backgroundColor: '#f7f8fa',
       minHeight: '100vh',
-      paddingTop: '80px',
+      paddingTop: isStandalone ? '24px' : '80px',
       paddingBottom: '40px'
     }}>
       <style>{customStyles}</style>
       
       <Container>
         {loading ? (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            minHeight: '400px' 
-          }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
             <Spin size="large" tip="Loading..." />
           </div>
         ) : (
@@ -643,58 +590,25 @@ export default function MedicalHistoryFormPage({
             <Col xs={24} sm={24} md={22} lg={20} xl={18}>
               <Card 
                 bordered={false}
-                style={{
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
-                }}
-                headStyle={{
-                  borderBottom: '1px solid #e0e0e0',
-                  backgroundColor: '#FFFFFF',
-                  padding: '16px'
-                }}
+                style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}
                 title={
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: '12px'
-                  }}>
-                    <Title level={4} style={{ 
-                      margin: 0,
-                      color: '#000000',
-                      fontWeight: 700,
-                      fontSize: '20px'
-                    }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <Title level={4} style={{ margin: 0, color: '#000000', fontWeight: 700, fontSize: '20px' }}>
                       {!medicalHistoryData ? "New Medical History" : "Medical History Details"}
                     </Title>
-                    
                     {!isStandalone && (
                       <Button 
                         onClick={() => history.push("/medical-history")}
-                        style={{ 
-                          height: '32px',
-                          padding: '0 16px',
-                          borderRadius: '4px',
-                          fontSize: '13px',
-                          borderColor: '#d9d9d9'
-                        }}
+                        style={{ height: '32px', padding: '0 16px', borderRadius: '4px', fontSize: '13px', borderColor: '#d9d9d9' }}
                       >
                         ← Back to List
                       </Button>
                     )}
                   </div>
                 }
-                bodyStyle={{ 
-                  backgroundColor: '#FFFFFF',
-                  padding: '16px'
-                }} 
-                headStyle={{ 
-                  backgroundColor: '#FFFFFF',
-                  borderBottom: '1px solid #e0e0e0',
-                  padding: '16px'
-                }} 
-                bodyStyle={{ padding: 20 }}>
+                headStyle={{ borderBottom: '1px solid #e0e0e0', backgroundColor: '#FFFFFF', padding: '16px' }}
+                bodyStyle={{ padding: 20 }}
+              >
                 <Form
                   form={form}
                   onFinish={onSubmit}
@@ -708,21 +622,12 @@ export default function MedicalHistoryFormPage({
                 >
                   <Row gutter={[32, 0]}>
                     <Col xs={24}>
-                      {/* Patient Selection */}
+
+                      {/* Patient */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Patient
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Patient</span>}
                         name="patient_id"
-                        rules={[
-                          { required: true, message: 'Patient selection is required!' }
-                        ]}
+                        rules={[{ required: true, message: 'Patient selection is required!' }]}
                         style={{ marginBottom: '10px' }}
                         className="medical-history-form-item"
                       >
@@ -744,15 +649,9 @@ export default function MedicalHistoryFormPage({
                         </Select>
                       </Form.Item>
 
-                      {/* Appointment Date and Time - Native HTML5 Input */}
+                      {/* Appointment Date & Time */}
                       <div style={{ marginBottom: '10px' }}>
-                        <label style={{ 
-                          display: 'block',
-                          marginBottom: '8px',
-                          color: '#000000',
-                          fontWeight: 600, 
-                          fontSize: '14px' 
-                        }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#000000', fontWeight: 600, fontSize: '14px' }}>
                           Appointment Date & Time <span style={{ color: '#ff4d4f' }}>*</span>
                         </label>
                         <input
@@ -767,45 +666,21 @@ export default function MedicalHistoryFormPage({
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
-                          {/* Service Type */}
                           <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Service Type
-                              </span>
-                            }
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Service Type</span>}
                             name="service_type"
-                            rules={[
-                              { required: true, message: 'Service type is required!' }
-                            ]}
+                            rules={[{ required: true, message: 'Service type is required!' }]}
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select
-                              className="medical-history-select"
-                              placeholder="Select service type"
-                            >
+                            <Select className="medical-history-select" placeholder="Select service type">
                               <Option value="Physiotherapy">Physiotherapy</Option>
                               <Option value="Pilates">Pilates</Option>
                             </Select>
                           </Form.Item>
                         </Col>
-                        
                         <Col xs={24} md={12}>
-                          {/* Staff Dropdown */}
                           <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Staff
-                              </span>
-                            }
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Staff</span>}
                             name="staff_id"
                             style={{ marginBottom: '10px' }}
                           >
@@ -832,455 +707,199 @@ export default function MedicalHistoryFormPage({
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
-                          {/* Injury Type */}
                           <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Injury Type
-                              </span>
-                            }
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Injury Type</span>}
                             name="injury_type"
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select
-                              className="medical-history-select"
-                              placeholder="Select injury type"
-                              allowClear
-                            >
+                            <Select className="medical-history-select" placeholder="Select injury type" allowClear>
                               {INJURY_TYPE_OPTIONS.map(type => (
-                                <Option key={type} value={type}>
-                                  {type}
-                                </Option>
+                                <Option key={type} value={type}>{type}</Option>
                               ))}
                             </Select>
                           </Form.Item>
                         </Col>
-
                         <Col xs={24} md={12}>
-                          {/* Area of Concern */}
                           <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Area of Concern
-                              </span>
-                            }
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Area of Concern</span>}
                             name="area_concern"
-                            rules={[
-                              { max: 255, message: 'Max 255 characters!' }
-                            ]}
+                            rules={[{ max: 255, message: 'Max 255 characters!' }]}
                             style={{ marginBottom: '10px' }}
                           >
-                            <Input 
+                            <Input
                               placeholder="e.g., Lower back, Right shoulder"
-                              style={{
-                                backgroundColor: '#FFFFFF',
-                                border: '1px solid #d9d9d9',
-                                color: '#000000',
-                                borderRadius: '4px',
-                                height: '34px',
-                                padding: '4px 11px',
-                                fontSize: '14px'
-                              }}
+                              style={{ backgroundColor: '#FFFFFF', border: '1px solid #d9d9d9', color: '#000000', borderRadius: '4px', height: '34px', padding: '4px 11px', fontSize: '14px' }}
                             />
                           </Form.Item>
                         </Col>
                       </Row>
 
-                      {/* Pain Levels */}
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
                           <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Pain Level (Before)
-                              </span>
-                            }
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (Before)</span>}
                             name="pain_before"
-                            rules={[
-                              { type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }
-                            ]}
+                            rules={[{ type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }]}
                             style={{ marginBottom: '10px' }}
                             className="pain-level-input"
                           >
-                            <InputNumber
-                              min={0}
-                              max={10}
-                              placeholder="0-10 scale"
-                              style={{ width: '100%' }}
-                            />
+                            <InputNumber min={0} max={10} placeholder="0-10 scale" style={{ width: '100%' }} />
                           </Form.Item>
                         </Col>
-                        
                         <Col xs={24} md={12}>
                           <Form.Item
-                            label={
-                              <span style={{ 
-                                color: '#000000',
-                                fontWeight: 600, 
-                                fontSize: '14px' 
-                              }}>
-                                Pain Level (After)
-                              </span>
-                            }
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (After)</span>}
                             name="pain_after"
-                            rules={[
-                              { type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }
-                            ]}
+                            rules={[{ type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }]}
                             style={{ marginBottom: '10px' }}
                             className="pain-level-input"
                           >
-                            <InputNumber
-                              min={0}
-                              max={10}
-                              placeholder="0-10 scale"
-                              style={{ width: '100%' }}
-                            />
+                            <InputNumber min={0} max={10} placeholder="0-10 scale" style={{ width: '100%' }} />
                           </Form.Item>
                         </Col>
                       </Row>
 
-                      {/* Diagnosis Result */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Diagnosis Result
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Diagnosis Result</span>}
                         name="diagnosis_result"
-                        rules={[
-                          { max: 1000, message: 'Max 1000 characters!' }
-                        ]}
+                        rules={[{ max: 1000, message: 'Max 1000 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Enter diagnosis result"
-                          className="medical-history-textarea"
-                          rows={3}
-                        />
+                        <TextArea placeholder="Enter diagnosis result" className="medical-history-textarea" rows={3} />
                       </Form.Item>
 
-                      {/* Expected Recovery Time */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Expected Recovery Time
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Expected Recovery Time</span>}
                         name="expected_recovery_time"
-                        rules={[
-                          { max: 100, message: 'Max 100 characters!' }
-                        ]}
+                        rules={[{ max: 100, message: 'Max 100 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <Input 
+                        <Input
                           placeholder="e.g., 2-4 weeks, 3 months"
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #d9d9d9',
-                            color: '#000000',
-                            borderRadius: '4px',
-                            height: '34px',
-                            padding: '4px 11px',
-                            fontSize: '14px'
-                          }}
+                          style={{ backgroundColor: '#FFFFFF', border: '1px solid #d9d9d9', color: '#000000', borderRadius: '4px', height: '34px', padding: '4px 11px', fontSize: '14px' }}
                         />
                       </Form.Item>
 
-                      {/* BARU: Recovery Goals */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Recovery Goals
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Recovery Goals</span>}
                         name="recovery_goals"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Enter specific recovery goals and milestones (e.g., return to running, lift 20kg without pain)"
-                          className="medical-history-textarea"
-                          rows={3}
-                        />
+                        <TextArea placeholder="Enter specific recovery goals and milestones" className="medical-history-textarea" rows={3} />
                       </Form.Item>
 
-                      {/* Objective Progress */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Objective Progress
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Objective Progress</span>}
                         name="objective_progress"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Describe objective measurable progress (e.g., increased ROM from 45° to 60°, reduced pain from 7/10 to 4/10)"
-                          className="medical-history-textarea"
-                          rows={3}
-                        />
+                        <TextArea placeholder="Describe objective measurable progress" className="medical-history-textarea" rows={3} />
                       </Form.Item>
 
-                      {/* Range of Motion Impact */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Range of Motion Impact
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Range of Motion Impact</span>}
                         name="range_of_motion_impact"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Describe range of motion limitations or improvements"
-                          className="medical-history-textarea"
-                          rows={2}
-                        />
+                        <TextArea placeholder="Describe range of motion limitations or improvements" className="medical-history-textarea" rows={2} />
                       </Form.Item>
 
-                      {/* Treatments - Dropdown */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Treatments
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Treatments</span>}
                         name="treatments"
                         style={{ marginBottom: '10px' }}
                       >
-                        <Select
-                          className="medical-history-select"
-                          placeholder="Select treatment"
-                          mode = "multiple"
-                          allowClear
-                        >
+                        <Select className="medical-history-select" placeholder="Select treatment" mode="multiple" allowClear>
                           {TREATMENT_OPTIONS.map(treatment => (
-                            <Option key={treatment} value={treatment}>
-                              {treatment}
-                            </Option>
+                            <Option key={treatment} value={treatment}>{treatment}</Option>
                           ))}
                         </Select>
                       </Form.Item>
 
-                      {/* Exercise */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Exercise
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Exercise</span>}
                         name="exercise"
-                        rules={[
-                          { max: 500, message: 'Max 500 characters!' }
-                        ]}
+                        rules={[{ max: 500, message: 'Max 500 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Enter recommended exercises"
-                          className="medical-history-textarea"
-                          rows={2}
-                        />
+                        <TextArea placeholder="Enter recommended exercises" className="medical-history-textarea" rows={2} />
                       </Form.Item>
 
-                      {/* Homework */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Homework
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Homework</span>}
                         name="homework"
-                        rules={[
-                          { max: 500, message: 'Max 500 characters!' }
-                        ]}
+                        rules={[{ max: 500, message: 'Max 500 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Enter homework assignments"
-                          className="medical-history-textarea"
-                          rows={2}
-                        />
+                        <TextArea placeholder="Enter homework assignments" className="medical-history-textarea" rows={2} />
                       </Form.Item>
 
-                      {/* Recovery Tips */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Recovery Tips
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Recovery Tips</span>}
                         name="recovery_tips"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea 
-                          placeholder="Enter recovery tips and recommendations"
-                          className="medical-history-textarea"
-                          rows={2}
-                        />
+                        <TextArea placeholder="Enter recovery tips and recommendations" className="medical-history-textarea" rows={2} />
                       </Form.Item>
 
-                      {/* Recommended Next Session */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Recommended Next Session
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Recommended Next Session</span>}
                         name="recommended_next_session"
                         style={{ marginBottom: '10px' }}
                       >
-                        <Select
-                          className="medical-history-select"
-                          placeholder="Select recommended next session"
-                          allowClear
-                        >
+                        <Select className="medical-history-select" placeholder="Select recommended next session" allowClear>
                           {NEXT_SESSION_OPTIONS.map(option => (
-                            <Option key={option} value={option}>
-                              {option}
-                            </Option>
+                            <Option key={option} value={option}>{option}</Option>
                           ))}
                         </Select>
                       </Form.Item>
 
-                      {/* Body Annotation */}
                       <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Body Pain Diagram
-                          </span>
-                        }
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Body Pain Diagram</span>}
                         name="body_annotation"
                         style={{ marginBottom: '10px' }}
                       >
-                        <BodyAnnotation 
-                          ref={bodyAnnotationRef}
-                          disabled={formDisabled} 
-                        />
+                        <BodyAnnotation ref={bodyAnnotationRef} disabled={formDisabled} />
                       </Form.Item>
+
                     </Col>
                   </Row>
 
                   {/* Action Buttons */}
-                  <Row style={{ 
-                    marginTop: '16px', 
-                    paddingTop: '12px', 
-                    borderTop: '1px solid #e0e0e0' 
-                  }}>
+                  <Row style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e0e0e0' }}>
                     <Col span={24}>
                       {!formDisabled ? (
                         <Row align="middle" justify="space-between">
                           <Col>
                             {isStandalone && (
-                              <Text style={{ 
-                                fontSize: '12px', 
-                                color: '#999999',
-                                fontStyle: 'italic'
-                              }}>
+                              <Text style={{ fontSize: '12px', color: '#999999', fontStyle: 'italic' }}>
                                 Form resets after submission
                               </Text>
                             )}
                           </Col>
-                          
                           <Col>
                             <Space size={8}>
-                              <Button 
-                                htmlType='submit' 
+                              <Button
+                                htmlType='submit'
                                 loading={loadingSubmit || uploadingImage}
-                                style={{ 
-                                  backgroundColor: '#000000',
-                                  borderColor: '#000000',
-                                  color: '#FFFFFF',
-                                  fontWeight: 600,
-                                  height: '36px',
-                                  padding: '0 24px',
-                                  borderRadius: '4px',
-                                  fontSize: '14px'
-                                }}
+                                style={{ backgroundColor: '#000000', borderColor: '#000000', color: '#FFFFFF', fontWeight: 600, height: '36px', padding: '0 24px', borderRadius: '4px', fontSize: '14px' }}
                               >
                                 {!medicalHistoryData ? "Add Record" : "Save"}
                               </Button>
                               
                               {medicalHistoryData && (
-                                <Button 
+                                <Button
                                   onClick={handleDelete}
-                                  style={{ 
-                                    backgroundColor: '#d93025',
-                                    borderColor: '#d93025',
-                                    color: '#FFFFFF',
-                                    height: '36px',
-                                    padding: '0 20px',
-                                    borderRadius: '4px',
-                                    fontSize: '14px'
-                                  }}
+                                  style={{ backgroundColor: '#d93025', borderColor: '#d93025', color: '#FFFFFF', height: '36px', padding: '0 20px', borderRadius: '4px', fontSize: '14px' }}
                                 >
                                   Delete
                                 </Button>
                               )}
 
                               {!isStandalone && (
-                                <Button 
+                                <Button
                                   onClick={() => history.push("/medical-history")}
-                                  style={{ 
-                                    height: '36px',
-                                    padding: '0 20px',
-                                    borderRadius: '4px',
-                                    fontSize: '14px'
-                                  }}
+                                  style={{ height: '36px', padding: '0 20px', borderRadius: '4px', fontSize: '14px' }}
                                 >
                                   Cancel
                                 </Button>
