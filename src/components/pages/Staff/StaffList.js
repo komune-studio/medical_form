@@ -44,6 +44,7 @@ const StaffList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [dataSource, setDataSource] = useState([]);
+  const [allData, setAllData] = useState([]); // store all data for client-side filtering
   const [refreshKey, setRefreshKey] = useState(0);
 
   const search = useFilter((state) => state.search);
@@ -63,10 +64,12 @@ const StaffList = () => {
 
   const handleSearch = (searchTerm) => {
     setSearch(searchTerm);
+    setPage(0);
   };
 
   const handleStatusChange = (value) => {
     setStatus(value);
+    setPage(0);
   };
 
   const columns = [
@@ -121,7 +124,7 @@ const StaffList = () => {
         return (
           <Space size="small">
             <Tooltip title="Edit">
-            <Link to={`/staff/${row.id}/edit`}>
+              <Link to={`/staff/${row.id}/edit`}>
                 <AntButton
                   type={'link'}
                   style={{ color: '#333' }}
@@ -196,7 +199,6 @@ const StaffList = () => {
     },
   ];
 
-  // Toggle staff active status
   const toggleStaffStatus = async (id, activate) => {
     try {
       if (activate) {
@@ -206,7 +208,7 @@ const StaffList = () => {
         await StaffModel.deleteStaff(id);
         message.success('Staff deactivated successfully');
       }
-      initializeData();
+      fetchAllData();
     } catch (error) {
       console.error(`Error ${activate ? 'activating' : 'deactivating'} staff:`, error);
       message.error(`Failed to ${activate ? 'activate' : 'deactivate'} staff`);
@@ -225,59 +227,70 @@ const StaffList = () => {
     try {
       await StaffModel.deleteStaff(id);
       message.success('Staff deleted successfully');
-      initializeData();
+      fetchAllData();
     } catch (error) {
       console.error("Error deleting staff:", error);
       message.error('Failed to delete staff');
     }
   };
 
-  const initializeData = async (
-    currentPage = page,
-    currentRowsPerPage = rowsPerPage
-  ) => {
+  // Fetch ALL data from API — no activeOnly param = backend returns all
+  const fetchAllData = async () => {
     setLoading(true);
     try {
-      const params = {};
-      
-      if (search) params.search = search;
-      if (status) {
-        if (status === 'active') params.activeOnly = 'true';
-        else if (status === 'inactive') params.activeOnly = 'false';
-      }
-      
-      const result = await StaffModel.getAllStaff(params);
-      
+      // Pass activeOnly=undefined so backend returns ALL staff (active + inactive)
+      const result = await StaffModel.getAllStaff({ activeOnly: undefined });
       if (result && result.http_code === 200) {
-        const allData = result.data || [];
-        const startIndex = currentPage * currentRowsPerPage;
-        const endIndex = startIndex + currentRowsPerPage;
-        const paginatedData = allData.slice(startIndex, endIndex);
-        
-        setDataSource(paginatedData);
-        setTotalCount(allData.length);
+        setAllData(result.data || []);
       } else {
-        setDataSource([]);
-        setTotalCount(0);
+        setAllData([]);
       }
     } catch (error) {
       console.error("Error fetching staff:", error);
-      setDataSource([]);
-      setTotalCount(0);
+      setAllData([]);
       message.error('Failed to load staff data');
     } finally {
       setLoading(false);
     }
   };
 
+  // Step 2: Apply filters client-side whenever allData/search/status/page changes
   useEffect(() => {
-    initializeData(page, rowsPerPage);
-  }, [page, rowsPerPage, search, status, refreshKey]);
+    let filtered = [...allData];
+
+    // Filter by status — handle boolean, integer (1/0), and string ('1'/'0')
+    if (status === 'active') {
+      filtered = filtered.filter(s => s.active === true || s.active === 1 || s.active === '1');
+    } else if (status === 'inactive') {
+      filtered = filtered.filter(s => !s.active || s.active === false || s.active === 0 || s.active === '0');
+    }
+    // status === 'all' → no filter, show everything
+
+    // Filter by search
+    if (search && search.trim() !== '') {
+      const keyword = search.trim().toLowerCase();
+      filtered = filtered.filter(s =>
+        (s.name && s.name.toLowerCase().includes(keyword)) ||
+        (s.phone_number && s.phone_number.toLowerCase().includes(keyword))
+      );
+    }
+
+    // Paginate
+    const startIndex = page * rowsPerPage;
+    const paginated = filtered.slice(startIndex, startIndex + rowsPerPage);
+
+    setTotalCount(filtered.length);
+    setDataSource(paginated);
+  }, [allData, search, status, page, rowsPerPage]);
+
+  // Fetch from API only on mount and after mutations
+  useEffect(() => {
+    fetchAllData();
+  }, [refreshKey]);
 
   return (
     <>
       <style>{`
-        /* Custom styles */
         .custom-add-button {
           background: #333 !important;
           border-color: #333 !important;
@@ -288,7 +301,6 @@ const StaffList = () => {
           border-color: #555 !important;
         }
         
-        /* Search input styling */
         .staff-search.ant-input-affix-wrapper {
           background: white !important;
           border: 1px solid #d9d9d9 !important;
@@ -307,7 +319,6 @@ const StaffList = () => {
           color: #666 !important;
         }
         
-        /* Hover dan focus state */
         .staff-search.ant-input-affix-wrapper:hover,
         .staff-search.ant-input-affix-wrapper:focus,
         .staff-search.ant-input-affix-wrapper-focused {
@@ -315,7 +326,6 @@ const StaffList = () => {
           box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.1) !important;
         }
         
-        /* Select filter styling */
         .filter-select .ant-select-selector {
           background: white !important;
           border: 1px solid #d9d9d9 !important;
@@ -344,7 +354,6 @@ const StaffList = () => {
           box-shadow: 0 0 0 2px rgba(102, 102, 102, 0.1) !important;
         }
         
-        /* Dropdown menu untuk Select */
         .filter-select .ant-select-dropdown {
           background: white !important;
           border: 1px solid #f0f0f0 !important;
@@ -363,7 +372,6 @@ const StaffList = () => {
           background-color: #f5f5f5 !important;
         }
         
-        /* Tooltip styling */
         .ant-tooltip-inner {
           background: #333 !important;
           color: white !important;
@@ -373,7 +381,6 @@ const StaffList = () => {
           background: #333 !important;
         }
         
-        /* Modal styling */
         .ant-modal-header {
           background: white !important;
           border-bottom: 1px solid #f0f0f0 !important;
@@ -392,14 +399,12 @@ const StaffList = () => {
           color: #333 !important;
         }
         
-        /* Table header styling */
         .ant-table-thead > tr > th {
           background: #fafafa !important;
           color: #333 !important;
           border-bottom: 1px solid #f0f0f0 !important;
         }
         
-        /* Table row styling */
         .ant-table-tbody > tr > td {
           border-bottom: 1px solid #f0f0f0 !important;
         }
@@ -408,7 +413,6 @@ const StaffList = () => {
           background: #fafafa !important;
         }
         
-        /* Pagination styling */
         .ant-pagination-item {
           border: 1px solid #d9d9d9 !important;
           background: white !important;
@@ -435,7 +439,6 @@ const StaffList = () => {
           color: #333 !important;
         }
         
-        /* Popconfirm styling */
         .ant-popconfirm-message-title {
           color: #333 !important;
         }
@@ -444,11 +447,7 @@ const StaffList = () => {
           color: #666 !important;
         }
         
-        /* ==========================================
-           TABLET/IPAD RESPONSIVE STYLES (768px - 1024px)
-           ========================================== */
         @media (min-width: 768px) and (max-width: 1024px) {
-          /* Larger fonts for better readability on tablets */
           .staff-search.ant-input-affix-wrapper {
             height: 44px !important;
             font-size: 16px !important;
@@ -456,14 +455,6 @@ const StaffList = () => {
           
           .staff-search .ant-input {
             font-size: 16px !important;
-          }
-          
-          .staff-search .ant-input::placeholder {
-            font-size: 16px !important;
-          }
-          
-          .staff-search .ant-input-prefix {
-            font-size: 22px !important;
           }
           
           .filter-select .ant-select-selector {
@@ -482,19 +473,12 @@ const StaffList = () => {
             line-height: 32px !important;
           }
           
-          .ant-select-item {
-            font-size: 16px !important;
-            padding: 10px 12px !important;
-            min-height: 44px !important;
-          }
-          
           .custom-add-button {
             font-size: 16px !important;
             height: 44px !important;
             padding: 0 24px !important;
           }
           
-          /* Table text larger on tablets */
           .ant-table-thead > tr > th {
             font-size: 16px !important;
             padding: 18px 16px !important;
@@ -506,31 +490,12 @@ const StaffList = () => {
             padding: 18px 16px !important;
           }
           
-          /* ID larger */
-          .ant-table-tbody > tr > td > div:first-child {
-            font-size: 16px !important;
-            font-weight: 600 !important;
-          }
-          
-          /* Staff name larger */
-          .ant-table-tbody > tr > td > div {
-            font-size: 16px !important;
-          }
-          
-          /* Status badge larger */
-          .ant-table-tbody > tr > td > div {
-            font-size: 15px !important;
-            padding: 6px 14px !important;
-          }
-          
-          /* Action buttons larger */
           .ant-btn-circle {
             font-size: 22px !important;
             width: 40px !important;
             height: 40px !important;
           }
           
-          /* Pagination larger */
           .ant-pagination-item {
             min-width: 40px !important;
             height: 40px !important;
@@ -541,33 +506,11 @@ const StaffList = () => {
             font-size: 16px !important;
           }
           
-          .ant-pagination-prev .ant-pagination-item-link,
-          .ant-pagination-next .ant-pagination-item-link {
-            font-size: 18px !important;
-          }
-          
-          /* Title larger */
           .staff-management-title {
             font-size: 26px !important;
           }
-          
-          /* Modal text larger */
-          .ant-modal-title {
-            font-size: 20px !important;
-          }
-          
-          .ant-modal-content {
-            font-size: 16px !important;
-          }
-          
-          /* Tooltip larger */
-          .ant-tooltip-inner {
-            font-size: 15px !important;
-            padding: 10px 14px !important;
-          }
         }
         
-        /* Mobile responsiveness */
         @media (max-width: 767px) {
           .custom-add-button {
             width: 100%;
@@ -584,7 +527,7 @@ const StaffList = () => {
         }}
           className="card-stats mb-4 mb-xl-0">
           <CardBody>
-            {/* Header dengan title dan buttons */}
+            {/* Header */}
             <Row className="mb-4">
               <Col md={6} xs={12}>
                 <div className="staff-management-title" style={{ fontWeight: "bold", fontSize: "1.2em", color: '#333' }}>
@@ -605,41 +548,46 @@ const StaffList = () => {
               </Col>
             </Row>
 
-          {/* Search and Filter Row */}
-<Row style={{ marginBottom: 24, alignItems: 'center' }}>
-  <Col xl={5} lg={4} md={12} className="mb-3 mb-lg-0">
-    <Input
-      className="staff-search"
-      placeholder="Search by name or phone"
-      onPressEnter={(e) => handleSearch(e.target.value)}
-      prefix={
-        <Iconify
-          icon="material-symbols:search"
-          style={{ color: '#666', fontSize: '18px' }}
-        />
-      }
-      allowClear
-      onClear={() => handleSearch("")}
-      style={{ width: '100%' }}
-    />
-  </Col>
-  <Col xl={3} lg={3} className="d-none d-lg-block"></Col>
-  <Col xl={4} lg={5} md={12} xs={12} className="mb-3 mb-lg-0">
-    <div className="d-flex justify-content-end">
-      <Select
-        className="filter-select"
-        placeholder="Status"
-        style={{ width: '100%', maxWidth: '200px' }}
-        value={status}
-        onChange={handleStatusChange}
-      >
-        <Select.Option value="all">All Status</Select.Option>
-        <Select.Option value="active">Active Only</Select.Option>
-        <Select.Option value="inactive">Inactive Only</Select.Option>
-      </Select>
-    </div>
-  </Col>
-</Row>
+            {/* Search and Filter Row */}
+            <Row style={{ marginBottom: 24, alignItems: 'center' }}>
+              <Col xl={5} lg={4} md={12} className="mb-3 mb-lg-0">
+                <Input
+                  className="staff-search"
+                  placeholder="Search by name or phone"
+                  onChange={(e) => {
+                    // Real-time search as user types
+                    if (e.target.value === '') handleSearch('');
+                  }}
+                  onPressEnter={(e) => handleSearch(e.target.value)}
+                  onBlur={(e) => handleSearch(e.target.value)}
+                  prefix={
+                    <Iconify
+                      icon="material-symbols:search"
+                      style={{ color: '#666', fontSize: '18px' }}
+                    />
+                  }
+                  allowClear
+                  onChange={(e) => handleSearch(e.target.value)}
+                  style={{ width: '100%' }}
+                />
+              </Col>
+              <Col xl={3} lg={3} className="d-none d-lg-block"></Col>
+              <Col xl={4} lg={5} md={12} xs={12} className="mb-3 mb-lg-0">
+                <div className="d-flex justify-content-end">
+                  <Select
+                    className="filter-select"
+                    placeholder="Status"
+                    style={{ width: '100%', maxWidth: '200px' }}
+                    value={status}
+                    onChange={handleStatusChange}
+                  >
+                    <Select.Option value="all">All Status</Select.Option>
+                    <Select.Option value="active">Active Only</Select.Option>
+                    <Select.Option value="inactive">Inactive Only</Select.Option>
+                  </Select>
+                </div>
+              </Col>
+            </Row>
 
             {/* Table */}
             <Row>

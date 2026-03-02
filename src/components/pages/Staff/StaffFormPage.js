@@ -20,7 +20,6 @@ import moment from 'moment';
 
 const { Title, Text } = Typography;
 
-// Add custom styles for responsive field spacing
 const customStyles = `
   @media (min-width: 768px) and (max-width: 1024px) {
     .staff-form-item {
@@ -28,22 +27,28 @@ const customStyles = `
     }
   }
   
-  /* Radio button styling */
   .status-radio .ant-radio-wrapper {
     color: #000000;
     font-size: 14px;
   }
   
   .status-radio .ant-radio-checked .ant-radio-inner {
+    border-color: #000000 !important;
+    background-color: #000000 !important;
+  }
+
+  .status-radio .ant-radio-checked .ant-radio-inner::after {
+    background-color: white !important;
+  }
+
+  .status-radio .ant-radio-inner {
+    border-color: #d9d9d9;
+  }
+
+  .status-radio .ant-radio-wrapper:hover .ant-radio-inner {
     border-color: #000000;
-    background-color: #000000;
   }
   
-  .status-radio .ant-radio-inner::after {
-    background-color: white;
-  }
-  
-  /* Active/Inactive badge styling */
   .status-badge {
     display: inline-block;
     padding: 4px 12px;
@@ -80,12 +85,17 @@ export default function StaffFormPage({
   const [formDisabled, setFormDisabled] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [formKey, setFormKey] = useState(0);
+  const [activeStatus, setActiveStatus] = useState(true);
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (changedValues.active !== undefined) {
+      setActiveStatus(changedValues.active);
+    }
+
     if (!staffData) {
       const changed = Object.keys(allValues).some(key => {
         const value = allValues[key];
-        if (value && value.toString().trim() !== '') {
+        if (value !== undefined && value !== null && value.toString().trim() !== '') {
           return true;
         }
         return false;
@@ -115,7 +125,6 @@ export default function StaffFormPage({
       
       let body = form.getFieldsValue();
       
-      // Validate required fields
       const validation = validateStaffData(body);
       if (!validation.isValid) {
         const errorMsg = Object.values(validation.errors).join(', ');
@@ -194,7 +203,6 @@ export default function StaffFormPage({
     }
   };
 
-  // Validation function
   const validateStaffData = (data) => {
     const errors = {};
 
@@ -223,30 +231,33 @@ export default function StaffFormPage({
 
   useEffect(() => {
     if (staffData) {
+      const status = staffData.active !== undefined ? staffData.active : true;
       form.setFieldsValue({
         name: staffData.name,
         phone_number: staffData.phone_number,
-        active: staffData.active !== undefined ? staffData.active : true,
+        active: status,
       });
+      setActiveStatus(status);
       setHasChanges(false);
     } else {
-      // Create mode: default active = true
       form.setFieldsValue({
         name: '',
         phone_number: '',
-        active: true, // Default active
+        active: true,
       });
+      setActiveStatus(true);
       setHasChanges(false);
     }
     
-    if (disabled) {
-      setFormDisabled(disabled);
+    // IMPORTANT: only disable form if explicitly passed as true
+    // Don't set formDisabled unless disabled prop is explicitly true
+    if (disabled === true) {
+      setFormDisabled(true);
+    } else {
+      setFormDisabled(false);
     }
   }, [staffData, form, disabled, formKey]);
 
-  // Get current status from form
-  const currentStatus = form.getFieldValue('active');
-  
   return (
     <div style={{ 
       minHeight: 'auto', 
@@ -334,27 +345,26 @@ export default function StaffFormPage({
                 border: '1px solid #e0e0e0',
                 padding: '16px'
               }} bodyStyle={{ padding: 0 }}>
+                {/* 
+                  KEY FIX: Remove `disabled` from Form component entirely.
+                  Instead, pass `disabled` directly to each individual input.
+                  This prevents Ant Design from blocking all interactions including radio buttons.
+                */}
                 <Form
                   form={form}
                   onFinish={onSubmit}
                   onValuesChange={onValuesChanged}
                   validateTrigger="onSubmit"
-                  disabled={formDisabled}
                   autoComplete='off'
                   key={formKey}
                   layout="vertical"
                 >
                   <Row gutter={[32, 0]}>
-                    {/* Single Column - All fields vertical */}
                     <Col xs={24}>
                       {/* 1. Staff Name */}
                       <Form.Item
                         label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
+                          <span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>
                             Staff Name <span style={{ color: '#ff4d4f' }}>*</span>
                           </span>
                         }
@@ -367,11 +377,12 @@ export default function StaffFormPage({
                         className="staff-form-item"
                       >
                         <Input 
+                          disabled={formDisabled}
                           placeholder="Enter staff name"
                           style={{ 
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: formDisabled ? '#fafafa' : '#FFFFFF',
                             border: '1px solid #d9d9d9',
-                            color: '#000000',
+                            color: formDisabled ? '#666' : '#000000',
                             borderRadius: '4px',
                             padding: '8px 12px',
                             fontSize: '14px',
@@ -383,11 +394,7 @@ export default function StaffFormPage({
                       {/* 2. Phone Number */}
                       <Form.Item
                         label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
+                          <span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>
                             Phone Number <span style={{ color: '#ff4d4f' }}>*</span>
                           </span>
                         }
@@ -401,11 +408,12 @@ export default function StaffFormPage({
                         className="staff-form-item"
                       >
                         <Input 
+                          disabled={formDisabled}
                           placeholder="08123456789"
                           style={{ 
-                            backgroundColor: '#FFFFFF',
+                            backgroundColor: formDisabled ? '#fafafa' : '#FFFFFF',
                             border: '1px solid #d9d9d9',
-                            color: '#000000',
+                            color: formDisabled ? '#666' : '#000000',
                             borderRadius: '4px',
                             padding: '8px 12px',
                             fontSize: '14px',
@@ -414,36 +422,33 @@ export default function StaffFormPage({
                         />
                       </Form.Item>
 
-                      {/* 3. Status (Active/Inactive) - RADIO BUTTON */}
+                      {/* 3. Status - Radio Button (NEVER disabled, always interactive) */}
                       <Form.Item
                         label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
+                          <span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>
                             Status
                           </span>
                         }
                         name="active"
                         rules={[{ required: true, message: 'Please select status!' }]}
                         style={{ marginBottom: '10px' }}
-                        className="staff-form-item status-radio"
+                        className="staff-form-item"
                       >
-                        <Radio.Group 
+                        <Radio.Group
+                          className="status-radio"
+                          disabled={formDisabled}
+                          onChange={(e) => setActiveStatus(e.target.value)}
                           style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
                         >
                           <Radio value={true}>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                               <span style={{ color: '#000000' }}>Active</span>
-                              <span className="status-badge active-badge" style={{ marginLeft: '8px' }}>
-                                ACTIVE
-                              </span>
+                              <span className="status-badge active-badge">ACTIVE</span>
                             </div>
                             <div style={{ 
                               fontSize: '12px', 
                               color: '#666',
-                              marginLeft: '24px',
+                              marginLeft: '0px',
                               marginTop: '2px'
                             }}>
                               Staff will be available for selection in visitor forms
@@ -451,16 +456,14 @@ export default function StaffFormPage({
                           </Radio>
                           
                           <Radio value={false}>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
                               <span style={{ color: '#000000' }}>Inactive</span>
-                              <span className="status-badge inactive-badge" style={{ marginLeft: '8px' }}>
-                                INACTIVE
-                              </span>
+                              <span className="status-badge inactive-badge">INACTIVE</span>
                             </div>
                             <div style={{ 
                               fontSize: '12px', 
                               color: '#666',
-                              marginLeft: '24px',
+                              marginLeft: '0px',
                               marginTop: '2px'
                             }}>
                               Staff will not be available for selection in visitor forms
@@ -469,24 +472,25 @@ export default function StaffFormPage({
                         </Radio.Group>
                       </Form.Item>
 
-                      {/* Current Status Preview */}
+                      {/* Status Preview */}
                       <div style={{ 
                         marginBottom: '16px',
                         padding: '12px',
-                        backgroundColor: currentStatus ? '#f6ffed' : '#fff2f0',
-                        border: `1px solid ${currentStatus ? '#b7eb8f' : '#ffccc7'}`,
+                        backgroundColor: activeStatus ? '#f6ffed' : '#fff2f0',
+                        border: `1px solid ${activeStatus ? '#b7eb8f' : '#ffccc7'}`,
                         borderRadius: '4px',
                         fontSize: '13px',
-                        color: currentStatus ? '#52c41a' : '#ff4d4f'
+                        color: activeStatus ? '#52c41a' : '#ff4d4f',
+                        transition: 'all 0.2s ease'
                       }}>
                         <div style={{ fontWeight: 500 }}>
                           Current selection: 
-                          <span style={{ marginLeft: '8px' }}>
-                            {currentStatus ? 'ACTIVE' : 'INACTIVE'}
+                          <span style={{ marginLeft: '8px', fontWeight: 700 }}>
+                            {activeStatus ? 'ACTIVE' : 'INACTIVE'}
                           </span>
                         </div>
                         <div style={{ marginTop: '4px', fontSize: '12px' }}>
-                          {currentStatus 
+                          {activeStatus 
                             ? 'This staff will appear in dropdown lists for visitor forms' 
                             : 'This staff will be hidden from dropdown lists in visitor forms'}
                         </div>

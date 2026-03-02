@@ -8,8 +8,10 @@ import {
   FontSizeOutlined,
   DotChartOutlined,
   DragOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  PictureOutlined,
 } from '@ant-design/icons';
+import defaultBodyImage from 'assets/img/body.jpg';
 
 const toolBtnStyle = (isActive) => ({
   padding: '5px 10px',
@@ -76,6 +78,13 @@ const BodyAnnotation = forwardRef(({
   const [textInputPos, setTextInputPos] = useState({ x: 0, y: 0 });
   const [textInputValue, setTextInputValue] = useState('');
 
+  // Load default body.jpg on mount if no value/defaultImageUrl provided
+  useEffect(() => {
+    if (!value && !defaultImageUrl) {
+      setImageUrl(defaultBodyImage);
+    }
+  }, []);
+
   useImperativeHandle(ref, () => ({
     getLocalFile: () => localFile,
     hasLocalFile: () => !!localFile,
@@ -122,7 +131,7 @@ const BodyAnnotation = forwardRef(({
       img.onload = () => {
         setBackgroundImage(img);
         const canvas = canvasRef.current;
-        const maxWidth = canvas.parentElement.offsetWidth;
+        const maxWidth = canvas.parentElement.offsetWidth || 700;
         const maxHeight = 600;
         let width = img.width;
         let height = img.height;
@@ -378,19 +387,30 @@ const BodyAnnotation = forwardRef(({
     }
   };
 
+  // Use default body.jpg template
+  const handleUseDefault = () => {
+    setImageUrl(defaultBodyImage);
+    setLocalFile(null);
+    setElements([]);
+    setCanvasInitialized(false);
+  };
+
+  // Upload custom image
   const handleImageSelect = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       setImageUrl(e.target.result);
       setLocalFile(file);
       setElements([]);
-      message.success('Image loaded! Draw your annotations, then submit the form to upload.');
+      setCanvasInitialized(false);
+      message.success('Custom image loaded! Draw your annotations.');
     };
     reader.onerror = () => message.error('Failed to load image');
     reader.readAsDataURL(file);
     return false;
   };
 
+  const isUsingDefault = imageUrl === defaultBodyImage;
   const isDeleteDisabled = selectedElementIndex === null;
   const isUndoDisabled = elements.length === 0;
   const isClearDisabled = elements.length === 0;
@@ -400,14 +420,34 @@ const BodyAnnotation = forwardRef(({
       <div style={{ marginBottom: '12px' }}>
         <Space wrap style={{ marginBottom: 10 }}>
           {!disabled && (
-            <Upload beforeUpload={handleImageSelect} showUploadList={false} accept="image/*">
-              <Button icon={<UploadOutlined />} size="small">
-                {imageUrl ? 'Change Image' : 'Select Anatomy Image'}
-              </Button>
-            </Upload>
+            <>
+              {/* Use Default Template Button */}
+              <Tooltip title="Use default body anatomy template">
+                <Button
+                  icon={<PictureOutlined />}
+                  size="small"
+                  type={isUsingDefault ? 'primary' : 'default'}
+                  onClick={handleUseDefault}
+                  style={isUsingDefault ? {
+                    backgroundColor: '#1890ff',
+                    borderColor: '#1890ff',
+                    color: '#fff',
+                  } : {}}
+                >
+                  Default Template
+                </Button>
+              </Tooltip>
+
+              {/* Upload Custom Image Button */}
+              <Upload beforeUpload={handleImageSelect} showUploadList={false} accept="image/*">
+                <Button icon={<UploadOutlined />} size="small">
+                  {!isUsingDefault && imageUrl ? 'Change Custom Image' : 'Upload Custom Image'}
+                </Button>
+              </Upload>
+            </>
           )}
 
-          {!disabled && imageUrl && (
+          {imageUrl && (
             <>
               {/* Tool Group */}
               <div style={{
@@ -522,7 +562,7 @@ const BodyAnnotation = forwardRef(({
                 )}
               </div>
 
-              {/* Action Buttons — consistent with toolbar height */}
+              {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <Tooltip title="Delete Selected">
                   <button
@@ -559,6 +599,7 @@ const BodyAnnotation = forwardRef(({
           )}
         </Space>
 
+        {/* Legend */}
         {imageUrl && !disabled && (
           <div style={{
             marginTop: '8px',
@@ -580,6 +621,7 @@ const BodyAnnotation = forwardRef(({
         )}
       </div>
 
+      {/* Canvas Area */}
       {imageUrl ? (
         <div style={{
           border: '2px solid #d9d9d9',
@@ -639,7 +681,7 @@ const BodyAnnotation = forwardRef(({
           <UploadOutlined style={{ fontSize: '48px', marginBottom: '12px' }} />
           <div>No anatomy image selected</div>
           <div style={{ fontSize: '12px', marginTop: '4px' }}>
-            Select an anatomy diagram to start marking pain areas
+            Use the default template or upload a custom anatomy diagram
           </div>
         </div>
       )}

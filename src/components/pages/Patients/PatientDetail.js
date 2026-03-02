@@ -128,7 +128,6 @@ const PatientDetail = () => {
       setPdfLoading(true);
       message.loading({ content: 'Generating PDF…', key: 'pdf', duration: 0 });
 
-      // Temporarily strip border/shadow so they don't render as lines in PDF
       const prevBorder  = paperEl.style.border;
       const prevShadow  = paperEl.style.boxShadow;
       const prevRadius  = paperEl.style.borderRadius;
@@ -138,22 +137,20 @@ const PatientDetail = () => {
       paperEl.style.borderRadius = '0';
       paperEl.style.padding     = '18px 24px 28px';
 
-      // Wait for all fonts to finish loading before capture — fixes blurry text
       await document.fonts.ready;
 
       const canvas = await html2canvas(paperEl, {
-        scale: 2.5,                    // sweet spot: sharp text, reasonable file size
+        scale: 2.5,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         logging: false,
         imageTimeout: 0,
         removeContainer: true,
-        letterRendering: true,         // renders each letter sharply
-        foreignObjectRendering: false, // disabling this prevents text blur
+        letterRendering: true,
+        foreignObjectRendering: false,
       });
 
-      // Restore original styles
       paperEl.style.border       = prevBorder;
       paperEl.style.boxShadow    = prevShadow;
       paperEl.style.borderRadius = prevRadius;
@@ -173,9 +170,9 @@ const PatientDetail = () => {
       while (remainH > 0) {
         if (yOffset > 0) pdf.addPage();
 
-        const sliceH      = Math.min(pageH - margin * 2, remainH);
-        const srcY        = (yOffset / printH) * canvas.height;
-        const srcH        = (sliceH / printH) * canvas.height;
+        const sliceH  = Math.min(pageH - margin * 2, remainH);
+        const srcY    = (yOffset / printH) * canvas.height;
+        const srcH    = (sliceH / printH) * canvas.height;
 
         const sliceCanvas       = document.createElement('canvas');
         sliceCanvas.width       = canvas.width;
@@ -185,7 +182,6 @@ const PatientDetail = () => {
           0, 0, canvas.width, Math.round(srcH)
         );
 
-        // JPEG 0.97 = near-lossless, file ~3-5MB (vs 17MB for PNG)
         const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.97);
         pdf.addImage(sliceData, 'JPEG', margin, margin, printW, sliceH);
 
@@ -252,6 +248,8 @@ const PatientDetail = () => {
           margin-bottom: 16px;
           flex-wrap: wrap;
           gap: 8px;
+          width: 100%;
+          max-width: 820px;
         }
 
         .pd-back-btn {
@@ -310,7 +308,6 @@ const PatientDetail = () => {
           background: #fff;
           width: 100%;
           max-width: 820px;
-          margin: 0 auto;
           padding: 18px 24px 28px;
           border: 1px solid #e8e8e8;
           border-radius: 4px;
@@ -354,16 +351,20 @@ const PatientDetail = () => {
         }
       `}</style>
 
-      {/* system font stack = jauh lebih tajam di canvas vs Helvetica */}
       <div className="patient-detail-wrapper" style={{
         background: '#fff',
         minHeight: '100%',
         padding: '20px 16px',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        boxSizing: 'border-box',
       }}>
 
         {/* ── TOOLBAR ── */}
-        <div className="pd-toolbar" style={{ maxWidth: 820, margin: '0 auto 16px' }}>
+        <div className="pd-toolbar">
           <button className="pd-back-btn" onClick={() => history.goBack()}>
             <BackIcon /> Back to Patients
           </button>
@@ -396,7 +397,7 @@ const PatientDetail = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 3 }}>
             <img src={LogoRangka} alt="Rangka" style={{ width: 110, objectFit: 'contain', flexShrink: 0 }} />
             <div style={{ flex: 1, textAlign: 'center' }}>
-              <div style={{ fontSize:22, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>
                 Treatment Plan &amp; Progress Report
               </div>
             </div>
