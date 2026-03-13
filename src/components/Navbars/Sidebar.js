@@ -10,16 +10,16 @@ import Palette from "../../utils/Palette";
 const SIDEBAR_COLOR = "#FFFFFF";
 
 const SIDEBAR_ADMIN = [
-    { path: "/patients",        name: "Patients",        icon: "mdi:account-group"      },
-    { path: "/medical-history", name: "Medical History", icon: "mdi:history"            },
-    { path: "/staff",           name: "Staff",           icon: "mdi:badge"              },
-    { path: "/user-management", name: "User Management", icon: "mdi:account-cog"        },
+    { path: "/patients", name: "Patients", icon: "mdi:account-group" },
+    { path: "/medical-history", name: "Medical History", icon: "mdi:history" },
+    { path: "/staff", name: "Staff", icon: "mdi:badge" },
+    { path: "/user-management", name: "User Management", icon: "mdi:account-cog" },
 ];
 
 const SIDEBAR_DOCTOR = [
-    { path: "/patients",        name: "Patients",        icon: "mdi:account-group"      },
-    { path: "/medical-history", name: "Medical History", icon: "mdi:history"            },
-    { path: "/form",            name: "Form",            icon: "mdi:file-document-edit" },
+    { path: "/patients", name: "Patients", icon: "mdi:account-group" },
+    { path: "/medical-history", name: "Medical History", icon: "mdi:history" },
+    { path: "/form", name: "Form", icon: "mdi:file-document-edit" },
 ];
 
 const Sidebar = (props) => {
@@ -28,10 +28,10 @@ const Sidebar = (props) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const sidebarRef = useRef(null);
 
-    const role      = localStorage.getItem('role');
-    const isAdmin   = role === 'ADMIN';
+    const role = localStorage.getItem('role');
+    const isAdmin = role === 'ADMIN';
     const adminName = localStorage.getItem('admin_name') || 'User';
-    const SIDEBAR   = isAdmin ? SIDEBAR_ADMIN : SIDEBAR_DOCTOR;
+    const SIDEBAR = isAdmin ? SIDEBAR_ADMIN : SIDEBAR_DOCTOR;
 
     // Lock body scroll when mobile drawer is open
     useEffect(() => {
@@ -56,13 +56,13 @@ const Sidebar = (props) => {
         return () => document.removeEventListener('mousedown', handler);
     }, [mobileOpen]);
 
-    if (location.pathname.startsWith('/form')) return null;
+    const isFormRoute = location.pathname.startsWith('/form');
 
     const activeRoute = (routeName) =>
         props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
 
     const handleLogout = () => {
-        ['super_token','username','token','role','admin_name','user_id'].forEach(k => {
+        ['super_token', 'username', 'token', 'role', 'admin_name', 'user_id'].forEach(k => {
             localStorage.removeItem(k);
             sessionStorage.removeItem(k);
         });
@@ -144,19 +144,21 @@ const Sidebar = (props) => {
     return (
         <>
             {/* ── DESKTOP sidebar (md and up) ────────────────────────── */}
-            <div className="d-none d-md-flex" style={{
-                position: 'fixed', top: 0, left: 0,
-                width: 250, height: '100vh',
-                background: Palette.BACKGROUND_BLACK,
-                flexDirection: 'column',
-                zIndex: 1040,
-                overflowY: 'auto',
-            }}>
-                <SidebarContent />
-            </div>
+            {!isFormRoute && (
+                <div className="d-none d-md-flex" style={{
+                    position: 'fixed', top: 0, left: 0,
+                    width: 250, height: '100vh',
+                    background: Palette.BACKGROUND_BLACK,
+                    flexDirection: 'column',
+                    zIndex: 1040,
+                    overflowY: 'auto',
+                }}>
+                    <SidebarContent />
+                </div>
+            )}
 
-            {/* ── MOBILE hamburger button ─────────────────────────────── */}
-            <div className="d-flex d-md-none" style={{
+            {/* ── MOBILE / FORM hamburger button ─────────────────────────────── */}
+            <div className={!isFormRoute ? "d-flex d-md-none" : "d-flex"} style={{
                 position: 'fixed', top: 12, left: 12, zIndex: 1060,
             }}>
                 <button
@@ -185,9 +187,10 @@ const Sidebar = (props) => {
             )}
 
             {/* ── MOBILE drawer ───────────────────────────────────────── */}
+            {/* On /form it functions as a desktop drawer too */}
             <div
                 ref={sidebarRef}
-                className="d-md-none"
+                className={!isFormRoute ? "d-md-none" : ""}
                 style={{
                     position: 'fixed', top: 0, left: 0,
                     width: 260, height: '100vh',

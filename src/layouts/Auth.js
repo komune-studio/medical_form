@@ -58,9 +58,7 @@ const Auth = (props) => {
 
   return (
     <>
-      <div
-
-          className="main-content" ref={mainContent}>
+      <div className="main-content no-sidebar" ref={mainContent}>
         <div
           style={{
             height: "100vh",

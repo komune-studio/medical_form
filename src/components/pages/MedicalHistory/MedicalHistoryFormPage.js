@@ -48,14 +48,6 @@ const TREATMENT_OPTIONS = [
   'Ice'
 ];
 
-const NEXT_SESSION_OPTIONS = [
-  'This week',
-  'Next Week',
-  'Next 2 Weeks',
-  'Next Month',
-  'Try pilates session'
-];
-
 const INJURY_TYPE_OPTIONS = [
   'Acute Injury',
   'Chronic Injury',
@@ -264,6 +256,7 @@ export default function MedicalHistoryFormPage({
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [appointmentDateTime, setAppointmentDateTime] = useState('');
+  const [nextSessionDate, setNextSessionDate] = useState(''); // ← STATE BARU
 
   const [staffList, setStaffList] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
@@ -318,6 +311,14 @@ export default function MedicalHistoryFormPage({
         setAppointmentDateTime(dateTimeValue);
       }
 
+      // ← Parse recommended_next_session ke format YYYY-MM-DD untuk input[type=date]
+      let nextSession = '';
+      if (medicalHistoryData.recommended_next_session) {
+        const d = moment(medicalHistoryData.recommended_next_session);
+        nextSession = d.isValid() ? d.format('YYYY-MM-DD') : '';
+      }
+      setNextSessionDate(nextSession);
+
       const formValues = {
         patient_id: medicalHistoryData.patient_id,
         staff_id: medicalHistoryData.staff_id || undefined,
@@ -337,7 +338,6 @@ export default function MedicalHistoryFormPage({
         exercise: medicalHistoryData.exercise || '',
         homework: medicalHistoryData.homework || '',
         recovery_tips: medicalHistoryData.recovery_tips || '',
-        recommended_next_session: medicalHistoryData.recommended_next_session || '',
         body_annotation: medicalHistoryData.body_annotation || '',
       };
 
@@ -346,6 +346,7 @@ export default function MedicalHistoryFormPage({
     } else {
       form.resetFields();
       setAppointmentDateTime('');
+      setNextSessionDate(''); // ← reset
       setHasChanges(false);
     }
 
@@ -360,7 +361,7 @@ export default function MedicalHistoryFormPage({
         const value = allValues[key];
         if (value && value.toString().trim() !== '') return true;
         return false;
-      }) || appointmentDateTime !== '';
+      }) || appointmentDateTime !== '' || nextSessionDate !== '';
       setHasChanges(changed);
       return;
     }
@@ -374,11 +375,16 @@ export default function MedicalHistoryFormPage({
       return currentValue !== originalValue;
     });
 
-    setHasChanges(changed || appointmentDateTime !== '');
+    setHasChanges(changed || appointmentDateTime !== '' || nextSessionDate !== '');
   };
 
   const handleDateTimeChange = (e) => {
     setAppointmentDateTime(e.target.value);
+    setHasChanges(true);
+  };
+
+  const handleNextSessionChange = (e) => {
+    setNextSessionDate(e.target.value);
     setHasChanges(true);
   };
 
@@ -394,11 +400,7 @@ export default function MedicalHistoryFormPage({
 
       let body = form.getFieldsValue();
 
-      // ─── UPLOAD LOGIC (FIXED) ────────────────────────────────────────────────
-      // needsUpload() = true hanya kalau:
-      //   1. User upload custom image (hasLocalFile)
-      //   2. User gambar sesuatu di atas template (hasAnnotations)
-      // Default template yang belum dicoret → skip upload, body_annotation = null
+      // ─── UPLOAD LOGIC ────────────────────────────────────────────────
       if (bodyAnnotationRef.current) {
         const ref = bodyAnnotationRef.current;
 
@@ -441,7 +443,6 @@ export default function MedicalHistoryFormPage({
             setUploadingImage(false);
           }
         } else {
-          // Tidak perlu upload
           if (body.body_annotation) {
             try {
               const parsed = JSON.parse(body.body_annotation);
@@ -450,12 +451,11 @@ export default function MedicalHistoryFormPage({
               // sudah plain URL string, biarkan apa adanya
             }
           } else {
-            // Default template belum dicoret → jangan simpan
             body.body_annotation = null;
           }
         }
       }
-      // ─────────────────────────────────────────────────────────────────────────
+      // ─────────────────────────────────────────────────────────────────
 
       const appointmentMoment = moment(appointmentDateTime);
       if (!appointmentMoment.isValid()) {
@@ -481,6 +481,14 @@ export default function MedicalHistoryFormPage({
         body.treatments = body.treatments.join(', ');
       }
 
+      // ← recommended_next_session: kirim YYYY-MM-DD atau null
+      if (nextSessionDate) {
+        const d = moment(nextSessionDate, 'YYYY-MM-DD', true);
+        body.recommended_next_session = d.isValid() ? d.format('YYYY-MM-DD') : null;
+      } else {
+        body.recommended_next_session = null;
+      }
+
       Object.keys(body).forEach(key => {
         if (body[key] === '') body[key] = null;
       });
@@ -504,6 +512,7 @@ export default function MedicalHistoryFormPage({
         if (isStandalone && onSubmitSuccess) {
           form.resetFields();
           setAppointmentDateTime('');
+          setNextSessionDate(''); // ← reset
           setHasChanges(false);
           setFormKey(prev => prev + 1);
           setTimeout(() => { onSubmitSuccess(); }, 300);
@@ -844,17 +853,19 @@ export default function MedicalHistoryFormPage({
                         <TextArea placeholder="Enter recovery tips and recommendations" className="medical-history-textarea" rows={2} />
                       </Form.Item>
 
-                      <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Recommended Next Session</span>}
-                        name="recommended_next_session"
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <Select className="medical-history-select" placeholder="Select recommended next session" allowClear>
-                          {NEXT_SESSION_OPTIONS.map(option => (
-                            <Option key={option} value={option}>{option}</Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
+                      {/* ── Recommended Next Session — DATE PICKER ── */}
+                      <div style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#000000', fontWeight: 600, fontSize: '14px' }}>
+                          Recommended Next Session
+                        </label>
+                        <input
+                          type="date"
+                          className="native-datetime-input"
+                          value={nextSessionDate}
+                          onChange={handleNextSessionChange}
+                          disabled={formDisabled}
+                        />
+                      </div>
 
                       <Form.Item
                         label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Body Pain Diagram</span>}
