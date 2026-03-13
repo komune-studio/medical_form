@@ -141,13 +141,13 @@ const PatientList = () => {
               <table style="border-collapse:collapse;width:100%;">
                 <tbody>
                   ${[
-                    ['Patient Name:', patient.name],
-                    ['Phone Number:', patient.phone],
-                    ['Email Address:', patient.email],
-                    ['Age:', patient.date_of_birth ? calcAge(patient.date_of_birth) + ' years' : null],
-                    ['Height (cm):', patient.height],
-                    ['Weight (kg):', patient.weight],
-                  ].map(([lbl, val]) => `
+          ['Patient Name:', patient.name],
+          ['Phone Number:', patient.phone],
+          ['Email Address:', patient.email],
+          ['Age:', patient.date_of_birth ? calcAge(patient.date_of_birth) + ' years' : null],
+          ['Height (cm):', patient.height],
+          ['Weight (kg):', patient.weight],
+        ].map(([lbl, val]) => `
                     <tr>
                       <td style="font-weight:700;font-size:9px;color:#111;padding:2.5px 8px 2.5px 0;vertical-align:top;white-space:nowrap;line-height:1.5;">${lbl}</td>
                       <td style="font-size:9px;color:#333;padding:2.5px 0;vertical-align:top;line-height:1.5;word-break:break-word;">${val || '-'}</td>
@@ -162,16 +162,16 @@ const PatientList = () => {
               <table style="border-collapse:collapse;width:100%;">
                 <tbody>
                   ${[
-                    ['Assessment Date:', fmtDate(firstSession.appointment_date)],
-                    ['Assessment Therapist:', firstSession.staff_name],
-                    ['Service Type:', firstSession.service_type],
-                    ['Injury Type:', firstSession.injury_type],
-                    ['Area Concern:', firstSession.area_concern],
-                    ['Diagnosis:', firstSession.diagnosis_result],
-                    ['Range of Motion Impact:', firstSession.range_of_motion_impact],
-                    ['Recovery Goals:', firstSession.recovery_goals],
-                    ['Expected Recovery Time:', firstSession.expected_recovery_time],
-                  ].map(([lbl, val]) => `
+          ['Assessment Date:', fmtDate(firstSession.appointment_date)],
+          ['Assessment Therapist:', firstSession.staff_name],
+          ['Service Type:', firstSession.service_type],
+          ['Injury Type:', firstSession.injury_type],
+          ['Area Concern:', firstSession.area_concern],
+          ['Diagnosis:', firstSession.diagnosis_result],
+          ['Range of Motion Impact:', firstSession.range_of_motion_impact],
+          ['Recovery Goals:', firstSession.recovery_goals],
+          ['Expected Recovery Time:', firstSession.expected_recovery_time],
+        ].map(([lbl, val]) => `
                     <tr>
                       <td style="font-weight:700;font-size:9px;color:#111;padding:2.5px 8px 2.5px 0;vertical-align:top;white-space:nowrap;line-height:1.5;">${lbl}</td>
                       <td style="font-size:9px;color:#333;padding:2.5px 0;vertical-align:top;line-height:1.5;word-break:break-word;">${val || '-'}</td>
@@ -198,8 +198,8 @@ const PatientList = () => {
 
           <!-- LEGEND -->
           <div style="display:flex;justify-content:flex-end;gap:12px;margin-bottom:6px;flex-wrap:wrap;">
-            ${[['#ff4d4f',': Treatment + Rest'],['#ffc107',': Treatment + Exercise'],['#4caf50',': Back to Sports Preparation']].map(([c,l]) =>
-              `<div style="display:flex;align-items:center;gap:4px;font-size:8px;color:#444;">
+            ${[['#ff4d4f', ': Treatment + Rest'], ['#ffc107', ': Treatment + Exercise'], ['#4caf50', ': Back to Sports Preparation']].map(([c, l]) =>
+          `<div style="display:flex;align-items:center;gap:4px;font-size:8px;color:#444;">
                 <span style="width:8px;height:8px;border-radius:50%;background:${c};display:inline-block;flex-shrink:0;"></span>
                 <span>${l}</span>
               </div>`).join('')}
@@ -215,23 +215,23 @@ const PatientList = () => {
               </colgroup>
               <thead>
                 <tr>
-                  ${[['Session<br/>#','#fafafa'],['Session<br/>Date','#fafafa'],['Rangka<br/>Therapist','#fafafa'],['Objective<br/>Progress','#fafafa'],['Home<br/>Exercise','#fafafa'],['Recovery<br/>Tips','#fafafa'],['Pre-<br/>Treatment','#fffbee'],['Post-<br/>Treatment','#f0fff4']]
-                    .map(([lbl,bg]) => `<th style="border:0.5px solid #ccc;padding:5px 3px;font-size:8px;font-weight:700;text-align:center;vertical-align:middle;color:#111;line-height:1.3;background:${bg};overflow:hidden;word-break:break-word;">${lbl}</th>`).join('')}
+                  ${[['Session<br/>#', '#fafafa'], ['Session<br/>Date', '#fafafa'], ['Rangka<br/>Therapist', '#fafafa'], ['Objective<br/>Progress', '#fafafa'], ['Home<br/>Exercise', '#fafafa'], ['Recovery<br/>Tips', '#fafafa'], ['Pre-<br/>Treatment', '#fffbee'], ['Post-<br/>Treatment', '#f0fff4']]
+          .map(([lbl, bg]) => `<th style="border:0.5px solid #ccc;padding:5px 3px;font-size:8px;font-weight:700;text-align:center;vertical-align:middle;color:#111;line-height:1.3;background:${bg};overflow:hidden;word-break:break-word;">${lbl}</th>`).join('')}
                 </tr>
               </thead>
               <tbody>
                 ${sessions.map((s, i) => {
-                  const pb = s.pain_before != null ? s.pain_before.toString() : '-';
-                  const pa = s.pain_after != null ? s.pain_after.toString() : '-';
-                  const pbColor = painColor(pb);
-                  const paColor = painColor(pa);
-                  return `<tr>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;font-weight:700;background:#fafafa;vertical-align:top;">${i+1}</td>
+            const pb = s.pain_before != null ? s.pain_before.toString() : '-';
+            const pa = s.pain_after != null ? s.pain_after.toString() : '-';
+            const pbColor = painColor(pb);
+            const paColor = painColor(pa);
+            return `<tr>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;font-weight:700;background:#fafafa;vertical-align:top;">${i + 1}</td>
                     <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;vertical-align:top;color:#333;">${fmtDate(s.appointment_date)}</td>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.staff_name||'-'}</td>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.objective_progress||'-'}</td>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.exercise||'-'}</td>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.recovery_tips||'-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.staff_name || '-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.objective_progress || '-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.exercise || '-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.recovery_tips || '-'}</td>
                     <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;background:#fffbee;vertical-align:top;">
                       <span style="display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:9px;color:#111;">
                         ${pb}${pbColor ? `<span style="width:7px;height:7px;border-radius:50%;background:${pbColor};display:inline-block;flex-shrink:0;"></span>` : ''}
@@ -243,7 +243,7 @@ const PatientList = () => {
                       </span>
                     </td>
                   </tr>`;
-                }).join('')}
+          }).join('')}
               </tbody>
             </table>
           </div>
@@ -253,7 +253,7 @@ const PatientList = () => {
             const img = s.body_annotation_base64 || s.body_annotation_url;
             if (!img || !img.trim()) return '';
             return `<div style="margin-bottom:18px;">
-              <div style="font-size:9px;font-weight:700;color:#111;margin-bottom:6px;">Session ${i+1} - Body Annotation:</div>
+              <div style="font-size:9px;font-weight:700;color:#111;margin-bottom:6px;">Session ${i + 1} - Body Annotation:</div>
               <div style="text-align:center;">
                 <img src="${img}" alt="body annotation" crossorigin="anonymous" style="max-width:280px;width:100%;display:block;margin:0 auto;" />
               </div>
@@ -288,12 +288,12 @@ const PatientList = () => {
       document.body.removeChild(wrapper);
 
       // 5. Save PDF — same as PatientDetail
-      const pdf   = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
       const margin = 8;
       const printW = pageW - margin * 2;
-      const ratio  = canvas.height / canvas.width;
+      const ratio = canvas.height / canvas.width;
       const printH = printW * ratio;
 
       let yOffset = 0;
@@ -301,10 +301,10 @@ const PatientList = () => {
       while (remainH > 0) {
         if (yOffset > 0) pdf.addPage();
         const sliceH = Math.min(pageH - margin * 2, remainH);
-        const srcY   = (yOffset / printH) * canvas.height;
-        const srcH   = (sliceH / printH) * canvas.height;
+        const srcY = (yOffset / printH) * canvas.height;
+        const srcH = (sliceH / printH) * canvas.height;
         const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width  = canvas.width;
+        sliceCanvas.width = canvas.width;
         sliceCanvas.height = Math.round(srcH);
         sliceCanvas.getContext('2d').drawImage(canvas, 0, Math.round(srcY), canvas.width, Math.round(srcH), 0, 0, canvas.width, Math.round(srcH));
         pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.97), 'JPEG', margin, margin, printW, sliceH);
@@ -689,8 +689,8 @@ const PatientList = () => {
         .patient-search.ant-input-affix-wrapper:hover,
         .patient-search.ant-input-affix-wrapper:focus,
         .patient-search.ant-input-affix-wrapper-focused {
-          border-color: #1890ff !important;
-          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+          border-color: #000000 !important;
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
         }
         
         .patient-search .ant-input-clear-icon {
@@ -743,12 +743,12 @@ const PatientList = () => {
         }
         
         .filter-select .ant-select-selector:hover {
-          border-color: #1890ff !important;
+          border-color: #000000 !important;
         }
         
         .filter-select.ant-select-focused .ant-select-selector {
-          border-color: #1890ff !important;
-          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+          border-color: #000000 !important;
+          box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
         }
         
         /* Modal styling */

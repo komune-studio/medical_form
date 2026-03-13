@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, Link, Prompt } from 'react-router-dom';
-import { 
-  Button, 
-  message, 
-  Spin, 
-  Typography, 
-  Form, 
-  Input, 
+import {
+  Button,
+  message,
+  Spin,
+  Typography,
+  Form,
+  Input,
   Select,
   Row,
   Col,
@@ -33,10 +33,10 @@ function dataURLtoBlob(dataurl) {
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
-  while(n--){
+  while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
-  return new Blob([u8arr], {type:mime});
+  return new Blob([u8arr], { type: mime });
 }
 
 const TREATMENT_OPTIONS = [
@@ -264,10 +264,10 @@ export default function MedicalHistoryFormPage({
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [appointmentDateTime, setAppointmentDateTime] = useState('');
-  
+
   const [staffList, setStaffList] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
-  
+
   const bodyAnnotationRef = useRef(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -317,7 +317,7 @@ export default function MedicalHistoryFormPage({
         dateTimeValue = momentDate.format('YYYY-MM-DDTHH:mm');
         setAppointmentDateTime(dateTimeValue);
       }
-      
+
       const formValues = {
         patient_id: medicalHistoryData.patient_id,
         staff_id: medicalHistoryData.staff_id || undefined,
@@ -340,7 +340,7 @@ export default function MedicalHistoryFormPage({
         recommended_next_session: medicalHistoryData.recommended_next_session || '',
         body_annotation: medicalHistoryData.body_annotation || '',
       };
-      
+
       form.setFieldsValue(formValues);
       setHasChanges(false);
     } else {
@@ -348,7 +348,7 @@ export default function MedicalHistoryFormPage({
       setAppointmentDateTime('');
       setHasChanges(false);
     }
-    
+
     if (disabled) {
       setFormDisabled(disabled);
     }
@@ -373,7 +373,7 @@ export default function MedicalHistoryFormPage({
       }
       return currentValue !== originalValue;
     });
-    
+
     setHasChanges(changed || appointmentDateTime !== '');
   };
 
@@ -384,14 +384,14 @@ export default function MedicalHistoryFormPage({
 
   const onSubmit = async () => {
     setLoadingSubmit(true);
-    
+
     try {
       if (!appointmentDateTime) {
         throw new Error('Appointment date and time is required');
       }
 
       await form.validateFields();
-      
+
       let body = form.getFieldsValue();
 
       // ─── UPLOAD LOGIC (FIXED) ────────────────────────────────────────────────
@@ -500,7 +500,7 @@ export default function MedicalHistoryFormPage({
 
       if (result && result.http_code === 200) {
         message.success(msg);
-        
+
         if (isStandalone && onSubmitSuccess) {
           form.resetFields();
           setAppointmentDateTime('');
@@ -522,7 +522,7 @@ export default function MedicalHistoryFormPage({
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       await swal.fire({
         title: 'Error',
         text: errorMessage,
@@ -537,7 +537,7 @@ export default function MedicalHistoryFormPage({
   const handleDelete = async () => {
     try {
       if (!medicalHistoryData || !medicalHistoryData.id) return;
-      
+
       await swal.fire({
         title: 'Delete Medical History',
         text: 'Are you sure you want to delete this medical history record? This action cannot be undone.',
@@ -572,14 +572,14 @@ export default function MedicalHistoryFormPage({
   };
 
   return (
-    <div style={{ 
+    <div style={{
       backgroundColor: '#f7f8fa',
       minHeight: '100vh',
       paddingTop: isStandalone ? '24px' : '80px',
       paddingBottom: '40px'
     }}>
       <style>{customStyles}</style>
-      
+
       <Container>
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
@@ -588,7 +588,7 @@ export default function MedicalHistoryFormPage({
         ) : (
           <Row justify="center">
             <Col xs={24} sm={24} md={22} lg={20} xl={18}>
-              <Card 
+              <Card
                 bordered={false}
                 style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}
                 title={
@@ -597,7 +597,7 @@ export default function MedicalHistoryFormPage({
                       {!medicalHistoryData ? "New Medical History" : "Medical History Details"}
                     </Title>
                     {!isStandalone && (
-                      <Button 
+                      <Button
                         onClick={() => history.push("/medical-history")}
                         style={{ height: '32px', padding: '0 16px', borderRadius: '4px', fontSize: '13px', borderColor: '#d9d9d9' }}
                       >
@@ -637,9 +637,10 @@ export default function MedicalHistoryFormPage({
                           loading={patientsLoading}
                           showSearch
                           optionFilterProp="children"
-                          filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                          }
+                          filterOption={(input, option) => {
+                            const childStr = Array.isArray(option.children) ? option.children.join('') : String(option.children || '');
+                            return childStr.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                          }}
                         >
                           {patients.map(patient => (
                             <Option key={patient.id} value={patient.id}>
@@ -691,9 +692,10 @@ export default function MedicalHistoryFormPage({
                               showSearch
                               allowClear
                               optionFilterProp="children"
-                              filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                              }
+                              filterOption={(input, option) => {
+                                const childStr = Array.isArray(option.children) ? option.children.join('') : String(option.children || '');
+                                return childStr.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                              }}
                             >
                               {staffList.map(staff => (
                                 <Option key={staff.id} value={staff.id}>
@@ -886,7 +888,7 @@ export default function MedicalHistoryFormPage({
                               >
                                 {!medicalHistoryData ? "Add Record" : "Save"}
                               </Button>
-                              
+
                               {medicalHistoryData && (
                                 <Button
                                   onClick={handleDelete}

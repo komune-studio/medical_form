@@ -1,5 +1,5 @@
-import { 
-  Link, 
+import {
+  Link,
   useHistory,
   useLocation // ✅ IMPORT useLocation
 } from "react-router-dom";
@@ -19,6 +19,7 @@ const AdminNavbar = () => {
   const history = useHistory();
   const location = useLocation(); // ✅ Pakai useLocation
   const adminName = localStorage.getItem('admin_name') || '-';
+  const role = localStorage.getItem('role') || 'User';
 
   // ✅ CEK: Jika pathname adalah /form, return null (tidak render navbar)
   if (location.pathname.startsWith('/form')) {
@@ -58,12 +59,17 @@ const AdminNavbar = () => {
           >
             <Media className="align-items-center">
               <Media className="mr-2 d-none d-lg-block">
-                <span
-                  className="mb-0 text-sm font-weight-bold"
-                  style={{ color: '#000' }}
-                >
-                  {adminName}
-                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
+                  <span
+                    className="mb-0 text-sm font-weight-bold"
+                    style={{ color: '#000' }}
+                  >
+                    {adminName}
+                  </span>
+                  <span style={{ color: '#666', fontSize: '11px', fontWeight: '500' }}>
+                    ({role.toLowerCase()})
+                  </span>
+                </div>
               </Media>
 
               <Avatar
