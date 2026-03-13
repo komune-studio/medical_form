@@ -18,7 +18,6 @@ const SIDEBAR_ADMIN = [
 
 const SIDEBAR_DOCTOR = [
     { path: "/patients", name: "Patients", icon: "mdi:account-group" },
-    { path: "/medical-history", name: "Medical History", icon: "mdi:history" },
     { path: "/form", name: "Form", icon: "mdi:file-document-edit" },
 ];
 

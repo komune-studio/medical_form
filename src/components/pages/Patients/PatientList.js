@@ -85,10 +85,14 @@ const PatientList = () => {
       message.loading({ content: 'Generating PDF report...', key: 'pdf-gen', duration: 0 });
 
       // 1. Fetch report data
-      const response = await MedicalHistoryModel.getProgressReport(patientId);
-      const reportData = response?.data;
-      if (!reportData) throw new Error('Failed to load patient data');
-      if (!reportData.sessions || reportData.sessions.length === 0) throw new Error('No medical history records found for this patient');
+      let reportData = null;
+      try {
+        const response = await MedicalHistoryModel.getProgressReport(patientId);
+        reportData = response?.data;
+      } catch (fetchErr) {
+        throw new Error('no_sessions'); // treat any network error as no data
+      }
+      if (!reportData || !reportData.sessions || reportData.sessions.length === 0) throw new Error('no_sessions');
 
       const { patient, sessions } = reportData;
       const firstSession = sessions[0] || {};
@@ -322,14 +326,45 @@ const PatientList = () => {
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
-      let errorMsg = 'Failed to generate PDF report';
-      if (error.message?.includes('No medical history')) {
-        errorMsg = 'No medical history records found for this patient';
-      } else if (error.message) {
-        errorMsg = error.message;
+      message.destroy('pdf-gen');
+
+      if (error.message === 'no_sessions' || error.message === 'no_data' || error.message?.toLowerCase().includes('no medical history')) {
+        Modal.warning({
+          title: 'Belum Ada Medical History',
+          content: `${patientName} (${patientCode}) belum memiliki riwayat medis. Progress report hanya bisa di-download setelah ada data medical history.`,
+          okText: 'Mengerti',
+          okButtonProps: { style: { background: '#1890ff', borderColor: '#1890ff' } },
+        });
+      } else {
+        Modal.error({
+          title: 'Gagal Generate PDF',
+          content: error.message || 'Terjadi kesalahan saat membuat PDF. Silakan coba lagi.',
+          okText: 'Tutup',
+        });
       }
-      message.error({ content: errorMsg, key: 'pdf-gen', duration: 5 });
     }
+  };
+
+  const handleViewPatient = async (row) => {
+    let hasData = false;
+    try {
+      const response = await MedicalHistoryModel.getProgressReport(row.id);
+      const d = response?.data;
+      hasData = !!(d && d.sessions && d.sessions.length > 0);
+    } catch (e) {
+      hasData = false;
+    }
+
+    if (!hasData) {
+      Modal.warning({
+        title: 'Belum Ada Medical History',
+        content: `${row.name} (${row.patient_code}) belum memiliki riwayat medis. Halaman detail baru bisa dibuka setelah ada data medical history.`,
+        okText: 'Mengerti',
+        okButtonProps: { style: { background: '#1890ff', borderColor: '#1890ff' } },
+      });
+      return;
+    }
+    window.location.href = `/patients/${row.id}`;
   };
 
   const columns = [
@@ -417,15 +452,14 @@ const PatientList = () => {
         return (
           <Space size="small">
             <Tooltip title="View Details">
-              <Link to={`/patients/${row.id}`}>
-                <AntButton
-                  type={'link'}
-                  style={{ color: '#333' }}
-                  className={"d-flex align-items-center justify-content-center"}
-                  shape="circle"
-                  icon={<Iconify icon={"material-symbols:visibility"} />}
-                />
-              </Link>
+              <AntButton
+                type={'link'}
+                style={{ color: '#333' }}
+                className={"d-flex align-items-center justify-content-center"}
+                shape="circle"
+                icon={<Iconify icon={"material-symbols:visibility"} />}
+                onClick={() => handleViewPatient(row)}
+              />
             </Tooltip>
 
             <Tooltip title="Edit Patient">

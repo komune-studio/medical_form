@@ -76,22 +76,22 @@ const LegendItem = ({ color, label }) => (
 
 const PdfIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="#fff" opacity="0.9"/>
-    <path d="M14 2V8H20" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="#fff" opacity="0.9" />
+    <path d="M14 2V8H20" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     <text x="7" y="18" fontSize="6" fontWeight="bold" fill="#e53e3e" fontFamily="helvetica">PDF</text>
   </svg>
 );
 
 const DownloadIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-    <path d="M12 16L7 11H10V4H14V11H17L12 16Z" fill="#fff"/>
-    <path d="M5 20H19" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+    <path d="M12 16L7 11H10V4H14V11H17L12 16Z" fill="#fff" />
+    <path d="M5 20H19" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 
 const BackIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -103,17 +103,29 @@ const PatientDetail = () => {
   const [loading, setLoading] = useState(true);
   const [reportData, setReportData] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(null); // 'no_history' | 'server_error' | null
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
+        setFetchError(null);
         const response = await MedicalHistoryModel.getProgressReport(id);
         const data = response?.data;
-        if (!data) throw new Error('Invalid response from server.');
+        if (!data) throw new Error('invalid_response');
+        if (!data.sessions || data.sessions.length === 0) {
+          setFetchError('no_history');
+          setReportData(data); // still set patient data if available
+          return;
+        }
         setReportData(data);
       } catch (err) {
-        message.error(err.message || 'Failed to load patient data');
+        const msg = err.message?.toLowerCase() || '';
+        if (msg.includes('no medical history') || msg.includes('404') || msg.includes('not found')) {
+          setFetchError('no_history');
+        } else {
+          setFetchError('server_error');
+        }
       } finally {
         setLoading(false);
       }
@@ -128,14 +140,14 @@ const PatientDetail = () => {
       setPdfLoading(true);
       message.loading({ content: 'Generating PDF…', key: 'pdf', duration: 0 });
 
-      const prevBorder  = paperEl.style.border;
-      const prevShadow  = paperEl.style.boxShadow;
-      const prevRadius  = paperEl.style.borderRadius;
+      const prevBorder = paperEl.style.border;
+      const prevShadow = paperEl.style.boxShadow;
+      const prevRadius = paperEl.style.borderRadius;
       const prevPadding = paperEl.style.padding;
-      paperEl.style.border      = 'none';
-      paperEl.style.boxShadow   = 'none';
+      paperEl.style.border = 'none';
+      paperEl.style.boxShadow = 'none';
       paperEl.style.borderRadius = '0';
-      paperEl.style.padding     = '18px 24px 28px';
+      paperEl.style.padding = '18px 24px 28px';
 
       await document.fonts.ready;
 
@@ -151,18 +163,18 @@ const PatientDetail = () => {
         foreignObjectRendering: false,
       });
 
-      paperEl.style.border       = prevBorder;
-      paperEl.style.boxShadow    = prevShadow;
+      paperEl.style.border = prevBorder;
+      paperEl.style.boxShadow = prevShadow;
       paperEl.style.borderRadius = prevRadius;
-      paperEl.style.padding      = prevPadding;
+      paperEl.style.padding = prevPadding;
 
-      const pdf   = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
-      const margin  = 8;
-      const printW  = pageW - margin * 2;
-      const ratio   = canvas.height / canvas.width;
-      const printH  = printW * ratio;
+      const margin = 8;
+      const printW = pageW - margin * 2;
+      const ratio = canvas.height / canvas.width;
+      const printH = printW * ratio;
 
       let yOffset = 0;
       let remainH = printH;
@@ -170,13 +182,13 @@ const PatientDetail = () => {
       while (remainH > 0) {
         if (yOffset > 0) pdf.addPage();
 
-        const sliceH  = Math.min(pageH - margin * 2, remainH);
-        const srcY    = (yOffset / printH) * canvas.height;
-        const srcH    = (sliceH / printH) * canvas.height;
+        const sliceH = Math.min(pageH - margin * 2, remainH);
+        const srcY = (yOffset / printH) * canvas.height;
+        const srcH = (sliceH / printH) * canvas.height;
 
-        const sliceCanvas       = document.createElement('canvas');
-        sliceCanvas.width       = canvas.width;
-        sliceCanvas.height      = Math.round(srcH);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = Math.round(srcH);
         sliceCanvas.getContext('2d').drawImage(
           canvas, 0, Math.round(srcY), canvas.width, Math.round(srcH),
           0, 0, canvas.width, Math.round(srcH)
@@ -211,13 +223,88 @@ const PatientDetail = () => {
     );
   }
 
+  if (!reportData && fetchError === 'no_history') {
+    return (
+      <div className="patient-detail-wrapper" style={{ padding: '60px 16px', display: 'flex', justifyContent: 'center', background: '#f7f8fa', minHeight: '100vh', width: '100%' }}>
+        <div style={{ textAlign: 'center', padding: '60px 40px', background: '#fff', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', width: '100%', maxWidth: 500 }}>
+          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#fff7e6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M12 9V13M12 17H12.01M3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12Z" stroke="#faad14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+          <h3 style={{ fontSize: 18, color: '#333', marginBottom: 8, fontWeight: 700 }}>Belum Ada Medical History</h3>
+          <p style={{ fontSize: 14, color: '#666', marginBottom: 28, lineHeight: 1.6 }}>
+            Pasien ini belum memiliki riwayat medis atau progress report yang tercatat di sistem.
+          </p>
+          <button style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#444',
+            border: '1px solid #d9d9d9', borderRadius: 6, padding: '8px 16px', fontSize: 14,
+            fontWeight: 500, cursor: 'pointer',
+          }} onClick={() => history.goBack()}>
+            <BackIcon /> Kembali
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError === 'server_error') {
+    return (
+      <div className="patient-detail-wrapper" style={{ padding: '60px 16px', display: 'flex', justifyContent: 'center', background: '#f7f8fa', minHeight: '100vh', width: '100%' }}>
+        <div style={{ textAlign: 'center', padding: '60px 40px', background: '#fff', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', width: '100%', maxWidth: 500 }}>
+          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#fff2f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M12 9V13M12 17H12.01M3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12Z" stroke="#ff4d4f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+          <h3 style={{ fontSize: 18, color: '#333', marginBottom: 8, fontWeight: 700 }}>Gagal Memuat Data</h3>
+          <p style={{ fontSize: 14, color: '#666', marginBottom: 28, lineHeight: 1.6 }}>
+            Terjadi kesalahan saat memuat data pasien. Silakan coba lagi.
+          </p>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <button style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#444',
+              border: '1px solid #d9d9d9', borderRadius: 6, padding: '8px 16px', fontSize: 14,
+              fontWeight: 500, cursor: 'pointer',
+            }} onClick={() => history.goBack()}>
+              <BackIcon /> Kembali
+            </button>
+            <button style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, background: '#1890ff', color: '#fff',
+              border: 'none', borderRadius: 6, padding: '8px 16px', fontSize: 14,
+              fontWeight: 500, cursor: 'pointer',
+            }} onClick={() => window.location.reload()}>
+              Coba Lagi
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!reportData) {
     return (
-      <div style={{ textAlign: 'center', padding: 60, color: '#888' }}>
-        <p style={{ fontSize: 14 }}>Patient data not found.</p>
-        <button className="pd-back-btn" onClick={() => history.goBack()}>
-          <BackIcon /> Back
-        </button>
+      <div className="patient-detail-wrapper" style={{ padding: '60px 16px', display: 'flex', justifyContent: 'center', background: '#f7f8fa', minHeight: '100vh', width: '100%' }}>
+        <div style={{ textAlign: 'center', padding: '60px 40px', background: '#fff', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', width: '100%', maxWidth: 500 }}>
+          <div style={{ marginBottom: 20, opacity: 0.5, display: 'flex', justifyContent: 'center' }}>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12H15M12 9V15M3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12Z" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <h3 style={{ fontSize: 20, color: '#333', marginBottom: 12, fontWeight: 700 }}>Belum Ada Medical History</h3>
+          <p style={{ fontSize: 14, color: '#666', marginBottom: 28, lineHeight: 1.6 }}>Pasien ini belum memiliki riwayat medis atau laporan perkembangan (progress report) yang tercatat di sistem.</p>
+          <button style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#444',
+            border: '1px solid #d9d9d9', borderRadius: 6, padding: '8px 16px', fontSize: 14,
+            fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s'
+          }} onClick={() => history.goBack()}>
+            <BackIcon /> Kembali
+          </button>
+        </div>
       </div>
     );
   }
@@ -226,14 +313,14 @@ const PatientDetail = () => {
   const firstSession = sessions[0] || {};
 
   const tableHeaders = [
-    { label: 'Session\n#',         width: 28,  bg: '#fafafa' },
-    { label: 'Session\nDate',       width: 52,  bg: '#fafafa' },
-    { label: 'Rangka\nTherapist',   width: 65,  bg: '#fafafa' },
+    { label: 'Session\n#', width: 28, bg: '#fafafa' },
+    { label: 'Session\nDate', width: 52, bg: '#fafafa' },
+    { label: 'Rangka\nTherapist', width: 65, bg: '#fafafa' },
     { label: 'Objective\nProgress', width: 120, bg: '#fafafa' },
-    { label: 'Home\nExercise',      width: 100, bg: '#fafafa' },
-    { label: 'Recovery\nTips',      width: 100, bg: '#fafafa' },
-    { label: 'Pre-\nTreatment',     width: 40,  bg: '#fffbee' },
-    { label: 'Post-\nTreatment',    width: 40,  bg: '#f0fff4' },
+    { label: 'Home\nExercise', width: 100, bg: '#fafafa' },
+    { label: 'Recovery\nTips', width: 100, bg: '#fafafa' },
+    { label: 'Pre-\nTreatment', width: 40, bg: '#fffbee' },
+    { label: 'Post-\nTreatment', width: 40, bg: '#f0fff4' },
   ];
 
   return (
@@ -374,8 +461,8 @@ const PatientDetail = () => {
               <>
                 <span className="pd-spin">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3"/>
-                    <path d="M12 2C6.48 2 2 6.48 2 12" stroke="#fff" strokeWidth="3" strokeLinecap="round"/>
+                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                    <path d="M12 2C6.48 2 2 6.48 2 12" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
                   </svg>
                 </span>
                 Generating…
@@ -412,12 +499,12 @@ const PatientDetail = () => {
               <div style={{ fontSize: 10, fontWeight: 700, color: '#111', marginBottom: 4 }}>Client's Data:</div>
               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                 <tbody>
-                  <InfoRow label="Patient Name:"   value={patient.name} />
-                  <InfoRow label="Phone Number:"   value={patient.phone} />
-                  <InfoRow label="Email Address:"  value={patient.email} />
-                  <InfoRow label="Age:"            value={patient.date_of_birth ? `${calculateAge(patient.date_of_birth)} years` : null} />
-                  <InfoRow label="Height (cm):"    value={patient.height} />
-                  <InfoRow label="Weight (kg):"    value={patient.weight} />
+                  <InfoRow label="Patient Name:" value={patient.name} />
+                  <InfoRow label="Phone Number:" value={patient.phone} />
+                  <InfoRow label="Email Address:" value={patient.email} />
+                  <InfoRow label="Age:" value={patient.date_of_birth ? `${calculateAge(patient.date_of_birth)} years` : null} />
+                  <InfoRow label="Height (cm):" value={patient.height} />
+                  <InfoRow label="Weight (kg):" value={patient.weight} />
                 </tbody>
               </table>
             </div>
@@ -427,15 +514,15 @@ const PatientDetail = () => {
               <div style={{ fontSize: 10, fontWeight: 700, color: '#111', marginBottom: 4 }}>Rangka Assessment:</div>
               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                 <tbody>
-                  <InfoRow label="Assessment Date:"          value={formatDate(firstSession.appointment_date)} />
-                  <InfoRow label="Assessment Therapist:"     value={firstSession.staff_name} />
-                  <InfoRow label="Service Type:"             value={firstSession.service_type} />
-                  <InfoRow label="Injury Type:"              value={firstSession.injury_type} />
-                  <InfoRow label="Area Concern:"             value={firstSession.area_concern} />
-                  <InfoRow label="Diagnosis:"                value={firstSession.diagnosis_result} />
-                  <InfoRow label="Range of Motion Impact:"   value={firstSession.range_of_motion_impact} />
-                  <InfoRow label="Recovery Goals:"           value={firstSession.recovery_goals} />
-                  <InfoRow label="Expected Recovery Time:"   value={firstSession.expected_recovery_time} />
+                  <InfoRow label="Assessment Date:" value={formatDate(firstSession.appointment_date)} />
+                  <InfoRow label="Assessment Therapist:" value={firstSession.staff_name} />
+                  <InfoRow label="Service Type:" value={firstSession.service_type} />
+                  <InfoRow label="Injury Type:" value={firstSession.injury_type} />
+                  <InfoRow label="Area Concern:" value={firstSession.area_concern} />
+                  <InfoRow label="Diagnosis:" value={firstSession.diagnosis_result} />
+                  <InfoRow label="Range of Motion Impact:" value={firstSession.range_of_motion_impact} />
+                  <InfoRow label="Recovery Goals:" value={firstSession.recovery_goals} />
+                  <InfoRow label="Expected Recovery Time:" value={firstSession.expected_recovery_time} />
                 </tbody>
               </table>
             </div>
