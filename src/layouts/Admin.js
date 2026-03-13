@@ -77,7 +77,7 @@ const Admin = (props) => {
           imgAlt: "..."
         }}
       />
-      <div className="main-content" ref={mainContent} style={{paddingTop : 80, background : Palette.BACKGROUND_DARK_GRAY, height: "100dvh"}}>
+      <div className={`main-content ${location.pathname.startsWith('/form') ? 'no-sidebar' : ''}`} ref={mainContent} style={{ paddingTop: 80, background: Palette.BACKGROUND_DARK_GRAY, height: "100dvh" }}>
         <AdminNavbar
           {...props}
           brandText={getBrandText(props.location.pathname)}
@@ -86,20 +86,20 @@ const Admin = (props) => {
         {/*<Container*/}
 
         {/*    fluid>*/}
-          <div
-              style={{
-                display: "flex",
-                flexGrow: 1,
-              background: Palette.BACKGROUND_DARK_GRAY
-              }}
-          >
-            <Switch>
-              {getRoutes(routes)}
-              <Redirect from="/" to="/patients" />
-              {/* <Route path={"*"} component={Dashboard}/> */}
-            </Switch>
-          </div>
-          {/* <Container fluid>
+        <div
+          style={{
+            display: "flex",
+            flexGrow: 1,
+            background: Palette.BACKGROUND_DARK_GRAY
+          }}
+        >
+          <Switch>
+            {getRoutes(routes)}
+            <Redirect from="/" to="/patients" />
+            {/* <Route path={"*"} component={Dashboard}/> */}
+          </Switch>
+        </div>
+        {/* <Container fluid>
               <AdminFooter />
           </Container> */}
         {/*</Container>*/}
