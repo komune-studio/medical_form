@@ -1,194 +1,109 @@
-import Modal from 'react-bootstrap/Modal';
-import { Button, DatePicker, message, Spin, Flex, Form, Input, Select } from "antd";
-import { useEffect, useState } from "react";
-import UserModel from "../../../models/UserModel";
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
-import PropTypes from "prop-types";
-import swal from "../../reusable/CustomSweetAlert";
-import Admin from 'models/AdminModel';
-import { useHistory } from "react-router-dom";
-import Placeholder from 'utils/Placeholder';
+import React, { useState, useEffect } from 'react';
+import { Modal, Form, Input, Select, Button, message } from 'antd';
+import AdminService from 'models/AdminModel';
 
-UserFormModal.propTypes = {
-    close: PropTypes.func,
-    isOpen: PropTypes.bool,
-    isNewRecord: PropTypes.bool,
-    userData: PropTypes.object,
-    isSuperAdmin: PropTypes.bool,
-};
+const { Option } = Select;
 
+/**
+ * Modal untuk:
+ * - Buat user baru (isNewRecord=true) — ADMIN only
+ * - (Edit username bisa ditambah nanti)
+ */
+const UserFormModal = ({ isOpen, isNewRecord, userData, isAdmin, close }) => {
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
 
-export default function UserFormModal({ isOpen, close, isNewRecord, userData, isSuperAdmin }) {
-    const history = useHistory()
-    const [form] = Form.useForm()
-
-    const userRoles = [
-        { label: "Admin", value: "ADMIN" },
-        { label: "Super Admin", value: "SUPERADMIN" },
-    ];
-
-    const [loadingUpload, setLoadingUpload] = useState(false)
-
-
-    const onSubmit = async () => {
-        try {
-            let result;
-            let body = form.getFieldsValue();
-            let msg = ''
-            console.log(body)
-            if (isNewRecord) {
-                if(body.role == "ADMIN") {
-                    await Admin.createAdmin(body);
-                } else {
-                    await Admin.createSuperAdmin(body);
-                }
-                msg = "Successfully added new User"
-            } 
-            // else {
-            //     if (isSuperAdmin) {
-            //         await Admin.edit(userData?.id, body)
-            //     } else {
-            //         await Admin.editSelf(body);
-            //     }
-            //     msg = "Successfully updated User"
-            // }
-
-            message.success(msg)
-            handleClose(true)
-        } catch (e) {
-            console.log(e)
-            let errorMessage = "An Error Occured"
-            await swal.fire({
-                title: 'Error',
-                text: e.error_message ? e.error_message : errorMessage,
-                icon: 'error',
-                confirmButtonText: 'Okay'
-            })
-        }
-
-    }
-
-    const handleClose = (refresh) => {
-        close(refresh)
-    }
-
-    const initForm = () => {
-        console.log('isi userData', userData)
-        if (!isNewRecord) {
-            form.setFieldsValue({
-                username: userData?.username,
-                role: userData?.role,
-            })
-        }
-
-    }
     useEffect(() => {
-        if (isNewRecord) {
-            reset()
-        } else {
-            initForm()
+        if (isOpen) {
+            if (isNewRecord) {
+                form.resetFields();
+            } else if (userData) {
+                form.setFieldsValue({
+                    username: userData.username,
+                    role: userData.role,
+                });
+            }
         }
+    }, [isOpen, isNewRecord, userData]);
 
+    const handleSubmit = async (values) => {
+        setLoading(true);
+        try {
+            if (isNewRecord) {
+                await AdminService.adminCreateUser({
+                    username: values.username,
+                    password: values.password,
+                    role: values.role,
+                });
+                message.success(`User "${values.username}" created as ${values.role}`);
+            }
+            close(true);
+        } catch (e) {
+            const errMsg = e?.error_message || e?.message || 'Failed to save user';
+            message.error(errMsg);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    }, [isOpen])
-
-    const reset = () => {
-        form.resetFields();
-    }
-
-    return <Modal
-        show={isOpen}
-        backdrop="static"
-        keyboard={false}
-    >
-        <Modal.Header style={{ paddingBottom: "0" }}>
-            <div className={'d-flex w-100 justify-content-between'}>
-                {/* <Modal.Title>{isNewRecord ? 'Create User' : `Update User`}</Modal.Title> */}
-                <Modal.Title>Add User</Modal.Title>
-                <Button onClick={() => {
-                    close()
-                }} style={{ position: 'relative', top: -5, color: '#fff', fontWeight: 800 }} type="link" shape="circle"
-                    icon={<CloseOutlined />} />
-            </div>
-        </Modal.Header>
-        <Modal.Body style={{ paddingTop: "0" }}>
+    return (
+        <Modal
+            title={isNewRecord ? 'Add New User' : 'Edit User'}
+            open={isOpen}
+            onCancel={() => close(false)}
+            footer={null}
+            destroyOnClose
+        >
             <Form
-                layout='vertical'
                 form={form}
-                onFinish={onSubmit}
-                validateTrigger="onSubmit"
-                autoComplete="off"
+                layout="vertical"
+                onFinish={handleSubmit}
+                initialValues={{ role: 'DOCTOR' }}
             >
                 <Form.Item
-                    label={"Username"}
-                    name={"username"}
-                    rules={[{
-                        required: true,
-                    }]}
+                    label="Username"
+                    name="username"
+                    rules={[{ required: true, message: 'Username is required' }]}
                 >
-                    <Input variant='filled' placeholder={Placeholder.name_person} />
+                    <Input placeholder="Enter username" />
                 </Form.Item>
-                {isNewRecord ? (
-                    <>
-                        <Form.Item
-                            label={"Role"}
-                            name={"role"}
-                            rules={[{
-                                required: true,
-                            }]}
-                        >
-                            <Select variant='filled' options={userRoles} placeholder={Placeholder.admin_role} />
-                        </Form.Item>
-                        <Form.Item
-                            label={"Password"}
-                            name={"password"}
-                            rules={[{
-                                required: true,
-                            }]}
-                        >
-                            <Input.Password variant='filled' placeholder={Placeholder.password} />
-                        </Form.Item>
-                        <Form.Item
-                            label={"Confirm Password"}
-                            name={"confirm_password"}
-                            rules={[
-                                {
-                                    required: true,
-                                    message: ""
-                                },
-                                {
-                                    validator: async (_, value) => {
-                                        if (!form.getFieldValue("password")) return Promise.reject("Please enter Password");
-                                        if (!value) return Promise.reject("Please confirm your password");
-                                        if (value !== form.getFieldValue("password")) {
-                                            return Promise.reject("Password confirmation does not match")
-                                        }
-                                    }
-                                }
-                            ]}
-                        >
-                            <Input.Password variant='filled' placeholder={Placeholder.password_confirm} />
-                        </Form.Item>
-                    </>
-                ) : (
-                    <></>
+
+                {isNewRecord && (
+                    <Form.Item
+                        label="Password"
+                        name="password"
+                        rules={[
+                            { required: true, message: 'Password is required' },
+                            { min: 6, message: 'Minimum 6 characters' }
+                        ]}
+                    >
+                        <Input.Password placeholder="Enter password" />
+                    </Form.Item>
                 )}
 
-                <div className={"d-flex flex-row justify-content-end"}>
-                    <Form.Item>
-                        <Button className={'text-white'} type={'link'} size="sm" variant="outline-danger"
-                            onClick={() => handleClose()} style={{ marginRight: '5px' }}>
-                            Cancel
-                        </Button>
+                {/* Role hanya bisa dipilih oleh ADMIN */}
+                {isAdmin && (
+                    <Form.Item
+                        label="Role"
+                        name="role"
+                        rules={[{ required: true, message: 'Role is required' }]}
+                    >
+                        <Select placeholder="Select role">
+                            <Option value="DOCTOR">🩺 Doctor</Option>
+                            <Option value="ADMIN">🛡️ Admin</Option>
+                        </Select>
                     </Form.Item>
-                    <Form.Item>
-                        <Button size="sm" type='primary' variant="primary" htmlType='submit'>
-                            {/* {isNewRecord ? 'Add' : 'Save'} */}
-                            Add
-                        </Button>
-                    </Form.Item>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+                    <Button onClick={() => close(false)}>Cancel</Button>
+                    <Button type="primary" htmlType="submit" loading={loading}>
+                        {isNewRecord ? 'Create User' : 'Save Changes'}
+                    </Button>
                 </div>
             </Form>
-        </Modal.Body>
-    </Modal>
-}
+        </Modal>
+    );
+};
+
+export default UserFormModal;

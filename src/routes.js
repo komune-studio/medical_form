@@ -11,11 +11,11 @@ import PatientDetail from "components/pages/Patients/PatientDetail";
 import MedicalHistoryList from "components/pages/MedicalHistory/MedicalHistoryList";
 import MedicalHistoryCreate from "components/pages/MedicalHistory/MedicalHistoryCreate";
 import MedicalHistoryEdit from "components/pages/MedicalHistory/MedicalHistoryEdit";
-import FormPage from "components/pages/Form/FormPage"; // ← TAMBAH INI
+import FormPage from "components/pages/Form/FormPage";
 
 var routes = [
 
-    // ─── FORM (dengan auth, tanpa sidebar) ───────────────────────────────────
+    // ─── FORM (tanpa sidebar) ─────────────────────────────────────────────────
     {
         path: "/form",
         name: "Medical Form",
@@ -23,7 +23,7 @@ var routes = [
         layout: "/admin",
     },
 
-    // PATIENTS
+    // ─── PATIENTS ─────────────────────────────────────────────────────────────
     {
         path: "/patients/create",
         name: "Patient Create",
@@ -48,8 +48,8 @@ var routes = [
         component: PatientList,
         layout: "/admin",
     },
-    
-    // MEDICAL HISTORY
+
+    // ─── MEDICAL HISTORY ──────────────────────────────────────────────────────
     {
         path: "/medical-history/create",
         name: "Medical History Create",
@@ -68,8 +68,8 @@ var routes = [
         component: MedicalHistoryList,
         layout: "/admin",
     },
-    
-    // STAFF
+
+    // ─── STAFF ────────────────────────────────────────────────────────────────
     {
         path: "/staff/create",
         name: "Staff Create",
@@ -88,16 +88,16 @@ var routes = [
         component: StaffList,
         layout: "/admin",
     },
-    
-    // USERS
+
+    // ─── USER MANAGEMENT (ADMIN ONLY) ─────────────────────────────────────────
     {
-        path: "/admins",
-        name: "Admins",
+        path: "/user-management",
+        name: "User Management",
         component: UserList,
         layout: "/admin",
     },
-    
-    // AUTH
+
+    // ─── AUTH ─────────────────────────────────────────────────────────────────
     {
         path: "/login",
         name: "Login",
