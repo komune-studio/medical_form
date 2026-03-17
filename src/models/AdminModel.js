@@ -96,4 +96,8 @@ export default class AdminService {
   static isDoctor = () => {
     return AdminService.getLocalRole() === 'DOCTOR';
   }
+
+  static isTherapist = () => {
+    return AdminService.getLocalRole() === 'THERAPIST';
+}
 }

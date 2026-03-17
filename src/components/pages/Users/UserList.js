@@ -1,4 +1,4 @@
-import { Space, Button as AntButton, Tooltip, Modal, message, Tag } from 'antd';
+import { Space, Button as AntButton, Tooltip, Modal, message, Tag, Input } from 'antd';
 import HeaderNav from "components/Headers/HeaderNav.js";
 import React, { useState, useEffect } from 'react';
 import { Card, Row, CardBody, Container } from "reactstrap";
@@ -12,16 +12,16 @@ import AdminService from 'models/AdminModel';
 
 const UserList = () => {
 
-    const history_unused = null;
     const [loading, setLoading] = useState(false);
     const [dataSource, setDataSource] = useState([]);
+    const [allData, setAllData] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [openUserModal, setOpenUserModal] = useState(false);
     const [isNewRecord, setIsNewRecord] = useState(false);
     const [openUserResetModal, setOpenUserResetModal] = useState(false);
     const [currentUserId, setCurrentUserId] = useState(null);
+    const [search, setSearch] = useState('');
 
-    // Ambil role dari localStorage — halaman ini hanya diakses ADMIN
     const isAdmin = localStorage.getItem('role') === 'ADMIN';
 
     const columns = [
@@ -41,7 +41,7 @@ const UserList = () => {
             filter: false,
             render: (row) => (
                 <Tag color={row.role === 'ADMIN' ? 'gold' : 'blue'}>
-                    {row.role}
+                    {row.role === 'DOCTOR' ? 'THERAPIST' : row.role}
                 </Tag>
             )
         },
@@ -50,7 +50,6 @@ const UserList = () => {
             label: 'Status',
             filter: false,
             render: (row) => {
-                // DB returns 0/1 (integer), cast to bool
                 const isActive = row.active === 1 || row.active === true;
                 return (
                     <Tag color={isActive ? 'green' : 'red'}>
@@ -67,7 +66,6 @@ const UserList = () => {
                 const isSelf = row.id === currentUserId;
                 return (
                     <Space size="small">
-                        {/* Reset Password — admin bisa reset siapa saja, doctor hanya diri sendiri */}
                         {(isAdmin || isSelf) && (
                             <Tooltip title="Reset Password">
                                 <AntButton
@@ -85,21 +83,19 @@ const UserList = () => {
                             </Tooltip>
                         )}
 
-                        {/* Ganti Role — ADMIN only, tidak bisa ubah diri sendiri */}
                         {isAdmin && !isSelf && (
-                            <Tooltip title={row.role === 'ADMIN' ? 'Set as Doctor' : 'Set as Admin'}>
+                            <Tooltip title={row.role === 'ADMIN' ? 'Set as Therapist' : 'Set as Admin'}>
                                 <AntButton
                                     type={'link'}
                                     style={{ color: row.role === 'ADMIN' ? '#faad14' : '#1890ff' }}
                                     onClick={() => onChangeRole(row)}
                                     className={"d-flex align-items-center justify-content-center"}
                                     shape="circle"
-                                    icon={<Iconify icon={row.role === 'ADMIN' ? "mdi:doctor" : "mdi:shield-account"} />}
+                                    icon={<Iconify icon={row.role === 'ADMIN' ? "mdi:medical-bag" : "mdi:shield-account"} />}
                                 />
                             </Tooltip>
                         )}
 
-                        {/* Delete / Restore — ADMIN only, tidak bisa hapus diri sendiri */}
                         {isAdmin && !isSelf && (
                             (row.active === 1 || row.active === true) ? (
                                 <Tooltip title="Deactivate">
@@ -168,15 +164,16 @@ const UserList = () => {
     };
 
     const onChangeRole = (row) => {
-        const newRole = row.role === 'ADMIN' ? 'DOCTOR' : 'ADMIN';
+        const newRole = row.role === 'ADMIN' ? 'THERAPIST' : 'ADMIN';
+        const newRoleLabel = newRole === 'THERAPIST' ? 'Therapist' : 'Admin';
         Modal.confirm({
-            title: `Change role to ${newRole}?`,
-            content: `User "${row.username}" will be set as ${newRole}.`,
-            okText: `Yes, set as ${newRole}`,
+            title: `Change role to ${newRoleLabel}?`,
+            content: `User "${row.username}" will be set as ${newRoleLabel}.`,
+            okText: `Yes, set as ${newRoleLabel}`,
             onOk: async () => {
                 try {
                     await AdminService.updateRole(row.id, newRole);
-                    message.success(`Role updated to ${newRole}`);
+                    message.success(`Role updated to ${newRoleLabel}`);
                     initializeData();
                 } catch (e) {
                     message.error('Failed to update role');
@@ -186,21 +183,30 @@ const UserList = () => {
     };
 
     const initializeData = async () => {
-    setLoading(true);
-    try {
-        const result = isAdmin
-            ? await AdminService.getAllWithInactive()
-            : await AdminService.getAll();
-        
-        console.log('RAW RESULT:', result); // <-- tambah ini
-        
-        setDataSource(Array.isArray(result) ? result : result?.data || []);
-    } catch (e) {
-        message.error('Failed to load users');
-    } finally {
-        setLoading(false);
-    }
-};
+        setLoading(true);
+        try {
+            const result = isAdmin
+                ? await AdminService.getAllWithInactive()
+                : await AdminService.getAll();
+            const data = Array.isArray(result) ? result : result?.data || [];
+            setAllData(data);
+        } catch (e) {
+            message.error('Failed to load users');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!search || search.trim() === '') {
+            setDataSource(allData);
+        } else {
+            const keyword = search.trim().toLowerCase();
+            setDataSource(allData.filter(u =>
+                u.username && u.username.toLowerCase().includes(keyword)
+            ));
+        }
+    }, [allData, search]);
 
     useEffect(() => {
         initializeData();
@@ -216,22 +222,48 @@ const UserList = () => {
 
     return (
         <>
+            <style>{`
+                .user-search.ant-input-affix-wrapper {
+                    background: white !important;
+                    border: 1px solid #d9d9d9 !important;
+                }
+                .user-search .ant-input {
+                    background: white !important;
+                    color: #333 !important;
+                }
+                .user-search .ant-input::placeholder {
+                    color: rgba(0, 0, 0, 0.25) !important;
+                }
+                .user-search .ant-input-prefix {
+                    color: #666 !important;
+                }
+                .user-search.ant-input-affix-wrapper:hover,
+                .user-search.ant-input-affix-wrapper:focus,
+                .user-search.ant-input-affix-wrapper-focused {
+                    border-color: #666 !important;
+                    box-shadow: 0 0 0 2px rgba(102,102,102,0.1) !important;
+                }
+            `}</style>
             <Container fluid>
                 <Card
-                    style={{ background: Palette.BACKGROUND_DARK_GRAY, color: "white" }}
+                    style={{
+                        background: '#ffffff',
+                        color: '#333',
+                        border: '1px solid #f0f0f0',
+                        boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03)'
+                    }}
                     className="card-stats mb-4 mb-xl-0"
                 >
                     <CardBody>
                         <Row>
                             <Col className='mb-3' md={6}>
-                                <div style={{ fontWeight: "bold", fontSize: "1.1em" }}>
+                                <div style={{ fontWeight: "bold", fontSize: "1.1em", color: '#333' }}>
                                     User Management
                                 </div>
-                                <div style={{ fontSize: '0.85em', color: '#aaa', marginTop: 2 }}>
-                                    Manage admin & doctor accounts
+                                <div style={{ fontSize: '0.85em', color: '#888', marginTop: 2 }}>
+                                    Manage admin & therapist accounts
                                 </div>
                             </Col>
-                            {/* Tombol Add User hanya untuk ADMIN */}
                             {isAdmin && (
                                 <Col className='mb-3 text-right' md={6}>
                                     <AntButton
@@ -251,8 +283,26 @@ const UserList = () => {
                             )}
                         </Row>
 
+                        <Row style={{ marginBottom: 16 }}>
+                            <Col md={6}>
+                                <Input
+                                    className="user-search"
+                                    placeholder="Search by username"
+                                    prefix={
+                                        <Iconify
+                                            icon="material-symbols:search"
+                                            style={{ color: '#666', fontSize: '18px' }}
+                                        />
+                                    }
+                                    allowClear
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    style={{ width: '100%' }}
+                                />
+                            </Col>
+                        </Row>
+
                         <CustomTable
-                            showFilter={true}
+                            showFilter={false}
                             pagination={true}
                             loading={loading}
                             searchText={''}

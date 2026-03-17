@@ -16,7 +16,7 @@ const SIDEBAR_ADMIN = [
     { path: "/user-management", name: "User Management", icon: "mdi:account-cog" },
 ];
 
-const SIDEBAR_DOCTOR = [
+const SIDEBAR_THERAPIST = [
     { path: "/patients", name: "Patients", icon: "mdi:account-group" },
     { path: "/form", name: "Form", icon: "mdi:file-document-edit" },
 ];
@@ -30,20 +30,17 @@ const Sidebar = (props) => {
     const role = localStorage.getItem('role');
     const isAdmin = role === 'ADMIN';
     const adminName = localStorage.getItem('admin_name') || 'User';
-    const SIDEBAR = isAdmin ? SIDEBAR_ADMIN : SIDEBAR_DOCTOR;
+    const SIDEBAR = isAdmin ? SIDEBAR_ADMIN : SIDEBAR_THERAPIST;
 
-    // Lock body scroll when mobile drawer is open
     useEffect(() => {
         document.body.style.overflow = mobileOpen ? 'hidden' : '';
         return () => { document.body.style.overflow = ''; };
     }, [mobileOpen]);
 
-    // Close drawer when route changes
     useEffect(() => {
         setMobileOpen(false);
     }, [location.pathname]);
 
-    // Close drawer on outside click
     useEffect(() => {
         if (!mobileOpen) return;
         const handler = (e) => {
@@ -95,7 +92,6 @@ const Sidebar = (props) => {
             );
         });
 
-    // ── Shared sidebar content ──────────────────────────────────────────
     const SidebarContent = () => (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '0 8px' }}>
             {/* Logo */}
@@ -110,7 +106,7 @@ const Sidebar = (props) => {
                 background: 'rgba(255,255,255,0.06)', borderRadius: 8
             }}>
                 <Iconify
-                    icon={isAdmin ? "mdi:shield-account" : "mdi:doctor"}
+                    icon={isAdmin ? "mdi:shield-account" : "mdi:medical-bag"}
                     style={{ color: isAdmin ? '#ffd700' : '#7eb8f7', fontSize: '1.2rem', flexShrink: 0 }}
                 />
                 <div>
@@ -118,7 +114,7 @@ const Sidebar = (props) => {
                         {adminName}
                     </div>
                     <div style={{ color: isAdmin ? '#ffd700' : '#7eb8f7', fontSize: '0.7rem', fontWeight: 700, letterSpacing: 1 }}>
-                        {isAdmin ? 'ADMIN' : 'DOCTOR'}
+                        {isAdmin ? 'ADMIN' : 'THERAPIST'}
                     </div>
                 </div>
             </div>
@@ -142,7 +138,7 @@ const Sidebar = (props) => {
 
     return (
         <>
-            {/* ── DESKTOP sidebar (md and up) ────────────────────────── */}
+            {/* DESKTOP sidebar */}
             {!isFormRoute && (
                 <div className="d-none d-md-flex" style={{
                     position: 'fixed', top: 0, left: 0,
@@ -156,7 +152,7 @@ const Sidebar = (props) => {
                 </div>
             )}
 
-            {/* ── MOBILE / FORM hamburger button ─────────────────────────────── */}
+            {/* MOBILE hamburger button */}
             <div className={!isFormRoute ? "d-flex d-md-none" : "d-flex"} style={{
                 position: 'fixed', top: 12, left: 12, zIndex: 1060,
             }}>
@@ -173,7 +169,7 @@ const Sidebar = (props) => {
                 </button>
             </div>
 
-            {/* ── MOBILE overlay ──────────────────────────────────────── */}
+            {/* MOBILE overlay */}
             {mobileOpen && (
                 <div
                     onClick={() => setMobileOpen(false)}
@@ -185,8 +181,7 @@ const Sidebar = (props) => {
                 />
             )}
 
-            {/* ── MOBILE drawer ───────────────────────────────────────── */}
-            {/* On /form it functions as a desktop drawer too */}
+            {/* MOBILE drawer */}
             <div
                 ref={sidebarRef}
                 className={!isFormRoute ? "d-md-none" : ""}
@@ -201,7 +196,6 @@ const Sidebar = (props) => {
                     boxShadow: mobileOpen ? '4px 0 24px rgba(0,0,0,0.5)' : 'none',
                 }}
             >
-                {/* Close button inside drawer */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 12px 0' }}>
                     <button
                         onClick={() => setMobileOpen(false)}
