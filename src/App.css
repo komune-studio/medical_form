@@ -212,6 +212,39 @@ input.order-input {
     border-bottom-color: #f0f0f0 !important;
 }
 
+.ant-modal-title {
+    color: #000000 !important;
+}
+
+.ant-modal-body {
+    color: #000000 !important;
+}
+
+/* MODAL CONFIRM */
+.ant-modal-confirm-title {
+    color: #000000 !important;
+}
+
+.ant-modal-confirm-content {
+    color: #000000 !important;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-title {
+    color: #000000 !important;
+}
+
+.ant-modal-confirm-body .ant-modal-confirm-content {
+    color: #000000 !important;
+}
+
+.ant-modal-confirm-body-wrapper .ant-modal-confirm-title {
+    color: #000000 !important;
+}
+
+.ant-modal-confirm-body-wrapper .ant-modal-confirm-content {
+    color: #000000 !important;
+}
+
 .ant-table {
     background-color: #FFFFFF !important;
     color: #000000 !important;

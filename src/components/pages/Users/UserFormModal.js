@@ -4,11 +4,6 @@ import AdminService from 'models/AdminModel';
 
 const { Option } = Select;
 
-/**
- * Modal untuk:
- * - Buat user baru (isNewRecord=true) — ADMIN only
- * - (Edit username bisa ditambah nanti)
- */
 const UserFormModal = ({ isOpen, isNewRecord, userData, isAdmin, close }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
@@ -35,7 +30,8 @@ const UserFormModal = ({ isOpen, isNewRecord, userData, isAdmin, close }) => {
                     password: values.password,
                     role: values.role,
                 });
-                message.success(`User "${values.username}" created as ${values.role}`);
+                const roleLabel = values.role === 'THERAPIST' ? 'Therapist' : 'Admin';
+                message.success(`User "${values.username}" created as ${roleLabel}`);
             }
             close(true);
         } catch (e) {
@@ -58,7 +54,7 @@ const UserFormModal = ({ isOpen, isNewRecord, userData, isAdmin, close }) => {
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                initialValues={{ role: 'DOCTOR' }}
+                initialValues={{ role: 'THERAPIST' }}
             >
                 <Form.Item
                     label="Username"
@@ -81,7 +77,6 @@ const UserFormModal = ({ isOpen, isNewRecord, userData, isAdmin, close }) => {
                     </Form.Item>
                 )}
 
-                {/* Role hanya bisa dipilih oleh ADMIN */}
                 {isAdmin && (
                     <Form.Item
                         label="Role"
@@ -89,7 +84,7 @@ const UserFormModal = ({ isOpen, isNewRecord, userData, isAdmin, close }) => {
                         rules={[{ required: true, message: 'Role is required' }]}
                     >
                         <Select placeholder="Select role">
-                            <Option value="DOCTOR">🩺 Doctor</Option>
+                            <Option value="THERAPIST">🩺 Therapist</Option>
                             <Option value="ADMIN">🛡️ Admin</Option>
                         </Select>
                     </Form.Item>
