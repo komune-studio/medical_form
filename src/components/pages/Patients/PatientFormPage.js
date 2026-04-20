@@ -24,6 +24,21 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 
+const normalizePhoneDigits = (value = '') => {
+  const digits = String(value).replace(/\D/g, '');
+
+  if (!digits) return '';
+  if (digits.startsWith('62')) return digits.slice(2);
+  if (digits.startsWith('0')) return digits.slice(1);
+
+  return digits;
+};
+
+const formatPhoneNumber = (value = '') => {
+  const digits = normalizePhoneDigits(value);
+  return digits ? `+62${digits}` : '';
+};
+
 // Update custom styles to match VisitorFormPage style
 const customStyles = `
   /* Custom styling untuk Select dropdown */
@@ -176,6 +191,13 @@ const customStyles = `
     border-color: #000000 !important;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
   }
+
+  .patient-phone-input .ant-input-prefix {
+    color: #000000 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    margin-right: 8px !important;
+  }
   
   /* Tablet responsive */
   @media (min-width: 768px) and (max-width: 1024px) {
@@ -226,6 +248,10 @@ const customStyles = `
       font-size: 16px !important;
       height: 38px !important;
     }
+
+    .patient-phone-input .ant-input-prefix {
+      font-size: 16px !important;
+    }
   }
 `;
 
@@ -255,6 +281,14 @@ export default function PatientFormPage({
   };
 
   const onValuesChanged = (changedValues, allValues) => {
+    if (changedValues.phone !== undefined) {
+      const normalizedPhone = normalizePhoneDigits(changedValues.phone);
+      if (normalizedPhone !== changedValues.phone) {
+        form.setFieldsValue({ phone: normalizedPhone });
+        allValues = { ...allValues, phone: normalizedPhone };
+      }
+    }
+
     // Update BMI calculation when height or weight changes
     if (changedValues.height !== undefined || changedValues.weight !== undefined) {
       const newBMI = calculateBMI(allValues.height, allValues.weight);
@@ -276,6 +310,10 @@ export default function PatientFormPage({
     const changed = Object.keys(allValues).some(key => {
       const currentValue = allValues[key];
       const originalValue = patientData[key];
+
+      if (key === 'phone') {
+        return normalizePhoneDigits(currentValue) !== normalizePhoneDigits(originalValue);
+      }
       
       if (key === 'date_of_birth' && currentValue) {
         const formattedCurrent = moment(currentValue).format('YYYY-MM-DD');
@@ -310,6 +348,8 @@ export default function PatientFormPage({
       if (body.date_of_birth) {
         body.date_of_birth = moment(body.date_of_birth).format('YYYY-MM-DD');
       }
+
+      body.phone = formatPhoneNumber(body.phone);
 
       console.log('Data to be saved:', body);
 
@@ -413,7 +453,7 @@ export default function PatientFormPage({
         name: patientData.name,
         date_of_birth: patientData.date_of_birth ? moment(patientData.date_of_birth) : null,
         gender: patientData.gender,
-        phone: patientData.phone,
+        phone: normalizePhoneDigits(patientData.phone),
         email: patientData.email,
         height: patientData.height,
         weight: patientData.weight,
@@ -762,14 +802,24 @@ export default function PatientFormPage({
                         name="phone"
                         rules={[
                           { required: true, message: 'Required!' },
-                          { pattern: /^[0-9+()-]+$/, message: 'Invalid format!' },
-                          { max: 20, message: 'Max 20 chars!' }
+                          { pattern: /^[0-9]+$/, message: 'Numbers only!' },
+                          { min: 8, message: 'Min 8 digits!' },
+                          { max: 15, message: 'Max 15 digits!' }
                         ]}
                         style={{ marginBottom: '10px' }}
                         className="patient-form-item"
                       >
                         <Input 
-                          placeholder="Enter phone number"
+                          className="patient-phone-input"
+                          prefix={<span>+62</span>}
+                          inputMode="numeric"
+                          placeholder="81234567890"
+                          maxLength={15}
+                          onChange={(e) => {
+                            form.setFieldsValue({
+                              phone: normalizePhoneDigits(e.target.value)
+                            });
+                          }}
                           style={{ 
                             backgroundColor: '#FFFFFF',
                             border: '1px solid #d9d9d9',

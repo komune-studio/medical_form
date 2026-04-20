@@ -164,7 +164,7 @@ const customStyles = `
   }
   
   .pain-level-slider {
-    margin: 10px 6px 4px !important;
+    margin: 8px 6px 0 !important;
   }
 
   .pain-level-slider .ant-slider-rail {
@@ -178,6 +178,31 @@ const customStyles = `
 
   .pain-level-slider .ant-slider-handle::after {
     box-shadow: 0 0 0 2px currentColor !important;
+  }
+
+  .pain-level-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .pain-level-badge {
+    min-width: 48px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  .pain-level-caption {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666666;
   }
   
   .readonly-field .ant-input {
@@ -240,6 +265,10 @@ const customStyles = `
     .pain-level-slider {
       margin-top: 12px !important;
     }
+
+    .pain-level-badge {
+      font-size: 13px;
+    }
     
     .medical-history-textarea .ant-input {
       min-height: 100px !important;
@@ -272,6 +301,8 @@ export default function MedicalHistoryFormPage({
 
   const bodyAnnotationRef = useRef(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const painBeforeValue = Form.useWatch('pain_before', form) ?? 1;
+  const painAfterValue = Form.useWatch('pain_after', form) ?? 1;
 
   useEffect(() => {
     const fetchStaff = async () => {
@@ -765,7 +796,17 @@ export default function MedicalHistoryFormPage({
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
                           <Form.Item
-                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (Before)</span>}
+                            label={
+                              <div className="pain-level-header">
+                                <span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (Before)</span>
+                                <span
+                                  className="pain-level-badge"
+                                  style={{ backgroundColor: getPainLevelColor(painBeforeValue) }}
+                                >
+                                  {painBeforeValue}/10
+                                </span>
+                              </div>
+                            }
                             name="pain_before"
                             rules={[{ type: 'number', min: 1, max: 10, message: 'Pain level must be between 1 and 10!' }]}
                             style={{ marginBottom: '10px' }}
@@ -776,24 +817,34 @@ export default function MedicalHistoryFormPage({
                               max={10}
                               step={1}
                               className="pain-level-slider"
-                              tooltip={{ open: true }}
+                              tooltip={{ formatter: null }}
                               marks={{ 1: '1', 10: '10' }}
                               railStyle={{ background: 'linear-gradient(90deg, #2e7d32 0%, #fbc02d 50%, #c62828 100%)', height: 8 }}
                               trackStyle={{ background: 'transparent' }}
                               handleStyle={{
-                                borderColor: getPainLevelColor(form.getFieldValue('pain_before')),
-                                backgroundColor: getPainLevelColor(form.getFieldValue('pain_before')),
-                                color: getPainLevelColor(form.getFieldValue('pain_before'))
+                                borderColor: getPainLevelColor(painBeforeValue),
+                                backgroundColor: getPainLevelColor(painBeforeValue),
+                                color: getPainLevelColor(painBeforeValue)
                               }}
                             />
                           </Form.Item>
-                          <Text style={{ color: getPainLevelColor(form.getFieldValue('pain_before')), fontWeight: 600 }}>
-                            {form.getFieldValue('pain_before') || 1}/10
-                          </Text>
+                          <div className="pain-level-caption">
+                            Drag to set pain score from 1 to 10.
+                          </div>
                         </Col>
                         <Col xs={24} md={12}>
                           <Form.Item
-                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (After)</span>}
+                            label={
+                              <div className="pain-level-header">
+                                <span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (After)</span>
+                                <span
+                                  className="pain-level-badge"
+                                  style={{ backgroundColor: getPainLevelColor(painAfterValue) }}
+                                >
+                                  {painAfterValue}/10
+                                </span>
+                              </div>
+                            }
                             name="pain_after"
                             rules={[{ type: 'number', min: 1, max: 10, message: 'Pain level must be between 1 and 10!' }]}
                             style={{ marginBottom: '10px' }}
@@ -804,20 +855,20 @@ export default function MedicalHistoryFormPage({
                               max={10}
                               step={1}
                               className="pain-level-slider"
-                              tooltip={{ open: true }}
+                              tooltip={{ formatter: null }}
                               marks={{ 1: '1', 10: '10' }}
                               railStyle={{ background: 'linear-gradient(90deg, #2e7d32 0%, #fbc02d 50%, #c62828 100%)', height: 8 }}
                               trackStyle={{ background: 'transparent' }}
                               handleStyle={{
-                                borderColor: getPainLevelColor(form.getFieldValue('pain_after')),
-                                backgroundColor: getPainLevelColor(form.getFieldValue('pain_after')),
-                                color: getPainLevelColor(form.getFieldValue('pain_after'))
+                                borderColor: getPainLevelColor(painAfterValue),
+                                backgroundColor: getPainLevelColor(painAfterValue),
+                                color: getPainLevelColor(painAfterValue)
                               }}
                             />
                           </Form.Item>
-                          <Text style={{ color: getPainLevelColor(form.getFieldValue('pain_after')), fontWeight: 600 }}>
-                            {form.getFieldValue('pain_after') || 1}/10
-                          </Text>
+                          <div className="pain-level-caption">
+                            Drag to set pain score from 1 to 10.
+                          </div>
                         </Col>
                       </Row>
 
