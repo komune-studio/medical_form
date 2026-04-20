@@ -12,7 +12,7 @@ import {
   Col,
   Card,
   Space,
-  InputNumber
+  Slider
 } from 'antd';
 import { Container } from 'reactstrap';
 import swal from '../../reusable/CustomSweetAlert';
@@ -57,6 +57,17 @@ const INJURY_TYPE_OPTIONS = [
   'Post-Surgery',
   'Other'
 ];
+
+const getPainLevelColor = (value = 1) => {
+  const safeValue = Math.min(Math.max(Number(value) || 1, 1), 10);
+  const hue = 120 - ((safeValue - 1) / 9) * 120;
+  return `hsl(${hue}, 72%, 45%)`;
+};
+
+const normalizePainLevel = (value) => {
+  if (value === undefined || value === null || value === '') return 1;
+  return Math.min(Math.max(Number(value) || 1, 1), 10);
+};
 
 const customStyles = `
   .medical-history-select .ant-select-selector {
@@ -152,18 +163,21 @@ const customStyles = `
     cursor: not-allowed !important;
   }
   
-  .pain-level-input .ant-input-number {
-    width: 100% !important;
-    background-color: #FFFFFF !important;
-    border: 1px solid #d9d9d9 !important;
-    color: #000000 !important;
-    border-radius: 4px !important;
+  .pain-level-slider {
+    margin: 10px 6px 4px !important;
   }
-  
-  .pain-level-input .ant-input-number-input {
-    height: 32px !important;
-    color: #000000 !important;
-    font-size: 14px !important;
+
+  .pain-level-slider .ant-slider-rail {
+    background: linear-gradient(90deg, #2e7d32 0%, #fbc02d 50%, #c62828 100%) !important;
+    height: 8px !important;
+  }
+
+  .pain-level-slider .ant-slider-track {
+    background: transparent !important;
+  }
+
+  .pain-level-slider .ant-slider-handle::after {
+    box-shadow: 0 0 0 2px currentColor !important;
   }
   
   .readonly-field .ant-input {
@@ -223,13 +237,8 @@ const customStyles = `
       font-size: 16px !important;
     }
     
-    .pain-level-input .ant-input-number {
-      height: 40px !important;
-    }
-    
-    .pain-level-input .ant-input-number-input {
-      height: 38px !important;
-      font-size: 16px !important;
+    .pain-level-slider {
+      margin-top: 12px !important;
     }
     
     .medical-history-textarea .ant-input {
@@ -329,8 +338,8 @@ export default function MedicalHistoryFormPage({
         expected_recovery_time: medicalHistoryData.expected_recovery_time || '',
         recovery_goals: medicalHistoryData.recovery_goals || '',
         objective_progress: medicalHistoryData.objective_progress || '',
-        pain_before: medicalHistoryData.pain_before || '',
-        pain_after: medicalHistoryData.pain_after || '',
+        pain_before: normalizePainLevel(medicalHistoryData.pain_before),
+        pain_after: normalizePainLevel(medicalHistoryData.pain_after),
         range_of_motion_impact: medicalHistoryData.range_of_motion_impact || '',
         treatments: medicalHistoryData.treatments
           ? medicalHistoryData.treatments.split(',').map(t => t.trim()).filter(Boolean)
@@ -345,6 +354,10 @@ export default function MedicalHistoryFormPage({
       setHasChanges(false);
     } else {
       form.resetFields();
+      form.setFieldsValue({
+        pain_before: 1,
+        pain_after: 1,
+      });
       setAppointmentDateTime('');
       setNextSessionDate(''); // ← reset
       setHasChanges(false);
@@ -628,6 +641,10 @@ export default function MedicalHistoryFormPage({
                   key={formKey}
                   layout="vertical"
                   requiredMark={false}
+                  initialValues={{
+                    pain_before: 1,
+                    pain_after: 1,
+                  }}
                 >
                   <Row gutter={[32, 0]}>
                     <Col xs={24}>
@@ -750,23 +767,57 @@ export default function MedicalHistoryFormPage({
                           <Form.Item
                             label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (Before)</span>}
                             name="pain_before"
-                            rules={[{ type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }]}
+                            rules={[{ type: 'number', min: 1, max: 10, message: 'Pain level must be between 1 and 10!' }]}
                             style={{ marginBottom: '10px' }}
                             className="pain-level-input"
                           >
-                            <InputNumber min={0} max={10} placeholder="0-10 scale" style={{ width: '100%' }} />
+                            <Slider
+                              min={1}
+                              max={10}
+                              step={1}
+                              className="pain-level-slider"
+                              tooltip={{ open: true }}
+                              marks={{ 1: '1', 10: '10' }}
+                              railStyle={{ background: 'linear-gradient(90deg, #2e7d32 0%, #fbc02d 50%, #c62828 100%)', height: 8 }}
+                              trackStyle={{ background: 'transparent' }}
+                              handleStyle={{
+                                borderColor: getPainLevelColor(form.getFieldValue('pain_before')),
+                                backgroundColor: getPainLevelColor(form.getFieldValue('pain_before')),
+                                color: getPainLevelColor(form.getFieldValue('pain_before'))
+                              }}
+                            />
                           </Form.Item>
+                          <Text style={{ color: getPainLevelColor(form.getFieldValue('pain_before')), fontWeight: 600 }}>
+                            {form.getFieldValue('pain_before') || 1}/10
+                          </Text>
                         </Col>
                         <Col xs={24} md={12}>
                           <Form.Item
                             label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Pain Level (After)</span>}
                             name="pain_after"
-                            rules={[{ type: 'number', min: 0, max: 10, message: 'Pain level must be between 0 and 10!' }]}
+                            rules={[{ type: 'number', min: 1, max: 10, message: 'Pain level must be between 1 and 10!' }]}
                             style={{ marginBottom: '10px' }}
                             className="pain-level-input"
                           >
-                            <InputNumber min={0} max={10} placeholder="0-10 scale" style={{ width: '100%' }} />
+                            <Slider
+                              min={1}
+                              max={10}
+                              step={1}
+                              className="pain-level-slider"
+                              tooltip={{ open: true }}
+                              marks={{ 1: '1', 10: '10' }}
+                              railStyle={{ background: 'linear-gradient(90deg, #2e7d32 0%, #fbc02d 50%, #c62828 100%)', height: 8 }}
+                              trackStyle={{ background: 'transparent' }}
+                              handleStyle={{
+                                borderColor: getPainLevelColor(form.getFieldValue('pain_after')),
+                                backgroundColor: getPainLevelColor(form.getFieldValue('pain_after')),
+                                color: getPainLevelColor(form.getFieldValue('pain_after'))
+                              }}
+                            />
                           </Form.Item>
+                          <Text style={{ color: getPainLevelColor(form.getFieldValue('pain_after')), fontWeight: 600 }}>
+                            {form.getFieldValue('pain_after') || 1}/10
+                          </Text>
                         </Col>
                       </Row>
 
