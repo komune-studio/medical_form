@@ -62,7 +62,7 @@ const MedicalHistoryList = () => {
   const serviceType = useFilter((state) => state.serviceType);
   const sortBy = useFilter((state) => state.sortBy);
   const sortOrder = useFilter((state) => state.sortOrder);
-  
+
   const setSearch = useFilter((state) => state.setSearch);
   const setDateRange = useFilter((state) => state.setDateRange);
   const setServiceType = useFilter((state) => state.setServiceType);
@@ -109,6 +109,20 @@ const MedicalHistoryList = () => {
     return '#722ed1'; // purple for extreme pain
   };
 
+  // ✅ Helper function buat ambil creator name (prioritas user_name, fallback staff_name)
+  const getCreatorName = (row) => {
+    // Prioritaskan user_name
+    if (row.user_name && row.user_name !== '-') {
+      return row.user_name;
+    }
+    // Fallback ke staff_name
+    if (row.staff_name && row.staff_name !== '-') {
+      return row.staff_name;
+    }
+    // Kalau kosong semua
+    return 'Not Assigned';
+  };
+
   const columns = [
     {
       id: 'patient_info',
@@ -138,8 +152,8 @@ const MedicalHistoryList = () => {
             <div style={{ fontSize: '12px', color: '#666' }}>
               {moment(row.appointment_date).format("HH:mm")}
             </div>
-            <div style={{ 
-              fontSize: '12px', 
+            <div style={{
+              fontSize: '12px',
               color: '#1890ff',
               marginTop: '2px',
               fontWeight: 500
@@ -151,13 +165,13 @@ const MedicalHistoryList = () => {
       }
     },
     {
-      id: 'staff_info',
-      label: 'Staff',
+      id: 'created_by',
+      label: 'Created By',  // ← GANTI dari 'Staff' jadi 'Created By'
       filter: false,
       render: (row) => (
         <div>
-          <div style={{ color: '#333' }}>
-            {row.staff_name || row.staff?.name || 'Not Assigned'}
+          <div style={{ color: '#333', fontWeight: 500 }}>
+            {getCreatorName(row)}
           </div>
           <div style={{ fontSize: '12px', color: '#666' }}>
             {row.service_type || 'General'}
@@ -173,14 +187,14 @@ const MedicalHistoryList = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {row.pain_before && (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ 
-                fontSize: '12px', 
+              <div style={{
+                fontSize: '12px',
                 color: '#666',
                 marginBottom: '2px'
               }}>
                 Before
               </div>
-              <div style={{ 
+              <div style={{
                 padding: '4px 8px',
                 borderRadius: '4px',
                 background: getPainLevelColor(row.pain_before),
@@ -194,17 +208,17 @@ const MedicalHistoryList = () => {
               </div>
             </div>
           )}
-          
+
           {row.pain_after && (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ 
-                fontSize: '12px', 
+              <div style={{
+                fontSize: '12px',
                 color: '#666',
                 marginBottom: '2px'
               }}>
                 After
               </div>
-              <div style={{ 
+              <div style={{
                 padding: '4px 8px',
                 borderRadius: '4px',
                 background: getPainLevelColor(row.pain_after),
@@ -227,7 +241,7 @@ const MedicalHistoryList = () => {
       filter: false,
       render: (row) => (
         <div>
-          <div style={{ 
+          <div style={{
             color: '#333',
             fontSize: '13px',
             marginBottom: '4px',
@@ -238,8 +252,8 @@ const MedicalHistoryList = () => {
           }}>
             {row.diagnosis_result || 'No diagnosis'}
           </div>
-          <div style={{ 
-            fontSize: '12px', 
+          <div style={{
+            fontSize: '12px',
             color: '#666',
             maxWidth: '200px',
             overflow: 'hidden',
@@ -356,9 +370,10 @@ const MedicalHistoryList = () => {
         filters.dateTo = dateRange[1].format('YYYY-MM-DD');
       }
 
-      const blobData = await MedicalHistoryModel.exportMedicalHistoriesCSV(filters);
+      // ✅ Pake user_id di export (bukan staff_id)
+      const blobData = await MedicalHistoryModel.exportMedicalHistoriesToCSV(filters);
       MedicalHistoryModel.downloadCSV(blobData);
-      
+
       message.success('CSV exported successfully!');
     } catch (error) {
       console.error('Error exporting CSV:', error);
@@ -372,7 +387,7 @@ const MedicalHistoryList = () => {
     setLoading(true);
     try {
       const filters = {};
-      
+
       if (search) filters.search = search;
       if (serviceType) filters.service_type = serviceType;
       if (dateRange && dateRange.length === 2) {
@@ -385,15 +400,15 @@ const MedicalHistoryList = () => {
       filters.offset = currentPage * currentRowsPerPage;
 
       const result = await MedicalHistoryModel.getAllMedicalHistories(filters);
-      
+
       if (result && result.http_code === 200) {
         const allData = Array.isArray(result.data) ? result.data : [];
-        
+
         // For client-side pagination (if API doesn't support pagination)
         const startIndex = currentPage * currentRowsPerPage;
         const endIndex = startIndex + currentRowsPerPage;
         const paginatedData = allData.slice(startIndex, endIndex);
-        
+
         setDataSource(paginatedData);
         setTotalCount(allData.length);
       } else {
@@ -714,8 +729,8 @@ const MedicalHistoryList = () => {
         }
       `}</style>
       <Container fluid>
-        <Card style={{ 
-          background: '#FFFFFF', 
+        <Card style={{
+          background: '#FFFFFF',
           color: "#333",
           border: '1px solid #f0f0f0',
           boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 6px -1px rgba(0,0,0,0.02), 0 2px 4px 0 rgba(0,0,0,0.02)'
@@ -740,7 +755,7 @@ const MedicalHistoryList = () => {
                       Add Record
                     </AntButton>
                   </Link>
-                  
+
                   <AntButton
                     size={'middle'}
                     type={'primary'}
@@ -774,7 +789,7 @@ const MedicalHistoryList = () => {
                   style={{ width: '100%' }}
                 />
               </Col>
-              
+
               <Col xl={3} lg={3} md={6} xs={12} className="mb-3 mb-lg-0">
                 <RangePicker
                   className="date-range-picker"
@@ -786,7 +801,7 @@ const MedicalHistoryList = () => {
                   allowClear
                 />
               </Col>
-              
+
               <Col xl={3} lg={3} md={6} xs={6} className="mb-3 mb-lg-0">
                 <Select
                   className="filter-select"
@@ -798,16 +813,11 @@ const MedicalHistoryList = () => {
                   onClear={() => handleServiceTypeChange("")}
                 >
                   <Select.Option value="">All Services</Select.Option>
-                  <Select.Option value="Consultation">Consultation</Select.Option>
-                  <Select.Option value="Therapy">Therapy</Select.Option>
-                  <Select.Option value="Follow-up">Follow-up</Select.Option>
-                  <Select.Option value="Emergency">Emergency</Select.Option>
-                  <Select.Option value="Check-up">Check-up</Select.Option>
-                  <Select.Option value="Rehabilitation">Rehabilitation</Select.Option>
-                  <Select.Option value="Screening">Screening</Select.Option>
+                  <Select.Option value="Physiotherapy">Physiotherapy</Select.Option>
+                  <Select.Option value="Pilates">Pilates</Select.Option>
                 </Select>
               </Col>
-              
+
               <Col xl={2} lg={2} md={6} xs={6} className="mb-3 mb-lg-0 ps-md-2">
                 <Select
                   className="filter-select"

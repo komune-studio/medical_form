@@ -69,6 +69,56 @@ const normalizePainLevel = (value) => {
   return Math.min(Math.max(Number(value) || 1, 1), 10);
 };
 
+const RECOVERY_DURATION_OPTIONS = Array.from({ length: 30 }, (_, index) => {
+  const value = index + 1;
+  return { value, label: String(value) };
+});
+
+const RECOVERY_UNIT_OPTIONS = [
+  { value: 'days', label: 'Days' },
+  { value: 'weeks', label: 'Weeks' },
+  { value: 'months', label: 'Months' },
+];
+
+const parseExpectedRecoveryTime = (value = '') => {
+  const match = String(value).trim().match(/^(\d+)\s+(days?|weeks?|months?)$/i);
+  if (!match) {
+    return { expected_recovery_value: undefined, expected_recovery_unit: undefined };
+  }
+
+  const amount = Number(match[1]);
+  const unit = match[2].toLowerCase();
+
+  return {
+    expected_recovery_value: amount >= 1 && amount <= 30 ? amount : undefined,
+    expected_recovery_unit: unit.endsWith('s') ? unit : `${unit}s`,
+  };
+};
+
+const normalizeName = (value = '') => String(value).trim().toLowerCase();
+
+const getStaffUserId = (staff) => {
+  if (!staff || typeof staff !== 'object') return undefined;
+
+  const rawValue = staff.user_id ?? staff.user?.id ?? staff.user?.user_id ?? staff.id;
+  if (rawValue === undefined || rawValue === null || rawValue === '') return undefined;
+
+  const parsedValue = Number(rawValue);
+  return Number.isNaN(parsedValue) ? rawValue : parsedValue;
+};
+
+const getMedicalHistoryUserId = (medicalHistory = {}) => {
+  const rawValue =
+    medicalHistory.user_id ??
+    medicalHistory.staff?.user_id ??
+    medicalHistory.staff?.user?.id;
+
+  if (rawValue === undefined || rawValue === null || rawValue === '') return undefined;
+
+  const parsedValue = Number(rawValue);
+  return Number.isNaN(parsedValue) ? rawValue : parsedValue;
+};
+
 const customStyles = `
   .medical-history-select .ant-select-selector {
     background-color: #FFFFFF !important;
@@ -298,6 +348,7 @@ export default function MedicalHistoryFormPage({
 
   const [staffList, setStaffList] = useState([]);
   const [staffLoading, setStaffLoading] = useState(false);
+  const [currentLoginName, setCurrentLoginName] = useState('');
 
   const bodyAnnotationRef = useRef(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -305,15 +356,62 @@ export default function MedicalHistoryFormPage({
   const painAfterValue = Form.useWatch('pain_after', form) ?? 1;
 
   useEffect(() => {
+    const storedName = localStorage.getItem('admin_name') || sessionStorage.getItem('admin_name') || '';
+    setCurrentLoginName(storedName);
+  }, []);
+
+  useEffect(() => {
     const fetchStaff = async () => {
       try {
         setStaffLoading(true);
         const response = await StaffModel.getActiveStaff();
-        if (response && response.http_code === 200) {
-          setStaffList(Array.isArray(response.data) ? response.data : []);
-        } else if (Array.isArray(response.data)) {
-          setStaffList(response.data);
+        const activeStaff = Array.isArray(response?.data) ? response.data : [];
+        let resolvedStaffList = activeStaff;
+
+        if (!medicalHistoryData && currentLoginName) {
+          let matchedStaff = activeStaff.find(
+            (staff) => normalizeName(staff.name) === normalizeName(currentLoginName)
+          );
+
+          if (!matchedStaff) {
+            const staffByName = await StaffModel.getStaffByName(currentLoginName);
+            matchedStaff = staffByName?.data || null;
+          }
+
+          // If still no matched staff, they might be a regular user
+          if (!matchedStaff) {
+            const loggedInUserId = localStorage.getItem('user_id') || sessionStorage.getItem('id');
+            if (loggedInUserId) {
+              matchedStaff = {
+                id: `user-${loggedInUserId}`,
+                user_id: parseInt(loggedInUserId) || loggedInUserId,
+                name: currentLoginName,
+                phone_number: 'User'
+              };
+            }
+          }
+
+          if (matchedStaff) {
+            if (!activeStaff.some((staff) => staff.id === matchedStaff.id)) {
+              resolvedStaffList = [...activeStaff, matchedStaff];
+            }
+            form.setFieldsValue({ user_id: getStaffUserId(matchedStaff) });
+          }
         }
+
+        if (medicalHistoryData?.staff_id && !resolvedStaffList.some((staff) => staff.id === medicalHistoryData.staff_id)) {
+          const existingStaff = await StaffModel.getStaffById(medicalHistoryData.staff_id);
+          if (existingStaff?.data) {
+            resolvedStaffList = [...resolvedStaffList, existingStaff.data];
+            form.setFieldsValue({ user_id: getStaffUserId(existingStaff.data) });
+          }
+        } else if (medicalHistoryData) {
+          const currentUserId = getMedicalHistoryUserId(medicalHistoryData);
+          if (currentUserId !== undefined) {
+            form.setFieldsValue({ user_id: currentUserId });
+          }
+        }
+        setStaffList(resolvedStaffList);
       } catch (error) {
         console.error("Error fetching staff:", error);
         message.error('Failed to load staff list');
@@ -322,7 +420,7 @@ export default function MedicalHistoryFormPage({
       }
     };
     fetchStaff();
-  }, []);
+  }, [currentLoginName, form, medicalHistoryData]);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -358,15 +456,16 @@ export default function MedicalHistoryFormPage({
         nextSession = d.isValid() ? d.format('YYYY-MM-DD') : '';
       }
       setNextSessionDate(nextSession);
+      const recoveryTimeValues = parseExpectedRecoveryTime(medicalHistoryData.expected_recovery_time);
 
       const formValues = {
         patient_id: medicalHistoryData.patient_id,
-        staff_id: medicalHistoryData.staff_id || undefined,
+        user_id: getMedicalHistoryUserId(medicalHistoryData),
         service_type: medicalHistoryData.service_type || '',
         injury_type: medicalHistoryData.injury_type || '',
         area_concern: medicalHistoryData.area_concern || '',
         diagnosis_result: medicalHistoryData.diagnosis_result || '',
-        expected_recovery_time: medicalHistoryData.expected_recovery_time || '',
+        ...recoveryTimeValues,
         recovery_goals: medicalHistoryData.recovery_goals || '',
         objective_progress: medicalHistoryData.objective_progress || '',
         pain_before: normalizePainLevel(medicalHistoryData.pain_before),
@@ -388,6 +487,8 @@ export default function MedicalHistoryFormPage({
       form.setFieldsValue({
         pain_before: 1,
         pain_after: 1,
+        expected_recovery_value: undefined,
+        expected_recovery_unit: undefined,
       });
       setAppointmentDateTime('');
       setNextSessionDate(''); // ← reset
@@ -412,7 +513,16 @@ export default function MedicalHistoryFormPage({
 
     const changed = Object.keys(allValues).some(key => {
       const currentValue = allValues[key];
-      const originalValue = medicalHistoryData[key];
+      const originalValue =
+        key === 'user_id'
+          ? (getMedicalHistoryUserId(medicalHistoryData) ?? medicalHistoryData.staff_id)
+          : medicalHistoryData[key];
+
+      if (key === 'expected_recovery_value' || key === 'expected_recovery_unit') {
+        const originalRecoveryTime = parseExpectedRecoveryTime(medicalHistoryData.expected_recovery_time);
+        return currentValue !== originalRecoveryTime[key];
+      }
+
       if (Array.isArray(currentValue) || Array.isArray(originalValue)) {
         return JSON.stringify(currentValue) !== JSON.stringify(originalValue);
       }
@@ -443,6 +553,12 @@ export default function MedicalHistoryFormPage({
       await form.validateFields();
 
       let body = form.getFieldsValue();
+      body.expected_recovery_time =
+        body.expected_recovery_value && body.expected_recovery_unit
+          ? `${body.expected_recovery_value} ${body.expected_recovery_unit}`
+          : '';
+      delete body.expected_recovery_value;
+      delete body.expected_recovery_unit;
 
       // ─── UPLOAD LOGIC ────────────────────────────────────────────────
       if (bodyAnnotationRef.current) {
@@ -507,10 +623,10 @@ export default function MedicalHistoryFormPage({
       }
       body.appointment_date = appointmentMoment.toISOString();
 
-      if (body.staff_id !== undefined && body.staff_id !== null && body.staff_id !== '') {
-        body.staff_id = parseInt(body.staff_id);
+      if (body.user_id !== undefined && body.user_id !== null && body.user_id !== '') {
+        body.user_id = parseInt(body.user_id);
       } else {
-        body.staff_id = null;
+        body.user_id = null;
       }
 
       if (body.pain_before !== undefined) {
@@ -739,15 +855,14 @@ export default function MedicalHistoryFormPage({
                         <Col xs={24} md={12}>
                           <Form.Item
                             label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Staff</span>}
-                            name="staff_id"
+                            name="user_id"
                             style={{ marginBottom: '10px' }}
                           >
                             <Select
                               className="medical-history-select"
-                              placeholder="Select staff (optional)"
+                              placeholder={currentLoginName || 'Staff'}
                               loading={staffLoading}
-                              showSearch
-                              allowClear
+                              disabled
                               optionFilterProp="children"
                               filterOption={(input, option) => {
                                 const childStr = Array.isArray(option.children) ? option.children.join('') : String(option.children || '');
@@ -755,7 +870,7 @@ export default function MedicalHistoryFormPage({
                               }}
                             >
                               {staffList.map(staff => (
-                                <Option key={staff.id} value={staff.id}>
+                                <Option key={staff.id} value={getStaffUserId(staff)}>
                                   {staff.name} - {staff.phone_number}
                                 </Option>
                               ))}
@@ -883,14 +998,46 @@ export default function MedicalHistoryFormPage({
 
                       <Form.Item
                         label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Expected Recovery Time</span>}
-                        name="expected_recovery_time"
-                        rules={[{ max: 100, message: 'Max 100 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <Input
-                          placeholder="e.g., 2-4 weeks, 3 months"
-                          style={{ backgroundColor: '#FFFFFF', border: '1px solid #d9d9d9', color: '#000000', borderRadius: '4px', height: '34px', padding: '4px 11px', fontSize: '14px' }}
-                        />
+                        <Row gutter={12}>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              name="expected_recovery_value"
+                              style={{ marginBottom: 0 }}
+                            >
+                              <Select
+                                className="medical-history-select"
+                                placeholder="Select number"
+                                allowClear
+                              >
+                                {RECOVERY_DURATION_OPTIONS.map((option) => (
+                                  <Option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              name="expected_recovery_unit"
+                              style={{ marginBottom: 0 }}
+                            >
+                              <Select
+                                className="medical-history-select"
+                                placeholder="Select unit"
+                                allowClear
+                              >
+                                {RECOVERY_UNIT_OPTIONS.map((option) => (
+                                  <Option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        </Row>
                       </Form.Item>
 
                       <Form.Item

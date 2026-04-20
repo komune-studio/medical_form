@@ -12,6 +12,7 @@ export default class MedicalHistoryModel {
       // Add filters to query params
       if (filters.patient_id) queryParams.append('patient_id', filters.patient_id);
       if (filters.staff_id) queryParams.append('staff_id', filters.staff_id);
+      if (filters.user_id) queryParams.append('user_id', filters.user_id);
       if (filters.service_type) queryParams.append('service_type', filters.service_type);
       if (filters.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
       if (filters.dateTo) queryParams.append('dateTo', filters.dateTo);
@@ -45,10 +46,13 @@ export default class MedicalHistoryModel {
 
   /**
    * Create new medical history
+   * Backend will auto-fill user_id from token, so we don't send it
    */
   static createMedicalHistory = async (data) => {
     try {
-      return await ApiRequest.set('v1/medical-history/create', "POST", data);
+      // Remove user_id if present (backend will inject from token)
+      const { user_id, ...cleanData } = data;
+      return await ApiRequest.set('v1/medical-history/create', "POST", cleanData);
     } catch (error) {
       console.error("Error creating medical history:", error);
       throw error;
@@ -91,6 +95,7 @@ export default class MedicalHistoryModel {
       if (filters.dateTo) queryParams.append('dateTo', filters.dateTo);
       if (filters.service_type) queryParams.append('service_type', filters.service_type);
       if (filters.staff_id) queryParams.append('staff_id', filters.staff_id);
+      if (filters.user_id) queryParams.append('user_id', filters.user_id);
 
       const queryString = queryParams.toString();
       const url = queryString
@@ -106,7 +111,6 @@ export default class MedicalHistoryModel {
 
   /**
    * Get patient progress report for PDF generation
-   * Updated: Better error handling for 404 and other errors
    */
   static getProgressReport = async (patientId) => {
     try {
@@ -155,7 +159,24 @@ export default class MedicalHistoryModel {
   }
 
   /**
-   * Generate Progress Report PDF - Rangka Style (Improved Layout)
+   * Get creator name (priority: user_name, fallback to staff_name)
+   */
+  static getCreatorName = (record) => {
+    if (!record) return '-';
+
+    // Prioritaskan user_name
+    if (record.user_name && record.user_name !== '-') {
+      return record.user_name;
+    }
+    // Fallback ke staff_name
+    if (record.staff_name && record.staff_name !== '-') {
+      return record.staff_name;
+    }
+    return '-';
+  }
+
+  /**
+   * Generate Progress Report PDF
    * Delegates to MedicalHistoryPDFGenerator
    */
   static generateProgressPDF = async (patientId) => {
@@ -184,19 +205,19 @@ export default class MedicalHistoryModel {
     try {
       const queryParams = new URLSearchParams();
 
-      // Add filters to query params
+      // Add filters to query params - prioritize user_id
       if (filters.patient_id) queryParams.append('patient_id', filters.patient_id);
-      if (filters.staff_id) queryParams.append('staff_id', filters.staff_id);
+      if (filters.user_id) queryParams.append('user_id', filters.user_id);
       if (filters.service_type) queryParams.append('service_type', filters.service_type);
       if (filters.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
       if (filters.dateTo) queryParams.append('dateTo', filters.dateTo);
+      if (filters.search) queryParams.append('search', filters.search);
 
       const queryString = queryParams.toString();
       const url = queryString
         ? `v1/medical-history/export-csv?${queryString}`
         : 'v1/medical-history/export-csv';
 
-      // Note: This should return a blob/file download
       return await ApiRequest.set(url, "GET", null, {
         responseType: 'blob'
       });
@@ -224,7 +245,6 @@ export default class MedicalHistoryModel {
    */
   static validateStaffExists = async (staffId) => {
     try {
-      // This should call your actual staff validation endpoint
       const response = await ApiRequest.set(`v1/staff/${staffId}`, "GET");
       return response && response.http_code === 200 && response.data !== null;
     } catch (error) {
@@ -235,7 +255,6 @@ export default class MedicalHistoryModel {
 
   /**
    * Format medical history data for form
-   * ✅ UPDATED: Added recovery_goals field
    */
   static formatMedicalHistoryForForm = (data = {}) => {
     // Convert date string to format compatible with datetime-local input
@@ -258,7 +277,7 @@ export default class MedicalHistoryModel {
       area_concern: data.area_concern || '',
       diagnosis_result: data.diagnosis_result || '',
       expected_recovery_time: data.expected_recovery_time || '',
-      recovery_goals: data.recovery_goals || '', // ✅ NEW FIELD
+      recovery_goals: data.recovery_goals || '',
       objective_progress: data.objective_progress || '',
       pain_before: data.pain_before !== undefined ? data.pain_before : '',
       pain_after: data.pain_after !== undefined ? data.pain_after : '',
@@ -321,7 +340,7 @@ export default class MedicalHistoryModel {
     if (isNaN(before) || isNaN(after) || before === 0) return null;
 
     const reduction = ((before - after) / before) * 100;
-    return Math.round(reduction * 10) / 10; // Round to 1 decimal place
+    return Math.round(reduction * 10) / 10;
   }
 
   /**
