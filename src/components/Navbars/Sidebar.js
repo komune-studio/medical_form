@@ -11,7 +11,7 @@ const SIDEBAR_COLOR = "#FFFFFF";
 
 const SIDEBAR_ADMIN = [
     { path: "/patients", name: "Patients", icon: "mdi:account-group" },
-    { path: "/medical-history", name: "Medical History", icon: "mdi:history" },
+    { path: "/treatment-plan", name: "Treatment Plan", icon: "mdi:history" },
     { path: "/staff", name: "Staff", icon: "mdi:badge" },
     { path: "/user-management", name: "User Management", icon: "mdi:account-cog" },
 ];

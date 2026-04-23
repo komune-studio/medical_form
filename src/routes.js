@@ -11,6 +11,9 @@ import PatientDetail from "components/pages/Patients/PatientDetail";
 import MedicalHistoryList from "components/pages/MedicalHistory/MedicalHistoryList";
 import MedicalHistoryCreate from "components/pages/MedicalHistory/MedicalHistoryCreate";
 import MedicalHistoryEdit from "components/pages/MedicalHistory/MedicalHistoryEdit";
+import TreatmentPlanList from "components/pages/TreatmentPlan/TreatmentPlanList";
+import TreatmentPlanCreate from "components/pages/TreatmentPlan/TreatmentPlanCreate";
+import TreatmentPlanEdit from "components/pages/TreatmentPlan/TreatmentPlanEdit";
 import FormPage from "components/pages/Form/FormPage";
 
 var routes = [
@@ -66,6 +69,26 @@ var routes = [
         path: "/medical-history",
         name: "Medical History",
         component: MedicalHistoryList,
+        layout: "/admin",
+    },
+
+    // ─── TREATMENT PLAN ──────────────────────────────────────────────────────
+    {
+        path: "/treatment-plan/create",
+        name: "Treatment Plan Create",
+        component: TreatmentPlanCreate,
+        layout: "/admin",
+    },
+    {
+        path: "/treatment-plan/:id/edit",
+        name: "Treatment Plan Edit",
+        component: TreatmentPlanEdit,
+        layout: "/admin",
+    },
+    {
+        path: "/treatment-plan",
+        name: "Treatment Plan",
+        component: TreatmentPlanList,
         layout: "/admin",
     },
 

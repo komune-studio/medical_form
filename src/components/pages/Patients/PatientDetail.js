@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { message, Spin } from 'antd';
-import MedicalHistoryModel from 'models/MedicalHistoryModel';
+import { message, Spin, Select } from 'antd';
+import TreatmentPlanModel from 'models/TreatmentPlanModel';
+import PatientModel from 'models/PatientModel';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
+
+const { Option } = Select;
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -101,37 +104,62 @@ const PatientDetail = () => {
   const { id } = useParams();
   const history = useHistory();
   const [loading, setLoading] = useState(true);
-  const [reportData, setReportData] = useState(null);
+  const [patientData, setPatientData] = useState(null);
+  const [patientPlans, setPatientPlans] = useState([]);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [planDetail, setPlanDetail] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null); // 'no_history' | 'server_error' | null
+  const [loadingPlan, setLoadingPlan] = useState(false);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadPatientAndPlans = async () => {
       try {
         setLoading(true);
         setFetchError(null);
-        const response = await MedicalHistoryModel.getProgressReport(id);
-        const data = response?.data;
-        if (!data) throw new Error('invalid_response');
-        if (!data.sessions || data.sessions.length === 0) {
-          setFetchError('no_history');
-          setReportData(data); // still set patient data if available
-          return;
-        }
-        setReportData(data);
-      } catch (err) {
-        const msg = err.message?.toLowerCase() || '';
-        if (msg.includes('no medical history') || msg.includes('404') || msg.includes('not found')) {
+        
+        // 1. Load patient data
+        const patientRes = await PatientModel.getPatientById(id);
+        if (!patientRes?.data) throw new Error('patient_not_found');
+        setPatientData(patientRes.data);
+
+        // 2. Load all plans for this patient
+        const plansRes = await TreatmentPlanModel.getAll({ patient_id: id });
+        const plans = plansRes?.data || [];
+        setPatientPlans(plans);
+
+        if (plans.length === 0) {
           setFetchError('no_history');
         } else {
-          setFetchError('server_error');
+          // Select the latest plan (first one)
+          setSelectedPlanId(plans[0].id);
         }
+      } catch (err) {
+        setFetchError('server_error');
       } finally {
         setLoading(false);
       }
     };
-    if (id) loadData();
+    if (id) loadPatientAndPlans();
   }, [id]);
+
+  useEffect(() => {
+    const loadPlanDetail = async () => {
+      if (!selectedPlanId) return;
+      try {
+        setLoadingPlan(true);
+        const res = await TreatmentPlanModel.getById(selectedPlanId);
+        if (res?.data) {
+           setPlanDetail(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load plan details', err);
+      } finally {
+        setLoadingPlan(false);
+      }
+    };
+    loadPlanDetail();
+  }, [selectedPlanId]);
 
   const handleDownloadPDF = async () => {
     const paperEl = document.getElementById('pd-paper-content');
@@ -201,7 +229,7 @@ const PatientDetail = () => {
         remainH -= sliceH;
       }
 
-      const safeName = (reportData?.patient?.name || 'patient')
+      const safeName = (patientData?.name || 'patient')
         .replace(/[^a-zA-Z0-9\s-]/g, '')
         .replace(/\s+/g, '-');
       pdf.save(`progress-report-${safeName}-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -223,7 +251,7 @@ const PatientDetail = () => {
     );
   }
 
-  if (!reportData && fetchError === 'no_history') {
+  if (!patientPlans.length && fetchError === 'no_history') {
     return (
       <div className="patient-detail-wrapper" style={{ padding: '60px 16px', display: 'flex', justifyContent: 'center', background: '#f7f8fa', minHeight: '100vh', width: '100%' }}>
         <div style={{ textAlign: 'center', padding: '60px 40px', background: '#fff', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', width: '100%', maxWidth: 500 }}>
@@ -246,6 +274,27 @@ const PatientDetail = () => {
             <BackIcon /> Kembali
           </button>
         </div>
+
+        {/* PLAN SELECTOR */}
+        {patientPlans.length > 0 && (
+          <div style={{ width: '100%', maxWidth: 820, marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#444', marginBottom: 6 }}>Select Treatment Plan:</label>
+            <Select 
+              value={selectedPlanId} 
+              onChange={val => setSelectedPlanId(val)}
+              style={{ width: '100%', maxWidth: 400 }}
+              disabled={loadingPlan}
+            >
+              {patientPlans.map(plan => (
+                <Option key={plan.id} value={plan.id}>
+                  {plan.title} - {formatDate(plan.started_at)}
+                </Option>
+              ))}
+            </Select>
+            {loadingPlan && <Spin size="small" style={{ marginLeft: 12 }} />}
+          </div>
+        )}
+
       </div>
     );
   }
@@ -286,31 +335,38 @@ const PatientDetail = () => {
     );
   }
 
-  if (!reportData) {
+  if (loadingPlan) {
     return (
-      <div className="patient-detail-wrapper" style={{ padding: '60px 16px', display: 'flex', justifyContent: 'center', background: '#f7f8fa', minHeight: '100vh', width: '100%' }}>
-        <div style={{ textAlign: 'center', padding: '60px 40px', background: '#fff', borderRadius: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', width: '100%', maxWidth: 500 }}>
-          <div style={{ marginBottom: 20, opacity: 0.5, display: 'flex', justifyContent: 'center' }}>
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-              <path d="M9 12H15M12 9V15M3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12Z" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <h3 style={{ fontSize: 20, color: '#333', marginBottom: 12, fontWeight: 700 }}>Belum Ada Medical History</h3>
-          <p style={{ fontSize: 14, color: '#666', marginBottom: 28, lineHeight: 1.6 }}>Pasien ini belum memiliki riwayat medis atau laporan perkembangan (progress report) yang tercatat di sistem.</p>
-          <button style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#444',
-            border: '1px solid #d9d9d9', borderRadius: 6, padding: '8px 16px', fontSize: 14,
-            fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s'
-          }} onClick={() => history.goBack()}>
-            <BackIcon /> Kembali
-          </button>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <Spin size="large" tip="Loading treatment plan..." />
       </div>
     );
   }
 
-  const { patient, sessions = [] } = reportData;
-  const firstSession = sessions[0] || {};
+  if (!planDetail && !loading && patientPlans.length > 0) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+        <Spin size="large" tip="Loading plan data..." />
+      </div>
+    );
+  }
+
+  const patient = patientData || {};
+  const sessions = planDetail?.treatment_logs || [];
+  
+  // We mock firstSession from planDetail to keep the UI exactly the same
+  const firstSession = planDetail ? {
+    appointment_date: planDetail.started_at,
+    staff_name: planDetail.staff_name,
+    service_type: planDetail.service_type,
+    injury_type: planDetail.injury_type,
+    area_concern: planDetail.area_concern,
+    diagnosis_result: planDetail.diagnosis_result,
+    range_of_motion_impact: sessions[0]?.range_of_motion_impact || '',
+    recovery_goals: planDetail.recovery_goals,
+    expected_recovery_time: planDetail.expected_recovery_time,
+  } : {};
+  
 
   const tableHeaders = [
     { label: 'Session\n#', width: 28, bg: '#fafafa' },
@@ -477,6 +533,27 @@ const PatientDetail = () => {
           </button>
         </div>
 
+        {/* PLAN SELECTOR */}
+        {patientPlans.length > 0 && (
+          <div style={{ width: '100%', maxWidth: 820, marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#444', marginBottom: 6 }}>Select Treatment Plan:</label>
+            <Select 
+              value={selectedPlanId} 
+              onChange={val => setSelectedPlanId(val)}
+              style={{ width: '100%', maxWidth: 400 }}
+              disabled={loadingPlan}
+            >
+              {patientPlans.map(plan => (
+                <Option key={plan.id} value={plan.id}>
+                  {plan.title} - {formatDate(plan.started_at)}
+                </Option>
+              ))}
+            </Select>
+            {loadingPlan && <Spin size="small" style={{ marginLeft: 12 }} />}
+          </div>
+        )}
+
+
         {/* ── PAPER ── */}
         <div className="pd-paper" id="pd-paper-content">
 
@@ -500,7 +577,7 @@ const PatientDetail = () => {
               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                 <tbody>
                   <InfoRow label="Patient Name:" value={patient.name} />
-                  <InfoRow label="Phone Number:" value={patient.phone} />
+                  <InfoRow label="Phone Number:" value={patient.phone_number || patient.phone} />
                   <InfoRow label="Email Address:" value={patient.email} />
                   <InfoRow label="Age:" value={patient.date_of_birth ? `${calculateAge(patient.date_of_birth)} years` : null} />
                   <InfoRow label="Height (cm):" value={patient.height} />
@@ -593,7 +670,7 @@ const PatientDetail = () => {
                   {sessions.map((s, i) => (
                     <tr key={s.id || i}>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, textAlign: 'center', fontWeight: 700, background: '#fafafa', verticalAlign: 'top', overflow: 'hidden' }}>{i + 1}</td>
-                      <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, textAlign: 'center', verticalAlign: 'top', color: '#333', overflow: 'hidden' }}>{formatDate(s.appointment_date)}</td>
+                      <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, textAlign: 'center', verticalAlign: 'top', color: '#333', overflow: 'hidden' }}>{formatDate(s.visit_date)}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.staff_name || '-'}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.objective_progress || '-'}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.exercise || '-'}</td>
@@ -611,28 +688,20 @@ const PatientDetail = () => {
             </div>
           )}
 
-          {/* BODY ANNOTATION IMAGES */}
-          {sessions.some(s => s.body_annotation_base64 || s.body_annotation_url) && (
-            <div>
-              {sessions.map((s, i) => {
-                const img = s.body_annotation_base64 || s.body_annotation_url;
-                if (!img || img.trim() === '') return null;
-                return (
-                  <div key={s.id || i} style={{ marginBottom: 18 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, color: '#111', marginBottom: 6 }}>
-                      Session {i + 1} - Body Annotation:
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <img
-                        src={img}
-                        alt={`Session ${i + 1} body annotation`}
-                        crossOrigin="anonymous"
-                        style={{ maxWidth: 280, width: '100%', display: 'block', margin: '0 auto' }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+          {/* BODY ANNOTATION IMAGE (1 per Plan) */}
+          {planDetail?.image_url && (
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: '#111', marginBottom: 6 }}>
+                Body Pain Diagram:
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <img
+                  src={planDetail.image_url}
+                  alt="Body annotation"
+                  crossOrigin="anonymous"
+                  style={{ maxWidth: 280, width: '100%', display: 'block', margin: '0 auto' }}
+                />
+              </div>
             </div>
           )}
 
