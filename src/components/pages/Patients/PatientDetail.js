@@ -7,7 +7,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
-import { getProxiedImageUrl } from '../../../utils/imageProxy';
+import { getProxiedImageUrl, fetchImageAsBase64 } from '../../../utils/imageProxy';
 
 const { Option } = Select;
 
@@ -113,6 +113,7 @@ const PatientDetail = () => {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [fetchError, setFetchError] = useState(null); // 'no_history' | 'server_error' | null
   const [loadingPlan, setLoadingPlan] = useState(false);
+  const [bodyImageBase64, setBodyImageBase64] = useState(null);
 
   useEffect(() => {
     const loadPatientAndPlans = async () => {
@@ -150,9 +151,14 @@ const PatientDetail = () => {
       if (!selectedPlanId) return;
       try {
         setLoadingPlan(true);
+        setBodyImageBase64(null);
         const res = await TreatmentPlanModel.getById(selectedPlanId);
         if (res?.data) {
-           setPlanDetail(res.data);
+          setPlanDetail(res.data);
+          // Pre-fetch body image as base64 to avoid CORS in production
+          if (res.data.image_url) {
+            fetchImageAsBase64(res.data.image_url).then(b64 => setBodyImageBase64(b64));
+          }
         }
       } catch (err) {
         console.error('Failed to load plan details', err);
@@ -715,7 +721,7 @@ const PatientDetail = () => {
               </div>
               <div style={{ textAlign: 'center' }}>
                 <img
-                  src={getProxiedImageUrl(planDetail.image_url)}
+                  src={bodyImageBase64 || getProxiedImageUrl(planDetail.image_url)}
                   alt="Body annotation"
                   crossOrigin="anonymous"
                   style={{ maxWidth: 280, width: '100%', display: 'block', margin: '0 auto' }}

@@ -11,7 +11,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
-import { getProxiedImageUrl } from '../../../utils/imageProxy';
+import { getProxiedImageUrl, fetchImageAsBase64 } from '../../../utils/imageProxy';
 
 import moment from 'moment';
 import create from 'zustand';
@@ -172,7 +172,10 @@ const PatientList = () => {
 
       // Build assessment info from planDetail
       const assessTherapist = planDetail.user_name || planDetail.staff_name || '-';
-      const bodyImageUrl = planDetail.image_url ? getProxiedImageUrl(planDetail.image_url) : null;
+      // Pre-fetch body image as base64 to avoid CORS in production
+      const bodyImageUrl = planDetail.image_url
+        ? await fetchImageAsBase64(planDetail.image_url)
+        : null;
 
       // Build hidden paper element
       const wrapper = document.createElement('div');
