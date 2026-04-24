@@ -15,8 +15,9 @@ const { Option } = Select;
 
 const calculateAge = (dob) => {
   if (!dob) return 'N/A';
-  const d = new Date(dob);
-  if (isNaN(d.getTime())) return 'Invalid date';
+  // Replace hyphens to fix Safari/timezone parsing issues with ISO dates
+  const d = new Date(String(dob).replace(/-/g, '/').split('T')[0].replace(/\//g, '/'));
+  if (isNaN(d.getTime())) return 'N/A';
   const today = new Date();
   let age = today.getFullYear() - d.getFullYear();
   const m = today.getMonth() - d.getMonth();
@@ -590,7 +591,13 @@ const PatientDetail = () => {
                   <InfoRow label="Patient Name:" value={patient.name} />
                   <InfoRow label="Phone Number:" value={patient.phone_number || patient.phone} />
                   <InfoRow label="Email Address:" value={patient.email} />
-                  <InfoRow label="Age:" value={patient.date_of_birth ? `${calculateAge(patient.date_of_birth)} years` : null} />
+                  <InfoRow label="Age:" value={
+                    patient.date_of_birth
+                      ? (calculateAge(patient.date_of_birth) > 0
+                          ? `${calculateAge(patient.date_of_birth)} years`
+                          : null)
+                      : null
+                  } />
                   <InfoRow label="Height (cm):" value={patient.height} />
                   <InfoRow label="Weight (kg):" value={patient.weight} />
                 </tbody>

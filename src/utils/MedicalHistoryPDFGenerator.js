@@ -8,8 +8,10 @@ export default class MedicalHistoryPDFGenerator {
 
   static calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return 'N/A';
-    const dob = new Date(dateOfBirth);
-    if (isNaN(dob.getTime())) return 'Invalid date';
+    const parts = String(dateOfBirth).split('T')[0].split('-');
+    if (parts.length < 3) return 'N/A';
+    const dob = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    if (isNaN(dob.getTime())) return 'N/A';
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
     const m = today.getMonth() - dob.getMonth();

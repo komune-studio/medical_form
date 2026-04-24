@@ -145,7 +145,10 @@ const PatientList = () => {
       };
       const calcAge = (dob) => {
         if (!dob) return 'N/A';
-        const d = new Date(dob);
+        const parts = String(dob).split('T')[0].split('-');
+        if (parts.length < 3) return 'N/A';
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (isNaN(d.getTime())) return 'N/A';
         const today = new Date();
         let age = today.getFullYear() - d.getFullYear();
         const m = today.getMonth() - d.getMonth();
@@ -196,7 +199,11 @@ const PatientList = () => {
           ['Patient Name:', patientFull.name || patient.name],
           ['Phone Number:', patientFull.phone_number || patientFull.phone],
           ['Email Address:', patientFull.email],
-          ['Age:', patientFull.date_of_birth ? calcAge(patientFull.date_of_birth) + ' years' : null],
+          ['Age:', (() => {
+            if (!patientFull.date_of_birth) return null;
+            const a = calcAge(patientFull.date_of_birth);
+            return (a != null && a > 0) ? a + ' years' : null;
+          })()],
           ['Height (cm):', patientFull.height],
           ['Weight (kg):', patientFull.weight],
         ].map(([lbl, val]) => `
