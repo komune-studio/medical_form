@@ -194,6 +194,7 @@ export default class MedicalHistoryPDFGenerator {
           String(idx + 1),
           fmtDate,
           s.staff_name         || '-',
+          s.treatment          || '-',
           s.objective_progress || '-',
           s.exercise           || '-',
           s.recovery_tips      || '-',
@@ -204,7 +205,7 @@ export default class MedicalHistoryPDFGenerator {
 
       autoTable(doc, {
         startY: yPos,
-        head: [['Session\n#', 'Session\nDate', 'Rangka\nTherapist', 'Objective\nProgress', 'Home\nExercise', 'Recovery\nTips', 'Pre-\nTreatment', 'Post-\nTreatment']],
+        head: [['Session\n#', 'Session\nDate', 'Rangka\nTherapist', 'Treatment', 'Objective\nProgress', 'Home\nExercise', 'Recovery\nTips', 'Pre-\nTreatment', 'Post-\nTreatment']],
         body: tableData,
         theme: 'grid',
         styles: {
@@ -218,19 +219,20 @@ export default class MedicalHistoryPDFGenerator {
         },
         bodyStyles: { fontSize: 7, textColor: [40, 40, 40], valign: 'top' },
         columnStyles: {
-          0: { cellWidth: 12, halign: 'center', fontStyle: 'bold' },
-          1: { cellWidth: 20, halign: 'center' },
-          2: { cellWidth: 22, halign: 'left' },
-          3: { cellWidth: 38, halign: 'left' },
-          4: { cellWidth: 32, halign: 'left' },
-          5: { cellWidth: 30, halign: 'left' },
-          6: { cellWidth: 14, halign: 'center', fillColor: [255, 250, 235] },
-          7: { cellWidth: 14, halign: 'center', fillColor: [240, 255, 245] },
+          0: { cellWidth: 10, halign: 'center', fontStyle: 'bold' },
+          1: { cellWidth: 18, halign: 'center' },
+          2: { cellWidth: 20, halign: 'left' },
+          3: { cellWidth: 24, halign: 'left' },
+          4: { cellWidth: 30, halign: 'left' },
+          5: { cellWidth: 26, halign: 'left' },
+          6: { cellWidth: 26, halign: 'left' },
+          7: { cellWidth: 14, halign: 'center', fillColor: [255, 250, 235] },
+          8: { cellWidth: 14, halign: 'center', fillColor: [240, 255, 245] },
         },
         margin: { left: 12, right: 12 },
         tableWidth: 'auto',
         didDrawCell: (data) => {
-          if ((data.column.index === 6 || data.column.index === 7) && data.section === 'body') {
+          if ((data.column.index === 7 || data.column.index === 8) && data.section === 'body') {
             const cv = data.cell.raw;
             if (cv === '-' || cv == null) return;
             const v = parseFloat(cv);

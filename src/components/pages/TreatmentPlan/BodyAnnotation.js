@@ -124,6 +124,13 @@ const BodyAnnotation = forwardRef(({
       if (canvasInitialized && backgroundImage) {
         redrawCanvas([], backgroundImage, null);
       }
+    },
+    // ✅ Fully reset to default body image
+    resetToDefault: () => {
+      setImageUrl(defaultBodyImage);
+      setLocalFile(null);
+      setElements([]);
+      setCanvasInitialized(false);
     }
   }));
 

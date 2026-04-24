@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Result, Button } from 'antd';
-import MedicalHistoryFormPage from 'components/pages/MedicalHistory/MedicalHistoryFormPage';
+import TreatmentPlanFormPage from 'components/pages/TreatmentPlan/TreatmentPlanFormPage';
 
 const FormPage = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -44,7 +44,7 @@ const FormPage = () => {
                   fontWeight: 600,
                 }}
               >
-                Medical History Submitted!
+                Treatment Plan / Log Submitted!
               </span>
             }
             subTitle={
@@ -84,8 +84,8 @@ const FormPage = () => {
         </div>
       ) : (
         <div style={{ width: '100%' }}>
-          <MedicalHistoryFormPage
-            medicalHistoryData={null}
+          <TreatmentPlanFormPage
+            treatmentPlanData={null}
             disabled={false}
             isStandalone={true}
             onSubmitSuccess={handleSubmitSuccess}

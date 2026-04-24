@@ -100,15 +100,6 @@ const TreatmentPlanList = () => {
     setPage(0);
   };
 
-  const getPainLevelColor = (score) => {
-    if (!score) return '#d9d9d9';
-    const pain = parseInt(score);
-    if (pain <= 3) return '#52c41a'; // green
-    if (pain <= 6) return '#faad14'; // orange
-    if (pain <= 9) return '#f5222d'; // red
-    return '#722ed1'; // purple for extreme pain
-  };
-
   // ✅ Helper function buat ambil creator name (prioritas user_name, fallback staff_name)
   const getCreatorName = (row) => {
     // Prioritaskan user_name
@@ -149,9 +140,6 @@ const TreatmentPlanList = () => {
             <div style={{ fontWeight: 500, color: '#333' }}>
               {moment(row.started_at).format("DD MMM YYYY")}
             </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              {moment(row.started_at).format("HH:mm")}
-            </div>
             <div style={{
               fontSize: '12px',
               color: '#1890ff',
@@ -166,115 +154,31 @@ const TreatmentPlanList = () => {
     },
     {
       id: 'created_by',
-      label: 'Created By',  // ← GANTI dari 'Staff' jadi 'Created By'
+      label: 'Created By',
       filter: false,
       render: (row) => (
         <div>
           <div style={{ color: '#333', fontWeight: 500 }}>
             {getCreatorName(row)}
           </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            {row.service_type || 'General'}
-          </div>
         </div>
       )
     },
     {
-      id: 'pain_level',
-      label: 'Pain Level',
+      id: 'title',
+      label: 'Plan Title',
       filter: false,
       render: (row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {row.pain_before && (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                fontSize: '12px',
-                color: '#666',
-                marginBottom: '2px'
-              }}>
-                Before
-              </div>
-              <div style={{
-                padding: '4px 8px',
-                borderRadius: '4px',
-                background: getPainLevelColor(row.pain_before),
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                minWidth: '30px',
-                display: 'inline-block'
-              }}>
-                {row.pain_before}
-              </div>
-            </div>
-          )}
-
-          {row.pain_after && (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                fontSize: '12px',
-                color: '#666',
-                marginBottom: '2px'
-              }}>
-                After
-              </div>
-              <div style={{
-                padding: '4px 8px',
-                borderRadius: '4px',
-                background: getPainLevelColor(row.pain_after),
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                minWidth: '30px',
-                display: 'inline-block'
-              }}>
-                {row.pain_after}
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      id: 'diagnosis',
-      label: 'Diagnosis & Treatment',
-      filter: false,
-      render: (row) => (
-        <div>
-          <div style={{
-            color: '#333',
-            fontSize: '13px',
-            marginBottom: '4px',
-            maxWidth: '200px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            {row.diagnosis_result || 'No diagnosis'}
-          </div>
-          <div style={{
-            fontSize: '12px',
-            color: '#666',
-            maxWidth: '200px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            {row.treatments || 'No treatment specified'}
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'created_at',
-      label: 'Record Date',
-      filter: false,
-      render: (row) => (
-        <div>
-          <div style={{ color: '#333' }}>{moment(row.created_at).format("DD MMM YYYY")}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            {moment(row.created_at).format("HH:mm")}
-          </div>
+        <div style={{
+          color: '#333',
+          fontSize: '13px',
+          fontWeight: 500,
+          maxWidth: '250px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
+        }}>
+          {row.title || `Plan #${row.id}`}
         </div>
       )
     },
@@ -811,8 +715,6 @@ const TreatmentPlanList = () => {
                 >
                   <Select.Option value="appointment_date_desc">Date (Newest)</Select.Option>
                   <Select.Option value="appointment_date_asc">Date (Oldest)</Select.Option>
-                  <Select.Option value="pain_before_desc">Pain Level (High)</Select.Option>
-                  <Select.Option value="pain_before_asc">Pain Level (Low)</Select.Option>
                 </Select>
               </Col>
             </Row>

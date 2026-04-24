@@ -558,12 +558,15 @@ export default function TreatmentPlanFormPage({
     if (planId !== 'new') {
       const plan = patientPlans.find(p => p.id === planId);
       if (plan) {
+        const recoveryTimeValues = parseExpectedRecoveryTime(plan.expected_recovery_time);
         form.setFieldsValue({
           service_type: plan.service_type || '',
           injury_type: plan.injury_type || '',
           area_concern: plan.area_concern || '',
-          diagnosis_result: plan.diagnosis || '',
+          diagnosis_result: plan.diagnosis_result || plan.diagnosis || '',
+          ...recoveryTimeValues,
           recovery_goals: plan.recovery_goals || '',
+          range_of_motion_impact: plan.range_of_motion_impact || '',
           // Assuming body annotation is bound via ref, we'll try to set it if possible
         });
         if (bodyAnnotationRef.current && plan.image_url) {
@@ -573,14 +576,20 @@ export default function TreatmentPlanFormPage({
     } else {
       // Clear plan fields
       form.setFieldsValue({
+        title: '',
         service_type: '',
         injury_type: '',
         area_concern: '',
         diagnosis_result: '',
         recovery_goals: '',
+        range_of_motion_impact: '',
       });
       if (bodyAnnotationRef.current) {
-         bodyAnnotationRef.current.clearAnnotations();
+         if (typeof bodyAnnotationRef.current.resetToDefault === 'function') {
+           bodyAnnotationRef.current.resetToDefault();
+         } else {
+           bodyAnnotationRef.current.clearAnnotations();
+         }
       }
     }
     setHasChanges(true);
@@ -718,8 +727,7 @@ export default function TreatmentPlanFormPage({
           const planData = {
             patient_id: body.patient_id,
             user_id: body.user_id,
-            staff_id: body.user_id,
-            title: `${body.service_type || 'Treatment'} for ${body.injury_type || body.area_concern || 'Patient'}`,
+            title: body.title || `${body.service_type || 'Treatment'} for ${body.injury_type || body.area_concern || 'Patient'}`,
             service_type: body.service_type,
             injury_type: body.injury_type,
             area_concern: body.area_concern,
@@ -943,6 +951,20 @@ export default function TreatmentPlanFormPage({
                         </Select>
                       </Form.Item>
 
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Plan Name / Title</span>}
+                        name="title"
+                        rules={[{ required: selectedPlanId === 'new', message: 'Plan Name is required!' }]}
+                        style={{ marginBottom: '10px' }}
+                        hidden={selectedPlanId !== 'new'}
+                      >
+                        <Input
+                          placeholder="e.g., Post-Surgery Recovery Plan"
+                          style={{ backgroundColor: '#FFFFFF', border: '1px solid #d9d9d9', color: '#000000', borderRadius: '4px', height: '34px', padding: '4px 11px', fontSize: '14px' }}
+                          disabled={formDisabled}
+                        />
+                      </Form.Item>
+
                       {/* Appointment Date & Time */}
                       <div style={{ marginBottom: '10px' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: '#000000', fontWeight: 600, fontSize: '14px' }}>
@@ -966,7 +988,7 @@ export default function TreatmentPlanFormPage({
                             rules={[{ required: selectedPlanId === 'new', message: 'Service type is required!' }]}
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select className="treatment-plan-select" placeholder="Select service type">
+                            <Select className="treatment-plan-select" placeholder="Select service type" disabled={formDisabled || selectedPlanId !== 'new'}>
                               <Option value="Physiotherapy">Physiotherapy</Option>
                               <Option value="Pilates">Pilates</Option>
                             </Select>
@@ -974,7 +996,7 @@ export default function TreatmentPlanFormPage({
                         </Col>
                         <Col xs={24} md={12}>
                           <Form.Item
-                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Staff</span>}
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>{selectedPlanId === 'new' ? 'Created By (Therapist)' : 'Attending Therapist'}</span>}
                             name="user_id"
                             style={{ marginBottom: '10px' }}
                           >
@@ -1006,7 +1028,7 @@ export default function TreatmentPlanFormPage({
                             name="injury_type"
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select className="treatment-plan-select" placeholder="Select injury type" allowClear>
+                            <Select className="treatment-plan-select" placeholder="Select injury type" allowClear disabled={formDisabled || selectedPlanId !== 'new'}>
                               {INJURY_TYPE_OPTIONS.map(type => (
                                 <Option key={type} value={type}>{type}</Option>
                               ))}
@@ -1023,6 +1045,7 @@ export default function TreatmentPlanFormPage({
                             <Input
                               placeholder="e.g., Lower back, Right shoulder"
                               style={{ backgroundColor: '#FFFFFF', border: '1px solid #d9d9d9', color: '#000000', borderRadius: '4px', height: '34px', padding: '4px 11px', fontSize: '14px' }}
+                              disabled={formDisabled || selectedPlanId !== 'new'}
                             />
                           </Form.Item>
                         </Col>
@@ -1113,7 +1136,7 @@ export default function TreatmentPlanFormPage({
                         rules={[{ max: 1000, message: 'Max 1000 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea placeholder="Enter diagnosis result" className="treatment-plan-textarea" rows={3} />
+                        <TextArea placeholder="Enter diagnosis result" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
                       </Form.Item>
 
                       <Form.Item
@@ -1130,6 +1153,7 @@ export default function TreatmentPlanFormPage({
                                 className="treatment-plan-select"
                                 placeholder="Select number"
                                 allowClear
+                                disabled={formDisabled || selectedPlanId !== 'new'}
                               >
                                 {RECOVERY_DURATION_OPTIONS.map((option) => (
                                   <Option key={option.value} value={option.value}>
@@ -1148,6 +1172,7 @@ export default function TreatmentPlanFormPage({
                                 className="treatment-plan-select"
                                 placeholder="Select unit"
                                 allowClear
+                                disabled={formDisabled || selectedPlanId !== 'new'}
                               >
                                 {RECOVERY_UNIT_OPTIONS.map((option) => (
                                   <Option key={option.value} value={option.value}>
@@ -1165,7 +1190,7 @@ export default function TreatmentPlanFormPage({
                         name="recovery_goals"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea placeholder="Enter specific recovery goals and milestones" className="treatment-plan-textarea" rows={3} />
+                        <TextArea placeholder="Enter specific recovery goals and milestones" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
                       </Form.Item>
 
                       <Form.Item
@@ -1181,7 +1206,7 @@ export default function TreatmentPlanFormPage({
                         name="range_of_motion_impact"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea placeholder="Describe range of motion limitations or improvements" className="treatment-plan-textarea" rows={2} />
+                        <TextArea placeholder="Describe range of motion limitations or improvements" className="treatment-plan-textarea" rows={2} disabled={formDisabled || selectedPlanId !== 'new'} />
                       </Form.Item>
 
                       <Form.Item
@@ -1241,7 +1266,7 @@ export default function TreatmentPlanFormPage({
                         name="body_annotation"
                         style={{ marginBottom: '10px' }}
                       >
-                        <BodyAnnotation ref={bodyAnnotationRef} disabled={formDisabled} />
+                        <BodyAnnotation ref={bodyAnnotationRef} disabled={formDisabled || selectedPlanId !== 'new'} />
                       </Form.Item>
 
                     </Col>

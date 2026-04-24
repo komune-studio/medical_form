@@ -125,6 +125,13 @@ const BodyAnnotation = forwardRef(({
         redrawCanvas([], backgroundImage, null);
       }
       message.success('All annotations cleared');
+    },
+    // ✅ Fully reset to default body image
+    resetToDefault: () => {
+      setImageUrl(defaultBodyImage);
+      setLocalFile(null);
+      setElements([]);
+      setCanvasInitialized(false);
     }
   }));
 
