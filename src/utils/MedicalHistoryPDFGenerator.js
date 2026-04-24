@@ -120,7 +120,7 @@ export default class MedicalHistoryPDFGenerator {
       const firstSession = sessions[0] || {};
       const assessRows = [
         ['Assessment Date:',        firstSession.appointment_date ? new Date(firstSession.appointment_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '-'],
-        ['Assessment Therapist:',   firstSession.staff_name             || '-'],
+        ['Assessment Therapist:',   firstSession.user_name || firstSession.staff_name || '-'],
         ['Service Type:',           firstSession.service_type           || '-'],
         ['Injury Type:',            firstSession.injury_type            || '-'],
         ['Area Concern:',           firstSession.area_concern           || '-'],
@@ -193,7 +193,7 @@ export default class MedicalHistoryPDFGenerator {
         return [
           String(idx + 1),
           fmtDate,
-          s.staff_name         || '-',
+          s.user_name || s.staff_name || '-',
           s.treatment          || '-',
           s.objective_progress || '-',
           s.exercise           || '-',

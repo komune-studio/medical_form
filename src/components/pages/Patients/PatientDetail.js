@@ -364,9 +364,9 @@ const PatientDetail = () => {
   const patient = patientData || {};
   const sessions = planDetail?.treatment_logs || [];
   
-  // We mock firstSession from planDetail to keep the UI exactly the same
   const firstSession = planDetail ? {
     appointment_date: planDetail.started_at,
+    user_name: planDetail.user_name,
     staff_name: planDetail.staff_name,
     service_type: planDetail.service_type,
     injury_type: planDetail.injury_type,
@@ -382,9 +382,10 @@ const PatientDetail = () => {
     { label: 'Session\n#', width: 28, bg: '#fafafa' },
     { label: 'Session\nDate', width: 52, bg: '#fafafa' },
     { label: 'Rangka\nTherapist', width: 65, bg: '#fafafa' },
-    { label: 'Objective\nProgress', width: 120, bg: '#fafafa' },
-    { label: 'Home\nExercise', width: 100, bg: '#fafafa' },
-    { label: 'Recovery\nTips', width: 100, bg: '#fafafa' },
+    { label: 'Treatment', width: 75, bg: '#fafafa' },
+    { label: 'Objective\nProgress', width: 100, bg: '#fafafa' },
+    { label: 'Home\nExercise', width: 85, bg: '#fafafa' },
+    { label: 'Recovery\nTips', width: 80, bg: '#fafafa' },
     { label: 'Pre-\nTreatment', width: 40, bg: '#fffbee' },
     { label: 'Post-\nTreatment', width: 40, bg: '#f0fff4' },
   ];
@@ -602,7 +603,7 @@ const PatientDetail = () => {
               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                 <tbody>
                   <InfoRow label="Assessment Date:" value={formatDate(firstSession.appointment_date)} />
-                  <InfoRow label="Assessment Therapist:" value={firstSession.staff_name} />
+                  <InfoRow label="Assessment Therapist:" value={firstSession.user_name || firstSession.staff_name || '-'} />
                   <InfoRow label="Service Type:" value={firstSession.service_type} />
                   <InfoRow label="Injury Type:" value={firstSession.injury_type} />
                   <InfoRow label="Area Concern:" value={firstSession.area_concern} />
@@ -681,7 +682,8 @@ const PatientDetail = () => {
                     <tr key={s.id || i}>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, textAlign: 'center', fontWeight: 700, background: '#fafafa', verticalAlign: 'top', overflow: 'hidden' }}>{i + 1}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, textAlign: 'center', verticalAlign: 'top', color: '#333', overflow: 'hidden' }}>{formatDate(s.visit_date)}</td>
-                      <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.staff_name || '-'}</td>
+                      <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.user_name || s.staff_name || '-'}</td>
+                      <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.treatment || '-'}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.objective_progress || '-'}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.exercise || '-'}</td>
                       <td style={{ border: '0.5px solid #ddd', padding: '4px 3px', fontSize: 8, verticalAlign: 'top', color: '#333', wordBreak: 'break-word', overflow: 'hidden' }}>{s.recovery_tips || '-'}</td>
