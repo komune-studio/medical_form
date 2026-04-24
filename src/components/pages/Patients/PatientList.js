@@ -6,11 +6,12 @@ import Iconify from "../../reusable/Iconify";
 import { Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import PatientModel from 'models/PatientModel';
-import MedicalHistoryModel from 'models/MedicalHistoryModel';
+import TreatmentPlanModel from 'models/TreatmentPlanModel';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
+import { getProxiedImageUrl } from '../../../utils/imageProxy';
 
 import moment from 'moment';
 import create from 'zustand';
@@ -40,6 +41,8 @@ const useFilter = create((set) => ({
     })),
 }));
 
+const { Option } = Select;
+
 const PatientList = () => {
   const [loading, setLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
@@ -47,6 +50,14 @@ const PatientList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [dataSource, setDataSource] = useState([]);
+
+  // PDF plan picker modal state
+  const [planPickerVisible, setPlanPickerVisible] = useState(false);
+  const [planPickerPlans, setPlanPickerPlans] = useState([]);
+  const [planPickerPatient, setPlanPickerPatient] = useState(null); // { id, name, patient_code }
+  const [planPickerSelected, setPlanPickerSelected] = useState(null);
+  const [planPickerLoading, setPlanPickerLoading] = useState(false);
+  const [pdfGenerating, setPdfGenerating] = useState(false);
 
   const search = useFilter((state) => state.search);
   const timeRange = useFilter((state) => state.timeRange);
@@ -80,22 +91,48 @@ const PatientList = () => {
     setPage(0);
   };
 
+  // Open plan picker modal before downloading
   const handleDownloadProgressPDF = async (patientId, patientName, patientCode) => {
     try {
+      message.loading({ content: 'Loading treatment plans...', key: 'plan-load', duration: 0 });
+      const res = await TreatmentPlanModel.getAll({ patient_id: patientId });
+      const plans = res?.data || [];
+      message.destroy('plan-load');
+
+      if (!plans.length) {
+        Modal.warning({
+          title: 'Belum Ada Treatment Plan',
+          content: `${patientName} (${patientCode}) belum memiliki treatment plan. Progress report hanya bisa di-download setelah ada data treatment.`,
+          okText: 'Mengerti',
+          okButtonProps: { style: { background: '#1890ff', borderColor: '#1890ff' } },
+        });
+        return;
+      }
+
+      setPlanPickerPlans(plans);
+      setPlanPickerPatient({ id: patientId, name: patientName, patient_code: patientCode });
+      setPlanPickerSelected(plans[0].id);
+      setPlanPickerVisible(true);
+    } catch (err) {
+      message.destroy('plan-load');
+      message.error('Gagal mengambil daftar treatment plan.');
+    }
+  };
+
+  // Generate PDF from the selected plan
+  const handleGeneratePDF = async () => {
+    if (!planPickerSelected || !planPickerPatient) return;
+    try {
+      setPdfGenerating(true);
       message.loading({ content: 'Generating PDF report...', key: 'pdf-gen', duration: 0 });
 
-      // 1. Fetch report data
-      let reportData = null;
-      try {
-        const response = await MedicalHistoryModel.getProgressReport(patientId);
-        reportData = response?.data;
-      } catch (fetchErr) {
-        throw new Error('no_sessions'); // treat any network error as no data
-      }
-      if (!reportData || !reportData.sessions || reportData.sessions.length === 0) throw new Error('no_sessions');
+      // Fetch full plan detail (includes treatment_logs)
+      const res = await TreatmentPlanModel.getById(planPickerSelected);
+      const planDetail = res?.data;
+      if (!planDetail) throw new Error('no_data');
 
-      const { patient, sessions } = reportData;
-      const firstSession = sessions[0] || {};
+      const sessions = planDetail.treatment_logs || [];
+      const patient = planPickerPatient;
 
       // helper
       const fmtDate = (dateStr) => {
@@ -123,7 +160,18 @@ const PatientList = () => {
         return '#ff4d4f';
       };
 
-      // 2. Build hidden paper element — same HTML as PatientDetail
+      // Fetch full patient data for height/weight/etc
+      let patientFull = {};
+      try {
+        const pRes = await PatientModel.getPatientById(patient.id);
+        patientFull = pRes?.data || {};
+      } catch (_) {}
+
+      // Build assessment info from planDetail
+      const assessTherapist = planDetail.user_name || planDetail.staff_name || '-';
+      const bodyImageUrl = planDetail.image_url ? getProxiedImageUrl(planDetail.image_url) : null;
+
+      // Build hidden paper element
       const wrapper = document.createElement('div');
       wrapper.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:820px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;box-sizing:border-box;';
       wrapper.innerHTML = `
@@ -145,12 +193,12 @@ const PatientList = () => {
               <table style="border-collapse:collapse;width:100%;">
                 <tbody>
                   ${[
-          ['Patient Name:', patient.name],
-          ['Phone Number:', patient.phone],
-          ['Email Address:', patient.email],
-          ['Age:', patient.date_of_birth ? calcAge(patient.date_of_birth) + ' years' : null],
-          ['Height (cm):', patient.height],
-          ['Weight (kg):', patient.weight],
+          ['Patient Name:', patientFull.name || patient.name],
+          ['Phone Number:', patientFull.phone_number || patientFull.phone],
+          ['Email Address:', patientFull.email],
+          ['Age:', patientFull.date_of_birth ? calcAge(patientFull.date_of_birth) + ' years' : null],
+          ['Height (cm):', patientFull.height],
+          ['Weight (kg):', patientFull.weight],
         ].map(([lbl, val]) => `
                     <tr>
                       <td style="font-weight:700;font-size:9px;color:#111;padding:2.5px 8px 2.5px 0;vertical-align:top;white-space:nowrap;line-height:1.5;">${lbl}</td>
@@ -166,15 +214,15 @@ const PatientList = () => {
               <table style="border-collapse:collapse;width:100%;">
                 <tbody>
                   ${[
-          ['Assessment Date:', fmtDate(firstSession.appointment_date)],
-          ['Assessment Therapist:', firstSession.staff_name],
-          ['Service Type:', firstSession.service_type],
-          ['Injury Type:', firstSession.injury_type],
-          ['Area Concern:', firstSession.area_concern],
-          ['Diagnosis:', firstSession.diagnosis_result],
-          ['Range of Motion Impact:', firstSession.range_of_motion_impact],
-          ['Recovery Goals:', firstSession.recovery_goals],
-          ['Expected Recovery Time:', firstSession.expected_recovery_time],
+          ['Assessment Date:', fmtDate(planDetail.started_at)],
+          ['Assessment Therapist:', assessTherapist],
+          ['Service Type:', planDetail.service_type],
+          ['Injury Type:', planDetail.injury_type],
+          ['Area Concern:', planDetail.area_concern],
+          ['Diagnosis:', planDetail.diagnosis_result],
+          ['Range of Motion Impact:', planDetail.range_of_motion_impact || sessions[0]?.range_of_motion_impact],
+          ['Recovery Goals:', planDetail.recovery_goals],
+          ['Expected Recovery Time:', planDetail.expected_recovery_time],
         ].map(([lbl, val]) => `
                     <tr>
                       <td style="font-weight:700;font-size:9px;color:#111;padding:2.5px 8px 2.5px 0;vertical-align:top;white-space:nowrap;line-height:1.5;">${lbl}</td>
@@ -214,12 +262,12 @@ const PatientList = () => {
             <table style="width:100%;border-collapse:collapse;font-size:8px;table-layout:fixed;">
               <colgroup>
                 <col style="width:28px"/><col style="width:52px"/><col style="width:65px"/>
-                <col style="width:120px"/><col style="width:100px"/><col style="width:100px"/>
+                <col style="width:75px"/><col style="width:100px"/><col style="width:85px"/><col style="width:80px"/>
                 <col style="width:40px"/><col style="width:40px"/>
               </colgroup>
               <thead>
                 <tr>
-                  ${[['Session<br/>#', '#fafafa'], ['Session<br/>Date', '#fafafa'], ['Rangka<br/>Therapist', '#fafafa'], ['Objective<br/>Progress', '#fafafa'], ['Home<br/>Exercise', '#fafafa'], ['Recovery<br/>Tips', '#fafafa'], ['Pre-<br/>Treatment', '#fffbee'], ['Post-<br/>Treatment', '#f0fff4']]
+                  ${[['Session<br/>#', '#fafafa'], ['Session<br/>Date', '#fafafa'], ['Rangka<br/>Therapist', '#fafafa'], ['Treatment', '#fafafa'], ['Objective<br/>Progress', '#fafafa'], ['Home<br/>Exercise', '#fafafa'], ['Recovery<br/>Tips', '#fafafa'], ['Pre-<br/>Treatment', '#fffbee'], ['Post-<br/>Treatment', '#f0fff4']]
           .map(([lbl, bg]) => `<th style="border:0.5px solid #ccc;padding:5px 3px;font-size:8px;font-weight:700;text-align:center;vertical-align:middle;color:#111;line-height:1.3;background:${bg};overflow:hidden;word-break:break-word;">${lbl}</th>`).join('')}
                 </tr>
               </thead>
@@ -229,10 +277,12 @@ const PatientList = () => {
             const pa = s.pain_after != null ? s.pain_after.toString() : '-';
             const pbColor = painColor(pb);
             const paColor = painColor(pa);
+            const therapistName = s.user_name || s.staff_name || '-';
             return `<tr>
                     <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;font-weight:700;background:#fafafa;vertical-align:top;">${i + 1}</td>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;vertical-align:top;color:#333;">${fmtDate(s.appointment_date)}</td>
-                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.staff_name || '-'}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;vertical-align:top;color:#333;">${fmtDate(s.visit_date)}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${therapistName}</td>
+                    <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.treatment || '-'}</td>
                     <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.objective_progress || '-'}</td>
                     <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.exercise || '-'}</td>
                     <td style="border:0.5px solid #ddd;padding:4px 3px;font-size:8px;vertical-align:top;color:#333;word-break:break-word;">${s.recovery_tips || '-'}</td>
@@ -253,29 +303,22 @@ const PatientList = () => {
           </div>
 
           <!-- BODY ANNOTATIONS -->
-          ${sessions.map((s, i) => {
-            const img = s.body_annotation_base64 || s.body_annotation_url;
-            if (!img || !img.trim()) return '';
-            return `<div style="margin-bottom:18px;">
-              <div style="font-size:9px;font-weight:700;color:#111;margin-bottom:6px;">Session ${i + 1} - Body Annotation:</div>
-              <div style="text-align:center;">
-                <img src="${img}" alt="body annotation" crossorigin="anonymous" style="max-width:280px;width:100%;display:block;margin:0 auto;" />
-              </div>
-            </div>`;
-          }).join('')}
+          ${bodyImageUrl ? `<div style="margin-bottom:18px;">
+            <div style="font-size:9px;font-weight:700;color:#111;margin-bottom:6px;">Body Pain Diagram:</div>
+            <div style="text-align:center;">
+              <img src="${bodyImageUrl}" alt="body annotation" crossorigin="anonymous" style="max-width:280px;width:100%;display:block;margin:0 auto;" />
+            </div>
+          </div>` : ''}
         </div>
       `;
 
       document.body.appendChild(wrapper);
-
-      // 3. Wait for images to load
       await document.fonts.ready;
       const imgs = wrapper.querySelectorAll('img');
       await Promise.all(Array.from(imgs).map(img =>
         img.complete ? Promise.resolve() : new Promise(res => { img.onload = res; img.onerror = res; })
       ));
 
-      // 4. html2canvas — same settings as PatientDetail
       const paperEl = wrapper.querySelector('#pdf-paper-tmp');
       const canvas = await html2canvas(paperEl, {
         scale: 2.5,
@@ -291,7 +334,6 @@ const PatientList = () => {
 
       document.body.removeChild(wrapper);
 
-      // 5. Save PDF — same as PatientDetail
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
@@ -316,54 +358,37 @@ const PatientList = () => {
         remainH -= sliceH;
       }
 
-      const safeName = (patient.name || 'patient').replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-');
-      pdf.save(`progress-report-${patient.patient_code || safeName}-${new Date().toISOString().split('T')[0]}.pdf`);
+      const safeName = (patientFull.name || patient.name || 'patient').replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-');
+      const planTitle = (planDetail.title || `plan-${planPickerSelected}`).replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-');
+      pdf.save(`progress-report-${safeName}-${planTitle}-${new Date().toISOString().split('T')[0]}.pdf`);
 
-      message.success({
-        content: `Progress report for ${patientName} (${patientCode}) downloaded successfully!`,
-        key: 'pdf-gen',
-        duration: 3
-      });
+      message.success({ content: `PDF downloaded successfully!`, key: 'pdf-gen', duration: 3 });
+      setPlanPickerVisible(false);
     } catch (error) {
       console.error('Error generating PDF:', error);
       message.destroy('pdf-gen');
-
-      if (error.message === 'no_sessions' || error.message === 'no_data' || error.message?.toLowerCase().includes('no medical history')) {
-        Modal.warning({
-          title: 'Belum Ada Medical History',
-          content: `${patientName} (${patientCode}) belum memiliki riwayat medis. Progress report hanya bisa di-download setelah ada data medical history.`,
-          okText: 'Mengerti',
-          okButtonProps: { style: { background: '#1890ff', borderColor: '#1890ff' } },
-        });
-      } else {
-        Modal.error({
-          title: 'Gagal Generate PDF',
-          content: error.message || 'Terjadi kesalahan saat membuat PDF. Silakan coba lagi.',
-          okText: 'Tutup',
-        });
-      }
+      message.error('Gagal generate PDF. Silakan coba lagi.');
+    } finally {
+      setPdfGenerating(false);
     }
   };
 
-  const handleViewPatient = async (row) => {
-    let hasData = false;
-    try {
-      const response = await MedicalHistoryModel.getProgressReport(row.id);
-      const d = response?.data;
-      hasData = !!(d && d.sessions && d.sessions.length > 0);
-    } catch (e) {
-      hasData = false;
-    }
 
-    if (!hasData) {
-      Modal.warning({
-        title: 'Belum Ada Medical History',
-        content: `${row.name} (${row.patient_code}) belum memiliki riwayat medis. Halaman detail baru bisa dibuka setelah ada data medical history.`,
-        okText: 'Mengerti',
-        okButtonProps: { style: { background: '#1890ff', borderColor: '#1890ff' } },
-      });
-      return;
-    }
+
+  const handleViewPatient = async (row) => {
+    try {
+      const res = await TreatmentPlanModel.getAll({ patient_id: row.id });
+      const plans = res?.data || [];
+      if (!plans.length) {
+        Modal.warning({
+          title: 'Belum Ada Treatment Plan',
+          content: `${row.name} (${row.patient_code}) belum memiliki treatment plan. Halaman detail baru bisa dibuka setelah ada data treatment.`,
+          okText: 'Mengerti',
+          okButtonProps: { style: { background: '#1890ff', borderColor: '#1890ff' } },
+        });
+        return;
+      }
+    } catch (e) { /* allow navigation even if check fails */ }
     window.location.href = `/patients/${row.id}`;
   };
 
@@ -1098,6 +1123,58 @@ const PatientList = () => {
           </CardBody>
         </Card>
       </Container>
+
+      {/* ── Plan Picker Modal ── */}
+      <Modal
+        open={planPickerVisible}
+        onCancel={() => { setPlanPickerVisible(false); setPlanPickerPlans([]); }}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 18 }}>📋</span>
+            <span>Download Progress Report</span>
+          </div>
+        }
+        footer={[
+          <AntButton key="cancel" onClick={() => { setPlanPickerVisible(false); setPlanPickerPlans([]); }}>
+            Cancel
+          </AntButton>,
+          <AntButton
+            key="download"
+            type="primary"
+            loading={pdfGenerating}
+            icon={<Iconify icon="mdi:file-pdf-box" />}
+            onClick={handleGeneratePDF}
+            style={{ background: '#1890ff', borderColor: '#1890ff' }}
+          >
+            Download PDF
+          </AntButton>,
+        ]}
+        width={480}
+      >
+        <div style={{ padding: '8px 0' }}>
+          <p style={{ color: '#555', marginBottom: 16 }}>
+            Pasien <strong>{planPickerPatient?.name}</strong> memiliki{' '}
+            <strong>{planPickerPlans.length}</strong> treatment plan. Pilih plan mana yang ingin di-download:
+          </p>
+          <Select
+            style={{ width: '100%' }}
+            value={planPickerSelected}
+            onChange={val => setPlanPickerSelected(val)}
+            size="large"
+          >
+            {planPickerPlans.map(plan => (
+              <Option key={plan.id} value={plan.id}>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{plan.title || `Plan #${plan.id}`}</div>
+                  <div style={{ fontSize: 12, color: '#888' }}>
+                    {plan.service_type} • {plan.started_at ? new Date(plan.started_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                  </div>
+                </div>
+              </Option>
+            ))}
+          </Select>
+        </div>
+      </Modal>
     </>
   );
 }

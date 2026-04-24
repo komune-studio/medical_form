@@ -126,7 +126,8 @@ const customStyles = `
     border: 1px solid #d9d9d9 !important;
     color: #000000 !important;
     border-radius: 4px !important;
-    height: 34px !important;
+    min-height: 34px !important;
+    height: auto !important;
     padding: 4px 11px !important;
     font-size: 14px !important;
   }
@@ -257,9 +258,50 @@ const customStyles = `
   }
   
   .readonly-field .ant-input {
-    background-color: #fafafa !important;
-    color: #666666 !important;
+    background-color: #f5f5f5 !important;
+    color: #8c8c8c !important;
     cursor: not-allowed !important;
+  }
+  
+  /* Make all disabled inputs and selects consistently grey */
+  .treatment-plan-textarea .ant-input[disabled],
+  .treatment-plan-select.ant-select-disabled .ant-select-selector {
+    background-color: #f5f5f5 !important;
+    color: #8c8c8c !important;
+    border-color: #d9d9d9 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+  }
+
+  .treatment-plan-select.ant-select-disabled .ant-select-selection-item,
+  .treatment-plan-textarea .ant-input[disabled] {
+    color: #8c8c8c !important;
+  }
+  
+  /* Nicer Multiple Select Tags styling */
+  .treatment-plan-select .ant-select-selection-overflow-item .ant-select-selection-item {
+    background-color: #f0f5ff !important;
+    border: 1px solid #adc6ff !important;
+    border-radius: 4px !important;
+    color: #2f54eb !important;
+    font-weight: 500 !important;
+    padding: 0 8px !important;
+    line-height: 24px !important;
+    height: 26px !important;
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .treatment-plan-select .ant-select-selection-overflow-item .ant-select-selection-item-remove {
+    color: #85a5ff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .treatment-plan-select .ant-select-selection-overflow-item .ant-select-selection-item-remove:hover {
+    color: #2f54eb !important;
   }
   
   .treatment-plan-textarea .ant-input {
@@ -287,7 +329,8 @@ const customStyles = `
     }
     
     .treatment-plan-select .ant-select-selector {
-      height: 40px !important;
+      min-height: 40px !important;
+      height: auto !important;
       font-size: 16px !important;
       padding: 8px 12px !important;
     }
