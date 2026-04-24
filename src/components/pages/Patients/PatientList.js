@@ -1161,17 +1161,27 @@ const PatientList = () => {
             value={planPickerSelected}
             onChange={val => setPlanPickerSelected(val)}
             size="large"
+            optionLabelProp="label"
           >
-            {planPickerPlans.map(plan => (
-              <Option key={plan.id} value={plan.id}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{plan.title || `Plan #${plan.id}`}</div>
-                  <div style={{ fontSize: 12, color: '#888' }}>
-                    {plan.service_type} • {plan.started_at ? new Date(plan.started_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+            {planPickerPlans.map(plan => {
+              const planDate = plan.started_at
+                ? new Date(plan.started_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                : '-';
+              return (
+                <Option
+                  key={plan.id}
+                  value={plan.id}
+                  label={plan.title || `Plan #${plan.id}`}
+                >
+                  <div style={{ padding: '2px 0' }}>
+                    <div style={{ fontWeight: 600, color: '#222' }}>{plan.title || `Plan #${plan.id}`}</div>
+                    <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                      {plan.service_type || '-'} &nbsp;•&nbsp; {planDate}
+                    </div>
                   </div>
-                </div>
-              </Option>
-            ))}
+                </Option>
+              );
+            })}
           </Select>
         </div>
       </Modal>

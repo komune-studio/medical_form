@@ -1037,26 +1037,15 @@ export default function TreatmentPlanFormPage({
                             </Select>
                           </Form.Item>
                         </Col>
-                        <Col xs={24} md={12}>
+                        <Col xs={24} md={12} style={{ display: 'none' }}>
                           <Form.Item
-                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>{selectedPlanId === 'new' ? 'Created By (Therapist)' : 'Attending Therapist'}</span>}
                             name="user_id"
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select
-                              className="treatment-plan-select"
-                              placeholder={currentLoginName || 'Staff'}
-                              loading={staffLoading}
-                              disabled
-                              optionFilterProp="children"
-                              filterOption={(input, option) => {
-                                const childStr = Array.isArray(option.children) ? option.children.join('') : String(option.children || '');
-                                return childStr.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-                              }}
-                            >
+                            <Select className="treatment-plan-select" disabled>
                               {staffList.map(staff => (
                                 <Option key={staff.id} value={getStaffUserId(staff)}>
-                                  {staff.name} - {staff.phone_number}
+                                  {staff.name}
                                 </Option>
                               ))}
                             </Select>
