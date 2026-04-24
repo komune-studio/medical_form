@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
+import { getProxiedImageUrl } from './imageProxy';
 
 export default class MedicalHistoryPDFGenerator {
 
@@ -267,7 +268,7 @@ export default class MedicalHistoryPDFGenerator {
               el.crossOrigin = 'Anonymous';
               el.onload  = () => res(el);
               el.onerror = () => rej(new Error('load failed'));
-              el.src = imageData;
+              el.src = getProxiedImageUrl(imageData);
             });
             let iw = 120, ih = (img.height * 120) / img.width;
             if (ih > 100) { ih = 100; iw = (img.width * 100) / img.height; }

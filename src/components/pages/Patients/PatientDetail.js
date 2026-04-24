@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
+import { getProxiedImageUrl } from '../../../utils/imageProxy';
 
 const { Option } = Select;
 
@@ -172,10 +173,15 @@ const PatientDetail = () => {
       const prevShadow = paperEl.style.boxShadow;
       const prevRadius = paperEl.style.borderRadius;
       const prevPadding = paperEl.style.padding;
+      const prevWidth = paperEl.style.width;
+      const prevMaxWidth = paperEl.style.maxWidth;
+      
       paperEl.style.border = 'none';
       paperEl.style.boxShadow = 'none';
       paperEl.style.borderRadius = '0';
       paperEl.style.padding = '18px 24px 28px';
+      paperEl.style.width = '820px';
+      paperEl.style.maxWidth = '820px';
 
       await document.fonts.ready;
 
@@ -189,12 +195,16 @@ const PatientDetail = () => {
         removeContainer: true,
         letterRendering: true,
         foreignObjectRendering: false,
+        width: 820,
+        windowWidth: 820,
       });
 
       paperEl.style.border = prevBorder;
       paperEl.style.boxShadow = prevShadow;
       paperEl.style.borderRadius = prevRadius;
       paperEl.style.padding = prevPadding;
+      paperEl.style.width = prevWidth;
+      paperEl.style.maxWidth = prevMaxWidth;
 
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
       const pageW = pdf.internal.pageSize.getWidth();
@@ -696,7 +706,7 @@ const PatientDetail = () => {
               </div>
               <div style={{ textAlign: 'center' }}>
                 <img
-                  src={planDetail.image_url}
+                  src={getProxiedImageUrl(planDetail.image_url)}
                   alt="Body annotation"
                   crossOrigin="anonymous"
                   style={{ maxWidth: 280, width: '100%', display: 'block', margin: '0 auto' }}

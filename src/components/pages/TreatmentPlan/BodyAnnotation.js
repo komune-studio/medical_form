@@ -114,6 +114,16 @@ const BodyAnnotation = forwardRef(({
       if (localFile) return true; // custom image uploaded
       if (elements.length > 0) return true; // drew something on default template
       return false; // default template, untouched — skip upload
+    },
+    // ✅ TAMBAHKAN METHOD clearAnnotations
+    clearAnnotations: () => {
+      setElements([]);
+      setSelectedElementIndex(null);
+      setCurrentElement(null);
+      setIsDrawing(false);
+      if (canvasInitialized && backgroundImage) {
+        redrawCanvas([], backgroundImage, null);
+      }
     }
   }));
 
