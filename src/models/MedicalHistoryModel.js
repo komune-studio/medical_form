@@ -385,8 +385,7 @@ export default class MedicalHistoryModel {
   static getServiceTypeOptions = () => {
     return [
       { value: '', label: 'Select Service Type' },
-      { value: 'Physiotherapy', label: 'Physiotherapy' },
-      { value: 'Pilates', label: 'Pilates' }
+      { value: 'Physiotherapy', label: 'Physiotherapy' }
     ];
   }
 
@@ -416,7 +415,7 @@ export default class MedicalHistoryModel {
       { value: 'Next Week', label: 'Next Week' },
       { value: 'Next 2 Weeks', label: 'Next 2 Weeks' },
       { value: 'Next Month', label: 'Next Month' },
-      { value: 'Try pilates session', label: 'Try pilates session' }
+      { value: 'Try psychotherapy session', label: 'Try psychotherapy session' }
     ];
   }
 

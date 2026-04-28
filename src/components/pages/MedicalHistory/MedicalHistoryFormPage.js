@@ -848,7 +848,6 @@ export default function MedicalHistoryFormPage({
                           >
                             <Select className="medical-history-select" placeholder="Select service type">
                               <Option value="Physiotherapy">Physiotherapy</Option>
-                              <Option value="Pilates">Pilates</Option>
                             </Select>
                           </Form.Item>
                         </Col>

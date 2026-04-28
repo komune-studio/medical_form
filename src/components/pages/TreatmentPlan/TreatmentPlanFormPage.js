@@ -994,6 +994,15 @@ export default function TreatmentPlanFormPage({
                         </Select>
                       </Form.Item>
 
+                      <div style={{ marginTop: '20px', marginBottom: '12px', paddingTop: '16px', borderTop: '1px solid #eaeaea' }}>
+                        <Title level={5} style={{ margin: 0, color: '#000000', fontWeight: 700 }}>
+                          Treatment Plan
+                        </Title>
+                        <Text style={{ color: '#666666', fontSize: '13px' }}>
+                          Bagian ini jadi referensi plan utama dan akan terkunci saat pakai plan yang sudah ada.
+                        </Text>
+                      </div>
+
                       <Form.Item
                         label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Plan Name / Title</span>}
                         name="title"
@@ -1008,21 +1017,6 @@ export default function TreatmentPlanFormPage({
                         />
                       </Form.Item>
 
-                      {/* Appointment Date & Time */}
-                      <div style={{ marginBottom: '10px' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', color: '#000000', fontWeight: 600, fontSize: '14px' }}>
-                          Appointment Date & Time <span style={{ color: '#ff4d4f' }}>*</span>
-                        </label>
-                        <input
-                          type="datetime-local"
-                          className="native-datetime-input"
-                          value={appointmentDateTime}
-                          onChange={handleDateTimeChange}
-                          disabled={formDisabled}
-                          required
-                        />
-                      </div>
-
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
                           <Form.Item
@@ -1033,7 +1027,6 @@ export default function TreatmentPlanFormPage({
                           >
                             <Select className="treatment-plan-select" placeholder="Select service type" disabled={formDisabled || selectedPlanId !== 'new'}>
                               <Option value="Physiotherapy">Physiotherapy</Option>
-                              <Option value="Pilates">Pilates</Option>
                             </Select>
                           </Form.Item>
                         </Col>
@@ -1082,6 +1075,118 @@ export default function TreatmentPlanFormPage({
                           </Form.Item>
                         </Col>
                       </Row>
+
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Diagnosis Result</span>}
+                        name="diagnosis_result"
+                        rules={[{ max: 1000, message: 'Max 1000 characters!' }]}
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea placeholder="Enter diagnosis result" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Expected Recovery Time</span>}
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <Row gutter={12}>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              name="expected_recovery_value"
+                              style={{ marginBottom: 0 }}
+                            >
+                              <Select
+                                className="treatment-plan-select"
+                                placeholder="Select number"
+                                allowClear
+                                disabled={formDisabled || selectedPlanId !== 'new'}
+                              >
+                                {RECOVERY_DURATION_OPTIONS.map((option) => (
+                                  <Option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                          <Col xs={24} md={12}>
+                            <Form.Item
+                              name="expected_recovery_unit"
+                              style={{ marginBottom: 0 }}
+                            >
+                              <Select
+                                className="treatment-plan-select"
+                                placeholder="Select unit"
+                                allowClear
+                                disabled={formDisabled || selectedPlanId !== 'new'}
+                              >
+                                {RECOVERY_UNIT_OPTIONS.map((option) => (
+                                  <Option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </Form.Item>
+
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Recovery Goals</span>}
+                        name="recovery_goals"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea placeholder="Enter specific recovery goals and milestones" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Range of Motion Impact</span>}
+                        name="range_of_motion_impact"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea placeholder="Describe range of motion limitations or improvements" className="treatment-plan-textarea" rows={2} disabled={formDisabled || selectedPlanId !== 'new'} />
+                      </Form.Item>
+
+                      {/* ── Recommended Next Session — DATE PICKER ── */}
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Body Pain Diagram</span>}
+                        name="body_annotation"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <BodyAnnotation ref={bodyAnnotationRef} disabled={formDisabled || selectedPlanId !== 'new'} />
+                      </Form.Item>
+
+                      <div style={{ marginTop: '28px', marginBottom: '12px', paddingTop: '16px', borderTop: '1px solid #eaeaea' }}>
+                        <Title level={5} style={{ margin: 0, color: '#000000', fontWeight: 700 }}>
+                          Visit Log
+                        </Title>
+                        <Text style={{ color: '#666666', fontSize: '13px' }}>
+                          Isi update sesi harian di bawah ini. Bagian ini tetap aktif walau treatment plan sudah dipilih.
+                        </Text>
+                      </div>
+
+                      {/* Appointment Date & Time */}
+                      <div style={{ marginBottom: '10px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#000000', fontWeight: 600, fontSize: '14px' }}>
+                          Appointment Date & Time <span style={{ color: '#ff4d4f' }}>*</span>
+                        </label>
+                        <input
+                          type="datetime-local"
+                          className="native-datetime-input"
+                          value={appointmentDateTime}
+                          onChange={handleDateTimeChange}
+                          disabled={formDisabled}
+                          required
+                        />
+                      </div>
+
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Objective Progress</span>}
+                        name="objective_progress"
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <TextArea placeholder="Describe objective measurable progress" className="treatment-plan-textarea" rows={3} />
+                      </Form.Item>
 
                       <Row gutter={16}>
                         <Col xs={24} md={12}>
@@ -1163,85 +1268,6 @@ export default function TreatmentPlanFormPage({
                       </Row>
 
                       <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Diagnosis Result</span>}
-                        name="diagnosis_result"
-                        rules={[{ max: 1000, message: 'Max 1000 characters!' }]}
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <TextArea placeholder="Enter diagnosis result" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Expected Recovery Time</span>}
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <Row gutter={12}>
-                          <Col xs={24} md={12}>
-                            <Form.Item
-                              name="expected_recovery_value"
-                              style={{ marginBottom: 0 }}
-                            >
-                              <Select
-                                className="treatment-plan-select"
-                                placeholder="Select number"
-                                allowClear
-                                disabled={formDisabled || selectedPlanId !== 'new'}
-                              >
-                                {RECOVERY_DURATION_OPTIONS.map((option) => (
-                                  <Option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </Option>
-                                ))}
-                              </Select>
-                            </Form.Item>
-                          </Col>
-                          <Col xs={24} md={12}>
-                            <Form.Item
-                              name="expected_recovery_unit"
-                              style={{ marginBottom: 0 }}
-                            >
-                              <Select
-                                className="treatment-plan-select"
-                                placeholder="Select unit"
-                                allowClear
-                                disabled={formDisabled || selectedPlanId !== 'new'}
-                              >
-                                {RECOVERY_UNIT_OPTIONS.map((option) => (
-                                  <Option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </Option>
-                                ))}
-                              </Select>
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </Form.Item>
-
-                      <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Recovery Goals</span>}
-                        name="recovery_goals"
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <TextArea placeholder="Enter specific recovery goals and milestones" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Objective Progress</span>}
-                        name="objective_progress"
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <TextArea placeholder="Describe objective measurable progress" className="treatment-plan-textarea" rows={3} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Range of Motion Impact</span>}
-                        name="range_of_motion_impact"
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <TextArea placeholder="Describe range of motion limitations or improvements" className="treatment-plan-textarea" rows={2} disabled={formDisabled || selectedPlanId !== 'new'} />
-                      </Form.Item>
-
-                      <Form.Item
                         label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Treatments</span>}
                         name="treatments"
                         style={{ marginBottom: '10px' }}
@@ -1279,7 +1305,6 @@ export default function TreatmentPlanFormPage({
                         <TextArea placeholder="Enter recovery tips and recommendations" className="treatment-plan-textarea" rows={2} />
                       </Form.Item>
 
-                      {/* ── Recommended Next Session — DATE PICKER ── */}
                       <div style={{ marginBottom: '10px' }}>
                         <label style={{ display: 'block', marginBottom: '8px', color: '#000000', fontWeight: 600, fontSize: '14px' }}>
                           Recommended Next Session
@@ -1292,14 +1317,6 @@ export default function TreatmentPlanFormPage({
                           disabled={formDisabled}
                         />
                       </div>
-
-                      <Form.Item
-                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Body Pain Diagram</span>}
-                        name="body_annotation"
-                        style={{ marginBottom: '10px' }}
-                      >
-                        <BodyAnnotation ref={bodyAnnotationRef} disabled={formDisabled || selectedPlanId !== 'new'} />
-                      </Form.Item>
 
                     </Col>
                   </Row>
