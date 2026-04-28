@@ -51,21 +51,26 @@ const TreatmentPlanEdit = () => {
   if (loading) {
     return (
       <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '400px',
-        backgroundColor: '#f5f5f5'
+        width: '100%',
+        minHeight: 'calc(100vh - 120px)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '24px 16px',
+        backgroundColor: '#ffffff'
       }}>
         <Card style={{ 
+          width: '100%',
+          maxWidth: '440px',
           textAlign: 'center', 
           padding: '40px',
-          border: 'none',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          border: '1px solid #f0f0f0',
+          borderRadius: '8px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.08)'
         }}>
           <Spin size="large" />
-          <div style={{ marginTop: '20px', color: '#666' }}>
-            Loading medical history data...
+          <div style={{ marginTop: '20px', color: '#666', fontSize: '14px' }}>
+            Loading treatment plan data...
           </div>
         </Card>
       </div>

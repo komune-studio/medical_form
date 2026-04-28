@@ -14,7 +14,11 @@ import Mascot from 'assets/img/Mascot.png';
 import { getProxiedImageUrl, fetchImageAsBase64 } from '../../../utils/imageProxy';
 
 import moment from 'moment';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import create from 'zustand';
+
+dayjs.extend(customParseFormat);
 
 const useFilter = create((set) => ({
   search: "",
@@ -42,6 +46,20 @@ const useFilter = create((set) => ({
 }));
 
 const { Option } = Select;
+
+const parseDateOfBirth = (value) => {
+  if (!value) return null;
+
+  const normalizedValue = typeof value === 'string' ? value.split('T')[0].trim() : value;
+  const parsedDate = dayjs(normalizedValue, ['YYYY-MM-DD', 'DD/MM/YYYY', 'YYYY/MM/DD'], true);
+
+  if (parsedDate.isValid()) {
+    return parsedDate;
+  }
+
+  const fallbackDate = dayjs(value);
+  return fallbackDate.isValid() ? fallbackDate : null;
+};
 
 const PatientList = () => {
   const [loading, setLoading] = useState(false);
@@ -144,16 +162,11 @@ const PatientList = () => {
         } catch { return '-'; }
       };
       const calcAge = (dob) => {
-        if (!dob) return 'N/A';
-        const parts = String(dob).split('T')[0].split('-');
-        if (parts.length < 3) return 'N/A';
-        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        if (isNaN(d.getTime())) return 'N/A';
-        const today = new Date();
-        let age = today.getFullYear() - d.getFullYear();
-        const m = today.getMonth() - d.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
-        return age;
+        const parsedDate = parseDateOfBirth(dob);
+        if (!parsedDate) return null;
+
+        const age = dayjs().diff(parsedDate, 'year');
+        return age >= 0 ? age : null;
       };
       const painColor = (val) => {
         const v = parseFloat(val);
@@ -205,7 +218,7 @@ const PatientList = () => {
           ['Age:', (() => {
             if (!patientFull.date_of_birth) return null;
             const a = calcAge(patientFull.date_of_birth);
-            return (a != null && a > 0) ? a + ' years' : null;
+            return (a != null && a >= 0) ? a + ' years' : null;
           })()],
           ['Height (cm):', patientFull.height],
           ['Weight (kg):', patientFull.weight],

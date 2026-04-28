@@ -8,21 +8,35 @@ import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
 import { getProxiedImageUrl, fetchImageAsBase64 } from '../../../utils/imageProxy';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 const { Option } = Select;
 
+dayjs.extend(customParseFormat);
+
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
+const parseDateOfBirth = (value) => {
+  if (!value) return null;
+
+  const normalizedValue = typeof value === 'string' ? value.split('T')[0].trim() : value;
+  const parsedDate = dayjs(normalizedValue, ['YYYY-MM-DD', 'DD/MM/YYYY', 'YYYY/MM/DD'], true);
+
+  if (parsedDate.isValid()) {
+    return parsedDate;
+  }
+
+  const fallbackDate = dayjs(value);
+  return fallbackDate.isValid() ? fallbackDate : null;
+};
+
 const calculateAge = (dob) => {
-  if (!dob) return 'N/A';
-  // Replace hyphens to fix Safari/timezone parsing issues with ISO dates
-  const d = new Date(String(dob).replace(/-/g, '/').split('T')[0].replace(/\//g, '/'));
-  if (isNaN(d.getTime())) return 'N/A';
-  const today = new Date();
-  let age = today.getFullYear() - d.getFullYear();
-  const m = today.getMonth() - d.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
-  return age;
+  const parsedDate = parseDateOfBirth(dob);
+  if (!parsedDate) return null;
+
+  const age = dayjs().diff(parsedDate, 'year');
+  return age >= 0 ? age : null;
 };
 
 const formatDate = (dateStr) => {
@@ -617,7 +631,7 @@ const PatientDetail = () => {
                   <InfoRow label="Email Address:" value={patient.email} />
                   <InfoRow label="Age:" value={
                     patient.date_of_birth
-                      ? (calculateAge(patient.date_of_birth) > 0
+                      ? (calculateAge(patient.date_of_birth) >= 0
                           ? `${calculateAge(patient.date_of_birth)} years`
                           : null)
                       : null

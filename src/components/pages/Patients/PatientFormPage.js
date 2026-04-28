@@ -19,10 +19,14 @@ import { Container } from 'reactstrap';
 import swal from '../../reusable/CustomSweetAlert';
 import PatientModel from 'models/PatientModel';
 import moment from 'moment';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+
+dayjs.extend(customParseFormat);
 
 const normalizePhoneDigits = (value = '') => {
   const digits = String(value).replace(/\D/g, '');
@@ -37,6 +41,38 @@ const normalizePhoneDigits = (value = '') => {
 const formatPhoneNumber = (value = '') => {
   const digits = normalizePhoneDigits(value);
   return digits ? `+62${digits}` : '';
+};
+
+const parseDateOfBirth = (value) => {
+  if (!value) return null;
+
+  if (dayjs.isDayjs(value)) {
+    return value.isValid() ? value : null;
+  }
+
+  if (moment.isMoment(value)) {
+    return value.isValid() ? dayjs(value.format('YYYY-MM-DD'), 'YYYY-MM-DD', true) : null;
+  }
+
+  if (value instanceof Date) {
+    const parsedDate = dayjs(value);
+    return parsedDate.isValid() ? parsedDate : null;
+  }
+
+  if (typeof value === 'string') {
+    const normalizedValue = value.split('T')[0].trim();
+    const parsedDate = dayjs(normalizedValue, ['YYYY-MM-DD', 'DD/MM/YYYY', 'YYYY/MM/DD'], true);
+
+    if (parsedDate.isValid()) {
+      return parsedDate;
+    }
+
+    const fallbackDate = dayjs(value);
+    return fallbackDate.isValid() ? fallbackDate : null;
+  }
+
+  const parsedDate = dayjs(value);
+  return parsedDate.isValid() ? parsedDate : null;
 };
 
 // Update custom styles to match VisitorFormPage style
@@ -316,8 +352,8 @@ export default function PatientFormPage({
       }
       
       if (key === 'date_of_birth' && currentValue) {
-        const formattedCurrent = moment(currentValue).format('YYYY-MM-DD');
-        const formattedOriginal = moment(originalValue).format('YYYY-MM-DD');
+        const formattedCurrent = parseDateOfBirth(currentValue)?.format('YYYY-MM-DD');
+        const formattedOriginal = parseDateOfBirth(originalValue)?.format('YYYY-MM-DD');
         return formattedCurrent !== formattedOriginal;
       }
       
@@ -346,7 +382,19 @@ export default function PatientFormPage({
       
       // Format tanggal lahir
       if (body.date_of_birth) {
-        body.date_of_birth = moment(body.date_of_birth).format('YYYY-MM-DD');
+        const parsedDateOfBirth = parseDateOfBirth(body.date_of_birth);
+
+        if (!parsedDateOfBirth) {
+          form.setFields([
+            {
+              name: 'date_of_birth',
+              errors: ['Please enter a valid date of birth']
+            }
+          ]);
+          throw new Error('Please enter a valid date of birth');
+        }
+
+        body.date_of_birth = parsedDateOfBirth.format('YYYY-MM-DD');
       }
 
       body.phone = formatPhoneNumber(body.phone);
@@ -463,7 +511,7 @@ export default function PatientFormPage({
       const formValues = {
         patient_code: patientData.patient_code,
         name: patientData.name,
-        date_of_birth: patientData.date_of_birth ? moment(patientData.date_of_birth) : null,
+        date_of_birth: parseDateOfBirth(patientData.date_of_birth),
         gender: patientData.gender,
         phone: normalizePhoneDigits(patientData.phone),
         email: patientData.email,
@@ -679,7 +727,7 @@ export default function PatientFormPage({
                           placeholder="DD/MM/YYYY"
                           format="DD/MM/YYYY"
                           disabledDate={(current) => {
-                            return current && current > moment().endOf('day');
+                            return current && current > dayjs().endOf('day');
                           }}
                           style={{ width: '100%' }}
                         />
