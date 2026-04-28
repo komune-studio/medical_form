@@ -120,6 +120,21 @@ const getTreatmentPlanUserId = (treatmentPlan = {}) => {
   return Number.isNaN(parsedValue) ? rawValue : parsedValue;
 };
 
+const normalizeTreatmentValues = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value.split(',').map((item) => item.trim()).filter(Boolean);
+  }
+
+  return [];
+};
+
+const getBodyAnnotationValue = (record = {}) =>
+  record.body_annotation || record.image_url || null;
+
 const customStyles = `
   .treatment-plan-select .ant-select-selector {
     background-color: #FFFFFF !important;
@@ -388,7 +403,9 @@ export default function TreatmentPlanFormPage({
   const [patients, setPatients] = useState([]);
   const [patientsLoading, setPatientsLoading] = useState(false);
   const [patientPlans, setPatientPlans] = useState([]);
+  const [treatmentLogs, setTreatmentLogs] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState('new');
+  const [selectedLogId, setSelectedLogId] = useState('new');
   const [appointmentDateTime, setAppointmentDateTime] = useState('');
   const [nextSessionDate, setNextSessionDate] = useState(''); // ← STATE BARU
 
@@ -400,146 +417,96 @@ export default function TreatmentPlanFormPage({
   const [uploadingImage, setUploadingImage] = useState(false);
   const painBeforeValue = Form.useWatch('pain_before', form) ?? 1;
   const painAfterValue = Form.useWatch('pain_after', form) ?? 1;
+  const isEditingCurrentPlan = Boolean(treatmentPlanData) && selectedPlanId === treatmentPlanData.id;
+  const planFieldsDisabled = formDisabled || (!isEditingCurrentPlan && selectedPlanId !== 'new');
 
-  useEffect(() => {
-    const storedName = localStorage.getItem('admin_name') || sessionStorage.getItem('admin_name') || '';
-    setCurrentLoginName(storedName);
-  }, []);
+  const applyPlanValues = (planData = {}) => {
+    const recoveryTimeValues = parseExpectedRecoveryTime(planData.expected_recovery_time);
 
-  useEffect(() => {
-    const fetchStaff = async () => {
-      try {
-        setStaffLoading(true);
-        const response = await StaffModel.getActiveStaff();
-        const activeStaff = Array.isArray(response?.data) ? response.data : [];
-        let resolvedStaffList = activeStaff;
+    form.setFieldsValue({
+      patient_id: planData.patient_id,
+      user_id: getTreatmentPlanUserId(planData),
+      title: planData.title || '',
+      service_type: planData.service_type || '',
+      injury_type: planData.injury_type || '',
+      area_concern: planData.area_concern || '',
+      diagnosis_result: planData.diagnosis_result || planData.diagnosis || '',
+      ...recoveryTimeValues,
+      recovery_goals: planData.recovery_goals || '',
+      range_of_motion_impact: planData.range_of_motion_impact || '',
+      body_annotation: getBodyAnnotationValue(planData),
+    });
 
-        if (!treatmentPlanData && currentLoginName) {
-          let matchedStaff = activeStaff.find(
-            (staff) => normalizeName(staff.name) === normalizeName(currentLoginName)
-          );
-
-          if (!matchedStaff) {
-            const staffByName = await StaffModel.getStaffByName(currentLoginName);
-            matchedStaff = staffByName?.data || null;
-          }
-
-          // If still no matched staff, they might be a regular user
-          if (!matchedStaff) {
-            const loggedInUserId = localStorage.getItem('user_id') || sessionStorage.getItem('id');
-            if (loggedInUserId) {
-              matchedStaff = {
-                id: `user-${loggedInUserId}`,
-                user_id: parseInt(loggedInUserId) || loggedInUserId,
-                name: currentLoginName,
-                phone_number: 'User'
-              };
-            }
-          }
-
-          if (matchedStaff) {
-            if (!activeStaff.some((staff) => staff.id === matchedStaff.id)) {
-              resolvedStaffList = [...activeStaff, matchedStaff];
-            }
-            form.setFieldsValue({ user_id: getStaffUserId(matchedStaff) });
-          }
-        }
-
-        if (treatmentPlanData?.staff_id && !resolvedStaffList.some((staff) => staff.id === treatmentPlanData.staff_id)) {
-          const existingStaff = await StaffModel.getStaffById(treatmentPlanData.staff_id);
-          if (existingStaff?.data) {
-            resolvedStaffList = [...resolvedStaffList, existingStaff.data];
-            form.setFieldsValue({ user_id: getStaffUserId(existingStaff.data) });
-          }
-        } else if (treatmentPlanData) {
-          const currentUserId = getTreatmentPlanUserId(treatmentPlanData);
-          if (currentUserId !== undefined) {
-            form.setFieldsValue({ user_id: currentUserId });
-          }
-        }
-        setStaffList(resolvedStaffList);
-      } catch (error) {
-        console.error("Error fetching staff:", error);
-        message.error('Failed to load staff list');
-      } finally {
-        setStaffLoading(false);
+    if (bodyAnnotationRef.current) {
+      const annotationValue = getBodyAnnotationValue(planData);
+      if (annotationValue && typeof bodyAnnotationRef.current.setUploadedImageUrl === 'function') {
+        bodyAnnotationRef.current.setUploadedImageUrl(annotationValue);
       }
-    };
-    fetchStaff();
-  }, [currentLoginName, form, treatmentPlanData]);
-
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        setPatientsLoading(true);
-        const response = await PatientModel.getAllPatients();
-        if (response && response.http_code === 200) {
-          setPatients(Array.isArray(response.data) ? response.data : []);
-        }
-      } catch (error) {
-        console.error("Error fetching patients:", error);
-        message.error('Failed to load patients');
-      } finally {
-        setPatientsLoading(false);
-      }
-    };
-    fetchPatients();
-  }, []);
-
-  useEffect(() => {
-    if (treatmentPlanData) {
-      let dateTimeValue = '';
-      if (treatmentPlanData.appointment_date) {
-        const momentDate = moment(treatmentPlanData.appointment_date);
-        dateTimeValue = momentDate.format('YYYY-MM-DDTHH:mm');
-        setAppointmentDateTime(dateTimeValue);
-      }
-
-      // ← Parse recommended_next_session ke format YYYY-MM-DD untuk input[type=date]
-      let nextSession = '';
-      if (treatmentPlanData.recommended_next_session) {
-        const d = moment(treatmentPlanData.recommended_next_session);
-        nextSession = d.isValid() ? d.format('YYYY-MM-DD') : '';
-      }
-      setNextSessionDate(nextSession);
-      const recoveryTimeValues = parseExpectedRecoveryTime(treatmentPlanData.expected_recovery_time);
-
-      const formValues = {
-        patient_id: treatmentPlanData.patient_id,
-        user_id: getTreatmentPlanUserId(treatmentPlanData),
-        service_type: treatmentPlanData.service_type || '',
-        injury_type: treatmentPlanData.injury_type || '',
-        area_concern: treatmentPlanData.area_concern || '',
-        diagnosis_result: treatmentPlanData.diagnosis_result || '',
-        ...recoveryTimeValues,
-        recovery_goals: treatmentPlanData.recovery_goals || '',
-        objective_progress: treatmentPlanData.objective_progress || '',
-        pain_before: normalizePainLevel(treatmentPlanData.pain_before),
-        pain_after: normalizePainLevel(treatmentPlanData.pain_after),
-        range_of_motion_impact: treatmentPlanData.range_of_motion_impact || '',
-        treatments: treatmentPlanData.treatments
-          ? treatmentPlanData.treatments.split(',').map(t => t.trim()).filter(Boolean)
-          : [],
-        exercise: treatmentPlanData.exercise || '',
-        homework: treatmentPlanData.homework || '',
-        recovery_tips: treatmentPlanData.recovery_tips || '',
-        body_annotation: treatmentPlanData.body_annotation || '',
-      };
-
-      form.setFieldsValue(formValues);
-      setHasChanges(false);
-    } else {
-      form.resetFields();
-      form.setFieldsValue({
-        pain_before: 1,
-        pain_after: 1,
-        expected_recovery_value: undefined,
-        expected_recovery_unit: undefined,
-      });
-      setAppointmentDateTime('');
-      setNextSessionDate(''); // ← reset
-      setHasChanges(false);
     }
+  };
+
+  const applyLogValues = (logData = {}) => {
+    let dateTimeValue = '';
+    if (logData.appointment_date || logData.visit_date) {
+      const momentDate = moment(logData.appointment_date || logData.visit_date);
+      dateTimeValue = momentDate.isValid() ? momentDate.format('YYYY-MM-DDTHH:mm') : '';
+    }
+    setAppointmentDateTime(dateTimeValue);
+
+    let nextSession = '';
+    if (logData.recommended_next_session) {
+      const nextMoment = moment(logData.recommended_next_session);
+      nextSession = nextMoment.isValid() ? nextMoment.format('YYYY-MM-DD') : '';
+    }
+    setNextSessionDate(nextSession);
+
+    form.setFieldsValue({
+      objective_progress: logData.objective_progress || '',
+      pain_before: normalizePainLevel(logData.pain_before),
+      pain_after: normalizePainLevel(logData.pain_after),
+      treatments: normalizeTreatmentValues(logData.treatments ?? logData.treatment),
+      exercise: logData.exercise || '',
+      homework: logData.homework || '',
+      recovery_tips: logData.recovery_tips || '',
+    });
+  };
+
+  useEffect(() => {
+    const initializeEditState = async () => {
+      if (treatmentPlanData) {
+        applyPlanValues(treatmentPlanData);
+        setSelectedPlanId(treatmentPlanData.id);
+        await fetchPatientPlans(treatmentPlanData.patient_id);
+
+        const logs = await fetchTreatmentLogs(treatmentPlanData.id);
+        if (logs.length > 0) {
+          setSelectedLogId(logs[0].id);
+          applyLogValues(logs[0]);
+        } else {
+          setSelectedLogId('new');
+          applyLogValues({});
+        }
+
+        setHasChanges(false);
+      } else {
+        form.resetFields();
+        form.setFieldsValue({
+          pain_before: 1,
+          pain_after: 1,
+          expected_recovery_value: undefined,
+          expected_recovery_unit: undefined,
+        });
+        setPatientPlans([]);
+        setTreatmentLogs([]);
+        setSelectedPlanId('new');
+        setSelectedLogId('new');
+        setAppointmentDateTime('');
+        setNextSessionDate('');
+        setHasChanges(false);
+      }
+    };
+
+    initializeEditState();
 
     if (disabled) {
       setFormDisabled(disabled);
@@ -589,44 +556,79 @@ export default function TreatmentPlanFormPage({
     }
   };
 
+  const fetchTreatmentLogs = async (planId) => {
+    if (!planId || planId === 'new') {
+      setTreatmentLogs([]);
+      setSelectedLogId('new');
+      return [];
+    }
+
+    try {
+      const response = await TreatmentLogModel.getAll({ treatment_plan_id: planId, limit: 1000 });
+      const logs = Array.isArray(response?.data) ? [...response.data] : [];
+      logs.sort((a, b) => {
+        const aDate = new Date(a.visit_date || a.appointment_date || a.created_at || 0).getTime();
+        const bDate = new Date(b.visit_date || b.appointment_date || b.created_at || 0).getTime();
+        return bDate - aDate;
+      });
+      setTreatmentLogs(logs);
+      return logs;
+    } catch (error) {
+      console.error('Failed to fetch treatment logs', error);
+      setTreatmentLogs([]);
+      setSelectedLogId('new');
+      return [];
+    }
+  };
+
   const handlePatientChange = (patientId) => {
     form.setFieldsValue({ patient_id: patientId });
     setSelectedPlanId('new');
+    setSelectedLogId('new');
+    setTreatmentLogs([]);
     fetchPatientPlans(patientId);
     setHasChanges(true);
   };
 
-  const handlePlanChange = (planId) => {
+  const handlePlanChange = async (planId) => {
     setSelectedPlanId(planId);
     if (planId !== 'new') {
       const plan = patientPlans.find(p => p.id === planId);
       if (plan) {
-        const recoveryTimeValues = parseExpectedRecoveryTime(plan.expected_recovery_time);
-        form.setFieldsValue({
-          service_type: plan.service_type || '',
-          injury_type: plan.injury_type || '',
-          area_concern: plan.area_concern || '',
-          diagnosis_result: plan.diagnosis_result || plan.diagnosis || '',
-          ...recoveryTimeValues,
-          recovery_goals: plan.recovery_goals || '',
-          range_of_motion_impact: plan.range_of_motion_impact || '',
-          // Assuming body annotation is bound via ref, we'll try to set it if possible
-        });
-        if (bodyAnnotationRef.current && plan.image_url) {
-           bodyAnnotationRef.current.setUploadedImageUrl(plan.image_url);
-        }
+        applyPlanValues(plan);
+      }
+
+      const logs = await fetchTreatmentLogs(planId);
+      if (logs.length > 0) {
+        setSelectedLogId(logs[0].id);
+        applyLogValues(logs[0]);
+      } else {
+        setSelectedLogId('new');
+        applyLogValues({});
       }
     } else {
-      // Clear plan fields
       form.setFieldsValue({
         title: '',
         service_type: '',
         injury_type: '',
         area_concern: '',
         diagnosis_result: '',
+        expected_recovery_value: undefined,
+        expected_recovery_unit: undefined,
         recovery_goals: '',
         range_of_motion_impact: '',
+        objective_progress: '',
+        treatments: [],
+        exercise: '',
+        homework: '',
+        recovery_tips: '',
+        pain_before: 1,
+        pain_after: 1,
       });
+      setTreatmentLogs([]);
+      setSelectedLogId('new');
+      setAppointmentDateTime('');
+      setNextSessionDate('');
       if (bodyAnnotationRef.current) {
          if (typeof bodyAnnotationRef.current.resetToDefault === 'function') {
            bodyAnnotationRef.current.resetToDefault();
@@ -635,6 +637,35 @@ export default function TreatmentPlanFormPage({
          }
       }
     }
+    setHasChanges(true);
+  };
+
+  const handleLogChange = async (logId) => {
+    setSelectedLogId(logId);
+
+    if (logId === 'new') {
+      applyLogValues({});
+      setHasChanges(true);
+      return;
+    }
+
+    const currentLog = treatmentLogs.find((log) => log.id === logId);
+    if (currentLog) {
+      applyLogValues(currentLog);
+      setHasChanges(true);
+      return;
+    }
+
+    try {
+      const response = await TreatmentLogModel.getById(logId);
+      if (response?.http_code === 200 && response.data) {
+        applyLogValues(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load treatment log', error);
+      message.error('Failed to load selected visit log');
+    }
+
     setHasChanges(true);
   };
 
@@ -763,56 +794,64 @@ export default function TreatmentPlanFormPage({
 
       let result;
       let msg;
+      const planTargetId = selectedPlanId === 'new' ? treatmentPlanData?.id : selectedPlanId;
+      const planData = {
+        patient_id: body.patient_id,
+        user_id: body.user_id,
+        title: body.title || `${body.service_type || 'Treatment'} for ${body.injury_type || body.area_concern || 'Patient'}`,
+        service_type: body.service_type,
+        injury_type: body.injury_type,
+        area_concern: body.area_concern,
+        diagnosis_result: body.diagnosis_result,
+        expected_recovery_time: body.expected_recovery_time,
+        recovery_goals: body.recovery_goals,
+        range_of_motion_impact: body.range_of_motion_impact,
+        image_url: body.body_annotation,
+        started_at: body.appointment_date || new Date().toISOString()
+      };
+      const logData = {
+        ...body,
+        treatment_plan_id: planTargetId,
+        visit_date: body.appointment_date,
+        treatment: body.treatments,
+      };
 
       if (!treatmentPlanData) {
         if (selectedPlanId === 'new') {
-          // Create Plan first
-          const planData = {
-            patient_id: body.patient_id,
-            user_id: body.user_id,
-            title: body.title || `${body.service_type || 'Treatment'} for ${body.injury_type || body.area_concern || 'Patient'}`,
-            service_type: body.service_type,
-            injury_type: body.injury_type,
-            area_concern: body.area_concern,
-            diagnosis_result: body.diagnosis_result,
-            expected_recovery_time: body.expected_recovery_time,
-            recovery_goals: body.recovery_goals,
-            image_url: body.body_annotation,
+          const planResult = await TreatmentPlanModel.create({
+            ...planData,
             status: 'ACTIVE',
-            started_at: body.appointment_date || new Date().toISOString()
-          };
-          const planResult = await TreatmentPlanModel.create(planData);
+          });
           if (planResult && planResult.http_code === 200 && planResult.data) {
              const newPlanId = planResult.data.id;
-             // Now create log
-             const logData = {
-                ...body,
-                treatment_plan_id: newPlanId,
-                visit_date: body.appointment_date,
-                treatment: body.treatments,
-             };
-             result = await TreatmentLogModel.create(logData);
+             result = await TreatmentLogModel.create({
+               ...logData,
+               treatment_plan_id: newPlanId,
+             });
              msg = 'Successfully created new Treatment Plan and Log';
           } else {
              throw new Error(planResult?.error_message || "Failed to create treatment plan");
           }
         } else {
-          // Create Log for existing plan
-          const logData = {
-             ...body,
-             treatment_plan_id: selectedPlanId,
-             visit_date: body.appointment_date,
-             treatment: body.treatments,
-          };
           result = await TreatmentLogModel.create(logData);
           msg = 'Successfully added new Visit Log';
         }
       } else {
-        // Update is not fully supported in this unified form anymore since it's split.
-        // We might need to update the Plan OR the Log depending on the context.
-        // Assuming we update the Plan for now.
-        msg = 'Successfully updated Treatment Plan';
-        result = await TreatmentPlanModel.update(treatmentPlanData.id, body);
+        const planResult = await TreatmentPlanModel.update(planTargetId, planData);
+        if (!planResult || planResult.http_code !== 200) {
+          throw new Error(planResult?.error_message || 'Failed to update treatment plan');
+        }
+
+        if (selectedLogId && selectedLogId !== 'new') {
+          result = await TreatmentLogModel.update(selectedLogId, logData);
+          msg = 'Successfully updated Treatment Plan and Visit Log';
+        } else if (selectedPlanId !== 'new') {
+          result = await TreatmentLogModel.create(logData);
+          msg = 'Successfully updated Treatment Plan and added new Visit Log';
+        } else {
+          result = planResult;
+          msg = 'Successfully updated Treatment Plan';
+        }
       }
 
       if (result && result.http_code === 200) {
@@ -1006,9 +1045,9 @@ export default function TreatmentPlanFormPage({
                       <Form.Item
                         label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Plan Name / Title</span>}
                         name="title"
-                        rules={[{ required: selectedPlanId === 'new', message: 'Plan Name is required!' }]}
+                        rules={[{ required: selectedPlanId === 'new' || isEditingCurrentPlan, message: 'Plan Name is required!' }]}
                         style={{ marginBottom: '10px' }}
-                        hidden={selectedPlanId !== 'new'}
+                        hidden={!isEditingCurrentPlan && selectedPlanId !== 'new'}
                       >
                         <Input
                           placeholder="e.g., Post-Surgery Recovery Plan"
@@ -1022,10 +1061,10 @@ export default function TreatmentPlanFormPage({
                           <Form.Item
                             label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Service Type</span>}
                             name="service_type"
-                            rules={[{ required: selectedPlanId === 'new', message: 'Service type is required!' }]}
+                            rules={[{ required: selectedPlanId === 'new' || isEditingCurrentPlan, message: 'Service type is required!' }]}
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select className="treatment-plan-select" placeholder="Select service type" disabled={formDisabled || selectedPlanId !== 'new'}>
+                            <Select className="treatment-plan-select" placeholder="Select service type" disabled={planFieldsDisabled}>
                               <Option value="Physiotherapy">Physiotherapy</Option>
                             </Select>
                           </Form.Item>
@@ -1053,7 +1092,7 @@ export default function TreatmentPlanFormPage({
                             name="injury_type"
                             style={{ marginBottom: '10px' }}
                           >
-                            <Select className="treatment-plan-select" placeholder="Select injury type" allowClear disabled={formDisabled || selectedPlanId !== 'new'}>
+                            <Select className="treatment-plan-select" placeholder="Select injury type" allowClear disabled={planFieldsDisabled}>
                               {INJURY_TYPE_OPTIONS.map(type => (
                                 <Option key={type} value={type}>{type}</Option>
                               ))}
@@ -1070,7 +1109,7 @@ export default function TreatmentPlanFormPage({
                             <Input
                               placeholder="e.g., Lower back, Right shoulder"
                               style={{ backgroundColor: '#FFFFFF', border: '1px solid #d9d9d9', color: '#000000', borderRadius: '4px', height: '34px', padding: '4px 11px', fontSize: '14px' }}
-                              disabled={formDisabled || selectedPlanId !== 'new'}
+                              disabled={planFieldsDisabled}
                             />
                           </Form.Item>
                         </Col>
@@ -1082,7 +1121,7 @@ export default function TreatmentPlanFormPage({
                         rules={[{ max: 1000, message: 'Max 1000 characters!' }]}
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea placeholder="Enter diagnosis result" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
+                        <TextArea placeholder="Enter diagnosis result" className="treatment-plan-textarea" rows={3} disabled={planFieldsDisabled} />
                       </Form.Item>
 
                       <Form.Item
@@ -1099,7 +1138,7 @@ export default function TreatmentPlanFormPage({
                                 className="treatment-plan-select"
                                 placeholder="Select number"
                                 allowClear
-                                disabled={formDisabled || selectedPlanId !== 'new'}
+                                disabled={planFieldsDisabled}
                               >
                                 {RECOVERY_DURATION_OPTIONS.map((option) => (
                                   <Option key={option.value} value={option.value}>
@@ -1118,7 +1157,7 @@ export default function TreatmentPlanFormPage({
                                 className="treatment-plan-select"
                                 placeholder="Select unit"
                                 allowClear
-                                disabled={formDisabled || selectedPlanId !== 'new'}
+                                disabled={planFieldsDisabled}
                               >
                                 {RECOVERY_UNIT_OPTIONS.map((option) => (
                                   <Option key={option.value} value={option.value}>
@@ -1136,7 +1175,7 @@ export default function TreatmentPlanFormPage({
                         name="recovery_goals"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea placeholder="Enter specific recovery goals and milestones" className="treatment-plan-textarea" rows={3} disabled={formDisabled || selectedPlanId !== 'new'} />
+                        <TextArea placeholder="Enter specific recovery goals and milestones" className="treatment-plan-textarea" rows={3} disabled={planFieldsDisabled} />
                       </Form.Item>
 
                       <Form.Item
@@ -1144,7 +1183,7 @@ export default function TreatmentPlanFormPage({
                         name="range_of_motion_impact"
                         style={{ marginBottom: '10px' }}
                       >
-                        <TextArea placeholder="Describe range of motion limitations or improvements" className="treatment-plan-textarea" rows={2} disabled={formDisabled || selectedPlanId !== 'new'} />
+                        <TextArea placeholder="Describe range of motion limitations or improvements" className="treatment-plan-textarea" rows={2} disabled={planFieldsDisabled} />
                       </Form.Item>
 
                       {/* ── Recommended Next Session — DATE PICKER ── */}
@@ -1153,7 +1192,7 @@ export default function TreatmentPlanFormPage({
                         name="body_annotation"
                         style={{ marginBottom: '10px' }}
                       >
-                        <BodyAnnotation ref={bodyAnnotationRef} disabled={formDisabled || selectedPlanId !== 'new'} />
+                        <BodyAnnotation ref={bodyAnnotationRef} disabled={planFieldsDisabled} />
                       </Form.Item>
 
                       <div style={{ marginTop: '28px', marginBottom: '12px', paddingTop: '16px', borderTop: '1px solid #eaeaea' }}>
@@ -1164,6 +1203,27 @@ export default function TreatmentPlanFormPage({
                           Isi update sesi harian di bawah ini. Bagian ini tetap aktif walau treatment plan sudah dipilih.
                         </Text>
                       </div>
+
+                      <Form.Item
+                        label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Visit Log Entry</span>}
+                        style={{ marginBottom: '10px' }}
+                      >
+                        <Select
+                          className="treatment-plan-select"
+                          value={selectedLogId}
+                          onChange={handleLogChange}
+                          disabled={formDisabled || selectedPlanId === 'new'}
+                        >
+                          <Option value="new">+ New Visit Log</Option>
+                          {treatmentLogs.map((log) => (
+                            <Option key={log.id} value={log.id}>
+                              {moment(log.visit_date || log.appointment_date || log.created_at).isValid()
+                                ? moment(log.visit_date || log.appointment_date || log.created_at).format('DD MMM YYYY HH:mm')
+                                : `Log #${log.id}`}
+                            </Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
 
                       {/* Appointment Date & Time */}
                       <div style={{ marginBottom: '10px' }}>
@@ -1380,3 +1440,4 @@ export default function TreatmentPlanFormPage({
     </div>
   );
 }
+

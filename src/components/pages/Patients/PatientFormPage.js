@@ -392,12 +392,24 @@ export default function PatientFormPage({
       }
     } catch (error) {
       console.error("Error saving patient:", error);
-      let errorMessage = "An error occurred while saving patient";
+      let errorMessage =
+        error?.error_message ||
+        error?.message ||
+        error?.response?.data?.error_message ||
+        "An error occurred while saving patient";
       
       if (error.errorFields) {
         errorMessage = "Please check the form for errors";
-      } else if (error.message) {
-        errorMessage = error.message;
+      } else if (
+        typeof errorMessage === 'string' &&
+        errorMessage.toLowerCase().includes('email already exists')
+      ) {
+        form.setFields([
+          {
+            name: 'email',
+            errors: [errorMessage]
+          }
+        ]);
       }
       
       await swal.fire({

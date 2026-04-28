@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { message, Spin, Select } from 'antd';
 import TreatmentPlanModel from 'models/TreatmentPlanModel';
 import PatientModel from 'models/PatientModel';
@@ -105,6 +105,7 @@ const BackIcon = () => (
 const PatientDetail = () => {
   const { id } = useParams();
   const history = useHistory();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [patientData, setPatientData] = useState(null);
   const [patientPlans, setPatientPlans] = useState([]);
@@ -114,6 +115,7 @@ const PatientDetail = () => {
   const [fetchError, setFetchError] = useState(null); // 'no_history' | 'server_error' | null
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [bodyImageBase64, setBodyImageBase64] = useState(null);
+  const requestedPlanId = new URLSearchParams(location.search).get('planId');
 
   useEffect(() => {
     const loadPatientAndPlans = async () => {
@@ -134,8 +136,11 @@ const PatientDetail = () => {
         if (plans.length === 0) {
           setFetchError('no_history');
         } else {
-          // Select the latest plan (first one)
-          setSelectedPlanId(plans[0].id);
+          const matchedPlan = requestedPlanId
+            ? plans.find((plan) => String(plan.id) === String(requestedPlanId))
+            : null;
+
+          setSelectedPlanId(matchedPlan ? matchedPlan.id : plans[0].id);
         }
       } catch (err) {
         setFetchError('server_error');
@@ -144,7 +149,20 @@ const PatientDetail = () => {
       }
     };
     if (id) loadPatientAndPlans();
-  }, [id]);
+  }, [id, requestedPlanId]);
+
+  useEffect(() => {
+    if (!id || !selectedPlanId) return;
+
+    const params = new URLSearchParams(location.search);
+    if (String(params.get('planId')) === String(selectedPlanId)) return;
+
+    params.set('planId', selectedPlanId);
+    history.replace({
+      pathname: `/patients/${id}`,
+      search: `?${params.toString()}`
+    });
+  }, [history, id, location.search, selectedPlanId]);
 
   useEffect(() => {
     const loadPlanDetail = async () => {

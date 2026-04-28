@@ -6,6 +6,7 @@ import Iconify from "../../reusable/Iconify";
 import { Col } from "react-bootstrap";
 import CustomTable from "../../reusable/CustomTable";
 import TreatmentPlanModel from 'models/TreatmentPlanModel';
+import UserModel from 'models/UserModel';
 import moment from 'moment';
 import create from 'zustand';
 
@@ -55,6 +56,7 @@ const TreatmentPlanList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [dataSource, setDataSource] = useState([]);
+  const [userRoleMap, setUserRoleMap] = useState({});
 
   // Filter states
   const search = useFilter((state) => state.search);
@@ -114,6 +116,57 @@ const TreatmentPlanList = () => {
     return 'Not Assigned';
   };
 
+  const getCreatorRole = (row) => {
+    const roleValue =
+      row.user_role ||
+      row.staff_role ||
+      row.role ||
+      row.user?.role ||
+      row.staff?.role ||
+      row.staff?.position ||
+      row.created_by_role;
+
+    if (roleValue && roleValue !== '-') {
+      return String(roleValue);
+    }
+
+    const creatorName = getCreatorName(row).trim().toLowerCase();
+    return userRoleMap[creatorName] || '';
+  };
+
+  useEffect(() => {
+    const loadUserRoles = async () => {
+      try {
+        const result = await UserModel.getAll();
+        const users = Array.isArray(result?.data) ? result.data : [];
+        const roleMap = {};
+
+        users.forEach((user) => {
+          const roleLabel = user.role === 'DOCTOR' ? 'THERAPIST' : user.role;
+          const keys = [
+            user.username,
+            user.name,
+            user.admin_name,
+            user.email,
+          ]
+            .filter(Boolean)
+            .map((value) => String(value).trim().toLowerCase());
+
+          keys.forEach((key) => {
+            roleMap[key] = roleLabel;
+          });
+        });
+
+        setUserRoleMap(roleMap);
+      } catch (error) {
+        console.error('Error loading user roles:', error);
+        setUserRoleMap({});
+      }
+    };
+
+    loadUserRoles();
+  }, []);
+
   const columns = [
     {
       id: 'patient_info',
@@ -156,13 +209,22 @@ const TreatmentPlanList = () => {
       id: 'created_by',
       label: 'Created By',
       filter: false,
-      render: (row) => (
-        <div>
-          <div style={{ color: '#333', fontWeight: 500 }}>
-            {getCreatorName(row)}
+      render: (row) => {
+        const creatorRole = getCreatorRole(row);
+
+        return (
+          <div>
+            <div style={{ color: '#333', fontWeight: 500 }}>
+              {getCreatorName(row)}
+            </div>
+            {creatorRole ? (
+              <div style={{ fontSize: '12px', color: '#1890ff', marginTop: '2px', fontWeight: 500 }}>
+                {creatorRole}
+              </div>
+            ) : null}
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       id: 'title',
@@ -189,11 +251,11 @@ const TreatmentPlanList = () => {
       render: (row) => {
         return (
           <Space size="small">
-            <Tooltip title="View Details">
-              <Link to={`/treatment-plan/${row.id}`}>
+            <Tooltip title="Detail">
+              <Link to={`/patients/${row.patient_id}?planId=${row.id}`}>
                 <AntButton
                   type={'link'}
-                  style={{ color: '#333' }}
+                  style={{ color: '#1890ff' }}
                   className={"d-flex align-items-center justify-content-center"}
                   shape="circle"
                   icon={<Iconify icon={"material-symbols:visibility"} />}
@@ -222,18 +284,6 @@ const TreatmentPlanList = () => {
                 shape="circle"
                 icon={<Iconify icon={"material-symbols:delete-outline"} />}
               />
-            </Tooltip>
-
-            <Tooltip title="View Patient">
-              <Link to={`/patients/${row.patient_id}`}>
-                <AntButton
-                  type={'link'}
-                  style={{ color: '#1890ff' }}
-                  className={"d-flex align-items-center justify-content-center"}
-                  shape="circle"
-                  icon={<Iconify icon={"mdi:account-arrow-right"} />}
-                />
-              </Link>
             </Tooltip>
           </Space>
         );
