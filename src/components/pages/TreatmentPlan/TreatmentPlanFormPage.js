@@ -420,6 +420,90 @@ export default function TreatmentPlanFormPage({
   const isEditingCurrentPlan = Boolean(treatmentPlanData) && selectedPlanId === treatmentPlanData.id;
   const planFieldsDisabled = formDisabled || (!isEditingCurrentPlan && selectedPlanId !== 'new');
 
+  useEffect(() => {
+    const storedName = localStorage.getItem('admin_name') || sessionStorage.getItem('admin_name') || '';
+    setCurrentLoginName(storedName);
+  }, []);
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        setStaffLoading(true);
+        const response = await StaffModel.getActiveStaff();
+        const activeStaff = Array.isArray(response?.data) ? response.data : [];
+        let resolvedStaffList = activeStaff;
+
+        if (!treatmentPlanData && currentLoginName) {
+          let matchedStaff = activeStaff.find(
+            (staff) => normalizeName(staff.name) === normalizeName(currentLoginName)
+          );
+
+          if (!matchedStaff) {
+            const staffByName = await StaffModel.getStaffByName(currentLoginName);
+            matchedStaff = staffByName?.data || null;
+          }
+
+          if (!matchedStaff) {
+            const loggedInUserId = localStorage.getItem('user_id') || sessionStorage.getItem('id');
+            if (loggedInUserId) {
+              matchedStaff = {
+                id: `user-${loggedInUserId}`,
+                user_id: parseInt(loggedInUserId) || loggedInUserId,
+                name: currentLoginName,
+                phone_number: 'User'
+              };
+            }
+          }
+
+          if (matchedStaff) {
+            if (!activeStaff.some((staff) => staff.id === matchedStaff.id)) {
+              resolvedStaffList = [...activeStaff, matchedStaff];
+            }
+            form.setFieldsValue({ user_id: getStaffUserId(matchedStaff) });
+          }
+        }
+
+        if (treatmentPlanData?.staff_id && !resolvedStaffList.some((staff) => staff.id === treatmentPlanData.staff_id)) {
+          const existingStaff = await StaffModel.getStaffById(treatmentPlanData.staff_id);
+          if (existingStaff?.data) {
+            resolvedStaffList = [...resolvedStaffList, existingStaff.data];
+            form.setFieldsValue({ user_id: getStaffUserId(existingStaff.data) });
+          }
+        } else if (treatmentPlanData) {
+          const currentUserId = getTreatmentPlanUserId(treatmentPlanData);
+          if (currentUserId !== undefined) {
+            form.setFieldsValue({ user_id: currentUserId });
+          }
+        }
+        setStaffList(resolvedStaffList);
+      } catch (error) {
+        console.error("Error fetching staff:", error);
+        message.error('Failed to load staff list');
+      } finally {
+        setStaffLoading(false);
+      }
+    };
+    fetchStaff();
+  }, [currentLoginName, form, treatmentPlanData]);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setPatientsLoading(true);
+        const response = await PatientModel.getAllPatients();
+        if (response && response.http_code === 200) {
+          setPatients(Array.isArray(response.data) ? response.data : []);
+        }
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+        message.error('Failed to load patients');
+      } finally {
+        setPatientsLoading(false);
+      }
+    };
+    fetchPatients();
+  }, []);
+
   const applyPlanValues = (planData = {}) => {
     const recoveryTimeValues = parseExpectedRecoveryTime(planData.expected_recovery_time);
 

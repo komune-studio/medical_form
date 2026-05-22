@@ -404,13 +404,37 @@ const MedicalHistoryList = () => {
       if (result && result.http_code === 200) {
         const allData = Array.isArray(result.data) ? result.data : [];
 
+        // Sort data client-side for consistent behavior
+        let sortedData = [...allData];
+        if (sortBy) {
+          sortedData.sort((a, b) => {
+            let valA = a[sortBy];
+            let valB = b[sortBy];
+
+            if (sortBy === 'appointment_date' || sortBy === 'created_at') {
+              valA = new Date(valA || 0).getTime();
+              valB = new Date(valB || 0).getTime();
+            } else if (typeof valA === 'string') {
+              valA = valA.toLowerCase();
+              valB = (valB || '').toLowerCase();
+            } else {
+              valA = Number(valA) || 0;
+              valB = Number(valB) || 0;
+            }
+
+            if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+            if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+            return 0;
+          });
+        }
+
         // For client-side pagination (if API doesn't support pagination)
         const startIndex = currentPage * currentRowsPerPage;
         const endIndex = startIndex + currentRowsPerPage;
-        const paginatedData = allData.slice(startIndex, endIndex);
+        const paginatedData = sortedData.slice(startIndex, endIndex);
 
         setDataSource(paginatedData);
-        setTotalCount(allData.length);
+        setTotalCount(sortedData.length);
       } else {
         setDataSource([]);
         setTotalCount(0);
@@ -814,7 +838,6 @@ const MedicalHistoryList = () => {
                 >
                   <Select.Option value="">All Services</Select.Option>
                   <Select.Option value="Physiotherapy">Physiotherapy</Select.Option>
-                  <Select.Option value="Pilates">Pilates</Select.Option>
                 </Select>
               </Col>
 
@@ -825,7 +848,9 @@ const MedicalHistoryList = () => {
                   style={{ width: '100%' }}
                   value={`${sortBy}_${sortOrder}`}
                   onChange={(value) => {
-                    const [field, order] = value.split('_');
+                    const parts = value.split('_');
+                    const order = parts.pop();
+                    const field = parts.join('_');
                     handleSortChange(field, order);
                   }}
                 >
