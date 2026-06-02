@@ -12,12 +12,14 @@ const SIDEBAR_COLOR = "#FFFFFF";
 const SIDEBAR_ADMIN = [
     { path: "/patients", name: "Patients", icon: "mdi:account-group" },
     { path: "/treatment-plan", name: "Medical History", icon: "mdi:history" },
+    { path: "/follow-up", name: "Follow Up", icon: "mdi:calendar-clock" },
     // { path: "/staff", name: "Staff", icon: "mdi:badge" }, // HIDDEN - commented out
     { path: "/user-management", name: "User Management", icon: "mdi:account-cog" },
 ];
 
 const SIDEBAR_THERAPIST = [
     { path: "/patients", name: "Patients", icon: "mdi:account-group" },
+    { path: "/follow-up", name: "Follow Up", icon: "mdi:calendar-clock" },
     { path: "/form", name: "Form", icon: "mdi:file-document-edit" },
 ];
 

@@ -15,6 +15,7 @@ import TreatmentPlanList from "components/pages/TreatmentPlan/TreatmentPlanList"
 import TreatmentPlanCreate from "components/pages/TreatmentPlan/TreatmentPlanCreate";
 import TreatmentPlanEdit from "components/pages/TreatmentPlan/TreatmentPlanEdit";
 import FormPage from "components/pages/Form/FormPage";
+import FollowUpList from "components/pages/FollowUp/FollowUpList";
 
 var routes = [
 
@@ -89,6 +90,12 @@ var routes = [
         path: "/treatment-plan",
         name: "Treatment Plan",
         component: TreatmentPlanList,
+        layout: "/admin",
+    },
+    {
+        path: "/follow-up",
+        name: "Follow Up",
+        component: FollowUpList,
         layout: "/admin",
     },
 

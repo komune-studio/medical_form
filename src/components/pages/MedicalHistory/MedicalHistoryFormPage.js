@@ -19,6 +19,7 @@ import swal from '../../reusable/CustomSweetAlert';
 import MedicalHistoryModel from 'models/MedicalHistoryModel';
 import PatientModel from 'models/PatientModel';
 import StaffModel from 'models/StaffModel';
+import UserModel from 'models/UserModel';
 import UploadService from '../../../utils/Uploadservice';
 import moment from 'moment';
 import BodyAnnotation from './BodyAnnotation';
@@ -346,8 +347,8 @@ export default function MedicalHistoryFormPage({
   const [appointmentDateTime, setAppointmentDateTime] = useState('');
   const [nextSessionDate, setNextSessionDate] = useState(''); // ← STATE BARU
 
-  const [staffList, setStaffList] = useState([]);
-  const [staffLoading, setStaffLoading] = useState(false);
+  const [therapists, setTherapists] = useState([]);
+  const [therapistsLoading, setTherapistsLoading] = useState(false);
   const [currentLoginName, setCurrentLoginName] = useState('');
 
   const bodyAnnotationRef = useRef(null);
@@ -361,66 +362,36 @@ export default function MedicalHistoryFormPage({
   }, []);
 
   useEffect(() => {
-    const fetchStaff = async () => {
+    const fetchTherapists = async () => {
       try {
-        setStaffLoading(true);
-        const response = await StaffModel.getActiveStaff();
-        const activeStaff = Array.isArray(response?.data) ? response.data : [];
-        let resolvedStaffList = activeStaff;
+        setTherapistsLoading(true);
+        const response = await UserModel.getByRole('THERAPIST');
+        const therapistList = Array.isArray(response) ? response : (Array.isArray(response?.data) ? response.data : []);
+        setTherapists(therapistList);
 
-        if (!medicalHistoryData && currentLoginName) {
-          let matchedStaff = activeStaff.find(
-            (staff) => normalizeName(staff.name) === normalizeName(currentLoginName)
-          );
-
-          if (!matchedStaff) {
-            const staffByName = await StaffModel.getStaffByName(currentLoginName);
-            matchedStaff = staffByName?.data || null;
-          }
-
-          // If still no matched staff, they might be a regular user
-          if (!matchedStaff) {
-            const loggedInUserId = localStorage.getItem('user_id') || sessionStorage.getItem('id');
-            if (loggedInUserId) {
-              matchedStaff = {
-                id: `user-${loggedInUserId}`,
-                user_id: parseInt(loggedInUserId) || loggedInUserId,
-                name: currentLoginName,
-                phone_number: 'User'
-              };
+        if (!medicalHistoryData) {
+          const loggedInUserId = localStorage.getItem('user_id') || sessionStorage.getItem('id');
+          if (loggedInUserId) {
+            const parsedId = parseInt(loggedInUserId);
+            if (therapistList.some(t => t.id === parsedId)) {
+              form.setFieldsValue({ user_id: parsedId });
             }
           }
-
-          if (matchedStaff) {
-            if (!activeStaff.some((staff) => staff.id === matchedStaff.id)) {
-              resolvedStaffList = [...activeStaff, matchedStaff];
-            }
-            form.setFieldsValue({ user_id: getStaffUserId(matchedStaff) });
-          }
-        }
-
-        if (medicalHistoryData?.staff_id && !resolvedStaffList.some((staff) => staff.id === medicalHistoryData.staff_id)) {
-          const existingStaff = await StaffModel.getStaffById(medicalHistoryData.staff_id);
-          if (existingStaff?.data) {
-            resolvedStaffList = [...resolvedStaffList, existingStaff.data];
-            form.setFieldsValue({ user_id: getStaffUserId(existingStaff.data) });
-          }
-        } else if (medicalHistoryData) {
-          const currentUserId = getMedicalHistoryUserId(medicalHistoryData);
-          if (currentUserId !== undefined) {
+        } else {
+          const currentUserId = medicalHistoryData.user_id;
+          if (currentUserId !== undefined && currentUserId !== null) {
             form.setFieldsValue({ user_id: currentUserId });
           }
         }
-        setStaffList(resolvedStaffList);
       } catch (error) {
-        console.error("Error fetching staff:", error);
-        message.error('Failed to load staff list');
+        console.error("Error fetching therapists:", error);
+        message.error('Failed to load therapists');
       } finally {
-        setStaffLoading(false);
+        setTherapistsLoading(false);
       }
     };
-    fetchStaff();
-  }, [currentLoginName, form, medicalHistoryData]);
+    fetchTherapists();
+  }, [form, medicalHistoryData]);
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -853,24 +824,24 @@ export default function MedicalHistoryFormPage({
                         </Col>
                         <Col xs={24} md={12}>
                           <Form.Item
-                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Staff</span>}
+                            label={<span style={{ color: '#000000', fontWeight: 600, fontSize: '14px' }}>Therapist</span>}
                             name="user_id"
+                            rules={[{ required: true, message: 'Therapist selection is required!' }]}
                             style={{ marginBottom: '10px' }}
                           >
                             <Select
                               className="medical-history-select"
-                              placeholder={currentLoginName || 'Staff'}
-                              loading={staffLoading}
-                              disabled
+                              placeholder="Select therapist"
+                              loading={therapistsLoading}
                               optionFilterProp="children"
                               filterOption={(input, option) => {
                                 const childStr = Array.isArray(option.children) ? option.children.join('') : String(option.children || '');
                                 return childStr.toLowerCase().indexOf(input.toLowerCase()) >= 0;
                               }}
                             >
-                              {staffList.map(staff => (
-                                <Option key={staff.id} value={getStaffUserId(staff)}>
-                                  {staff.name} - {staff.phone_number}
+                              {therapists.map(therapist => (
+                                <Option key={therapist.id} value={therapist.id}>
+                                  {therapist.username}
                                 </Option>
                               ))}
                             </Select>

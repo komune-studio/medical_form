@@ -74,4 +74,16 @@ export default class TreatmentLogModel {
       throw error;
     }
   }
+
+  /**
+   * Get all follow-up sessions
+   */
+  static getFollowUpList = async () => {
+    try {
+      return await ApiRequest.set('v1/treatment-log/follow-up', "GET");
+    } catch (error) {
+      console.error("Error fetching follow-up sessions:", error);
+      throw error;
+    }
+  }
 }
