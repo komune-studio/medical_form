@@ -1,5 +1,5 @@
 import { Space, Button as AntButton, Tooltip, Modal, message, Input, Select } from 'antd';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, Row, CardBody, Container } from "reactstrap";
 import { Link } from 'react-router-dom';
 import Iconify from "../../reusable/Iconify";
@@ -12,6 +12,8 @@ import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
 import Mascot from 'assets/img/Mascot.png';
 import { getProxiedImageUrl, fetchImageAsBase64 } from '../../../utils/imageProxy';
+import BatchAddPatientModal from './BatchAddPatientModal';
+// import ApiConfig from '../../../utils/ApiConfig';
 
 import moment from 'moment';
 import dayjs from 'dayjs';
@@ -69,13 +71,13 @@ const PatientList = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [dataSource, setDataSource] = useState([]);
 
-  // PDF plan picker modal state
   const [planPickerVisible, setPlanPickerVisible] = useState(false);
   const [planPickerPlans, setPlanPickerPlans] = useState([]);
-  const [planPickerPatient, setPlanPickerPatient] = useState(null); // { id, name, patient_code }
+  const [planPickerPatient, setPlanPickerPatient] = useState(null); 
   const [planPickerSelected, setPlanPickerSelected] = useState(null);
   const [planPickerLoading, setPlanPickerLoading] = useState(false);
   const [pdfGenerating, setPdfGenerating] = useState(false);
+  const [openBatchModal, setOpenBatchModal] = useState(false);
 
   const search = useFilter((state) => state.search);
   const timeRange = useFilter((state) => state.timeRange);
@@ -109,6 +111,8 @@ const PatientList = () => {
     setPage(0);
   };
 
+  const handleOpenBatchModal = () => setOpenBatchModal(true);
+
   // Open plan picker modal before downloading
   const handleDownloadProgressPDF = async (patientId, patientName, patientCode) => {
     try {
@@ -137,14 +141,12 @@ const PatientList = () => {
     }
   };
 
-  // Generate PDF from the selected plan
   const handleGeneratePDF = async () => {
     if (!planPickerSelected || !planPickerPatient) return;
     try {
       setPdfGenerating(true);
       message.loading({ content: 'Generating PDF report...', key: 'pdf-gen', duration: 0 });
 
-      // Fetch full plan detail (includes treatment_logs)
       const res = await TreatmentPlanModel.getById(planPickerSelected);
       const planDetail = res?.data;
       if (!planDetail) throw new Error('no_data');
@@ -152,7 +154,6 @@ const PatientList = () => {
       const sessions = planDetail.treatment_logs || [];
       const patient = planPickerPatient;
 
-      // helper
       const fmtDate = (dateStr) => {
         if (!dateStr) return '-';
         try {
@@ -176,16 +177,14 @@ const PatientList = () => {
         return '#ff4d4f';
       };
 
-      // Fetch full patient data for height/weight/etc
       let patientFull = {};
       try {
         const pRes = await PatientModel.getPatientById(patient.id);
         patientFull = pRes?.data || {};
       } catch (_) {}
 
-      // Build assessment info from planDetail
+
       const assessTherapist = planDetail.user_name || planDetail.staff_name || '-';
-      // Pre-fetch body image as base64 to avoid CORS in production
       const bodyImageUrl = planDetail.image_url
         ? await fetchImageAsBase64(planDetail.image_url)
         : null;
@@ -572,108 +571,138 @@ const PatientList = () => {
   };
 
   const exportCSV = async () => {
-    setExportLoading(true);
-    try {
-      const filters = {};
-      if (search) filters.search = search;
-      if (gender) filters.gender = gender;
-      if (timeRange && timeRange !== "all") filters.timeRange = timeRange;
+  setExportLoading(true);
 
-      const result = await PatientModel.getAllPatients(filters);
+  // phone number export helper function
+  const formatPhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return "";
+    let phoneString = String(phoneNumber).trim();
 
-      if (!result || result.http_code !== 200) {
-        throw new Error("Failed to fetch data");
+    if (phoneString.includes("E") || phoneString.includes("e")) {
+      try {
+        phoneString = Number(phoneString).toFixed(0);
+      } catch (e) {
+        phoneString = phoneString.replace(/[^0-9]/g, "");
       }
-
-      let data = result.data || [];
-
-      data = data.sort((a, b) => {
-        const idA = parseInt(a.id) || 0;
-        const idB = parseInt(b.id) || 0;
-        return idA - idB;
-      });
-
-      const headers = [
-        'ID',
-        'Patient Code',
-        'Full Name',
-        'Date of Birth',
-        'Age',
-        'Gender',
-        'Height (cm)',
-        'Weight (kg)',
-        'BMI',
-        'Phone Number',
-        'Email',
-        'Address',
-        'Registration Date'
-      ];
-
-      const rows = data.map(patient => {
-        const dob = patient.date_of_birth ?
-          moment(patient.date_of_birth).format('DD/MM/YYYY') : '';
-
-        const regDate = patient.created_at ?
-          moment(patient.created_at).format('DD/MM/YYYY HH:mm') : '';
-
-        return [
-          patient.id || '',
-          patient.patient_code || '',
-          patient.name || '',
-          dob,
-          patient.age || '',
-          patient.gender || '',
-          patient.height || '',
-          patient.weight || '',
-          patient.bmi || '',
-          patient.phone || '',
-          patient.email || '',
-          patient.address || '',
-          regDate
-        ];
-      });
-
-      const allRows = [headers, ...rows];
-
-      const csvContent = allRows
-        .map(row =>
-          row
-            .map(cell => {
-              const cellStr = String(cell || '');
-              if (cellStr.includes(';') || cellStr.includes('"') || cellStr.includes('\n')) {
-                return `"${cellStr.replace(/"/g, '""')}"`;
-              }
-              return cellStr;
-            })
-            .join(';')
-        )
-        .join('\n');
-
-      const BOM = '\uFEFF';
-      const finalContent = BOM + csvContent;
-
-      const blob = new Blob([finalContent], { type: 'text/csv;charset=utf-8;' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-
-      const timestamp = moment().format('YYYY-MM-DD_HH-mm');
-      link.download = `patients_${timestamp}.csv`;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      message.success(`CSV exported! ${data.length} patients exported.`);
-
-    } catch (error) {
-      console.error('Error exporting CSV:', error);
-      message.error('Failed to export CSV: ' + error.message);
-    } finally {
-      setExportLoading(false);
     }
+
+    const digits = phoneString.replace(/[^0-9]/g, "");
+    if (!digits) return "";
+
+    let formatted = phoneString;
+    if (digits.startsWith("08")) {
+      formatted = `+62${digits.slice(1)}`;
+    } else if (digits.startsWith("628")) {
+      formatted = `+${digits}`;
+    } else if (digits.startsWith("8")) {
+      formatted = `+62${digits}`;
+    }
+
+    return `\u200B${formatted}`;
   };
+
+  try {
+    const filters = {};
+    if (search) filters.search = search;
+    if (gender) filters.gender = gender;
+    if (timeRange && timeRange !== "all") filters.timeRange = timeRange;
+
+    const result = await PatientModel.getAllPatients(filters);
+
+    if (!result || result.http_code !== 200) {
+      throw new Error("Failed to fetch data");
+    }
+
+    let data = result.data || [];
+
+    data = data.sort((a, b) => {
+      const idA = parseInt(a.id) || 0;
+      const idB = parseInt(b.id) || 0;
+      return idA - idB;
+    });
+
+    const headers = [
+      'ID',
+      'Patient Code',
+      'Full Name',
+      'Date of Birth',
+      'Age',
+      'Gender',
+      'Height (cm)',
+      'Weight (kg)',
+      'BMI',
+      'Phone Number',
+      'Email',
+      'Address',
+      'Registration Date'
+    ];
+
+    const rows = data.map(patient => {
+      const dob = patient.date_of_birth ?
+        moment(patient.date_of_birth).format('DD/MM/YYYY') : '';
+
+      const regDate = patient.created_at ?
+        moment(patient.created_at).format('DD/MM/YYYY HH:mm') : '';
+
+      return [
+        patient.id || '',
+        patient.patient_code || '',
+        patient.name || '',
+        dob,
+        patient.age || '',
+        patient.gender || '',
+        patient.height || '',
+        patient.weight || '',
+        patient.bmi || '',
+        formatPhoneNumber(patient.phone),
+        patient.email || '',
+        patient.address || '',
+        regDate
+      ];
+    });
+
+    const allRows = [headers, ...rows];
+
+    const csvContent = allRows
+      .map(row =>
+        row
+          .map(cell => {
+            const cellStr = String(cell || '');
+            if (cellStr.includes(';') || cellStr.includes('"') || cellStr.includes('\n')) {
+              return `"${cellStr.replace(/"/g, '""')}"`;
+            }
+            return cellStr;
+          })
+          .join(';')
+      )
+      .join('\n');
+
+    const BOM = '\uFEFF';
+    const finalContent = BOM + csvContent;
+
+    const blob = new Blob([finalContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    const timestamp = moment().format('YYYY-MM-DD_HH-mm');
+    link.download = `patients_${timestamp}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    message.success(`CSV exported! ${data.length} patients exported.`);
+
+  } catch (error) {
+    console.error('Error exporting CSV:', error);
+    message.error('Failed to export CSV: ' + error.message);
+  } finally {
+    setExportLoading(false);
+  }
+};
+  
 
   const initializeData = async (currentPage = page, currentRowsPerPage = rowsPerPage) => {
     setLoading(true);
@@ -1069,6 +1098,16 @@ const PatientList = () => {
                   >
                     Export CSV
                   </AntButton>
+                  
+                  <AntButton
+                    size="middle"
+                    type="primary"
+                    icon={<Iconify icon="mdi:file-import-outline" />}
+                    className="custom-export-button"
+                    onClick={() => setOpenBatchModal(true)}
+                  >
+                    Import CSV
+                  </AntButton>
                 </div>
               </Col>
             </Row>
@@ -1133,7 +1172,7 @@ const PatientList = () => {
                   columns={columns}
                   defaultOrder={"created_at"}
                   onSearch={null}
-                  apiPagination={false}
+                  apiPagination={true}
                   totalCount={totalCount}
                   currentPage={page}
                   rowsPerPage={rowsPerPage}
@@ -1208,6 +1247,14 @@ const PatientList = () => {
           </Select>
         </div>
       </Modal>
+      
+        <BatchAddPatientModal
+        open={openBatchModal}
+        onClose={() => setOpenBatchModal(false)}
+        onSuccess={() => {
+          initializeData(page, rowsPerPage); 
+        }}
+      />
     </>
   );
 }
