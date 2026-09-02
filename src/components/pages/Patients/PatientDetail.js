@@ -6,6 +6,7 @@ import PatientModel from 'models/PatientModel';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LogoRangka from 'assets/img/Logo_rangka.png';
+import logoKomune from 'assets/img/Logo_komune.png';
 import Mascot from 'assets/img/Mascot.png';
 import { getProxiedImageUrl, fetchImageAsBase64 } from '../../../utils/imageProxy';
 import dayjs from 'dayjs';
@@ -614,7 +615,11 @@ const PatientDetail = () => {
               <div style={{ fontSize: 22, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>
                 Treatment Plan &amp; Progress Report
               </div>
+              <div style={{ fontSize: 11, fontWeight: 350, color: '#111', lineHeight: 1.2 }}>
+                Developed by Komune Studio Software House
+              </div>
             </div>
+            <img src={logoKomune} alt="Rangka" style={{ width: 110, objectFit: 'contain', flexShrink: 0 }} />
           </div>
           <div style={{ height: 1, background: '#111', margin: '3px 0 10px' }} />
 

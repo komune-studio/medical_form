@@ -50,7 +50,7 @@ export default class ApiRequest {
 
   static setMultipart = async (endpoint, method, body) => {
     console.log('isi body', body)
-    let token = localStorage.super_token;
+    let token = localStorage.getItem('super_token') || localStorage.getItem('token');
 
     let response = await fetch(apiConfig.base_url + endpoint, {
       method: method,

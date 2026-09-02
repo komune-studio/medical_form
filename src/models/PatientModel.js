@@ -42,6 +42,15 @@ export default class PatientModel {
     }
   }
 
+static createBatch = async (patientsArray) => {
+  try {
+    return await ApiRequest.set('v1/patient/batch', 'POST', patientsArray);
+  } catch (error) {
+    console.error("Error creating batch patients:", error);
+    throw error;
+  }
+};
+
   static updatePatient = async (id, data) => {
     try {
       return await ApiRequest.set(`v1/patient/${id}`, "PUT", data);
