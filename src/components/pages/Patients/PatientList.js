@@ -633,6 +633,8 @@ const PatientList = () => {
       'BMI',
       'Phone Number',
       'Email',
+      'Allergies',
+      'Medical Notes',
       'Address',
       'Registration Date'
     ];
@@ -656,6 +658,8 @@ const PatientList = () => {
         patient.bmi || '',
         formatPhoneNumber(patient.phone),
         patient.email || '',
+        patient.allergies || '',
+        patient.medical_notes || '',
         patient.address || '',
         regDate
       ];

@@ -21,6 +21,8 @@ import PatientModel from 'models/PatientModel';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { parsePhoneNumberWithError, isValidPhoneNumber } from 'libphonenumber-js';
+import countries from '../../../countries.json';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -28,19 +30,45 @@ const { TextArea } = Input;
 
 dayjs.extend(customParseFormat);
 
-const normalizePhoneDigits = (value = '') => {
-  const digits = String(value).replace(/\D/g, '');
 
-  if (!digits) return '';
-  if (digits.startsWith('62')) return digits.slice(2);
-  if (digits.startsWith('0')) return digits.slice(1);
+// normalizePhoneDigits
+const normalizePhoneDigits = (value = '', countryCode = null) => {
+  if (!value) return '';
+  let str = String(value).trim();
+
+  if (str.startsWith('+')) {
+    try {
+      const parsed = parsePhoneNumberWithError(str);
+      if (parsed && parsed.nationalNumber) {
+        return parsed.nationalNumber;
+      }
+    } catch (e) {
+      str = str.replace(/^\+\d{1,3}/, '');
+    }
+  }
+
+  let digits = str.replace(/\D/g, '');
+  if (countryCode === 'ID') {
+    if (digits.startsWith('62')) digits = digits.slice(2);
+    if (digits.startsWith('0')) digits = digits.slice(1);
+  }
 
   return digits;
 };
 
-const formatPhoneNumber = (value = '') => {
-  const digits = normalizePhoneDigits(value);
-  return digits ? `+62${digits}` : '';
+const formatPhoneNumber = (value = '', currentCallingCode = '+62', countryCode = null) => {
+  if (!value) return '';
+  const str = String(value).trim();
+  if (str.startsWith('+')) {
+    try {
+      const parsed = parsePhoneNumberWithError(str);
+      if (parsed) return parsed.format('E.164');
+    } catch (e) {
+      return str;
+    }
+  }
+  const digits = normalizePhoneDigits(value, countryCode);
+  return digits ? `${currentCallingCode}${digits}` : '';
 };
 
 const parseDateOfBirth = (value) => {
@@ -307,6 +335,36 @@ export default function PatientFormPage({
   const [formKey, setFormKey] = useState(0);
   const [bmi, setBmi] = useState(null);
 
+  const [selectedCountry, setSelectedCountry] = useState('ID');
+  const [callingCode, setCallingCode] = useState('+62');
+
+const countrySelect = (
+  <Select
+    showSearch
+    value={selectedCountry}
+    onChange={(countryCode) => {
+      setSelectedCountry(countryCode);
+      const selected = countries.find((c) => c.cca2 === countryCode);
+      if (selected) {
+        setCallingCode(selected.code);
+      }
+    }}
+    filterOption={(input, option) =>
+      String(option?.children || '')
+        .toLowerCase()
+        .includes(input.toLowerCase())
+    }
+    style={{ width: 180 }}
+    bordered={false}
+  >
+    {countries.map((c) => (
+      <Select.Option key={c.cca2} value={c.cca2}>
+        {c.name} ({c.code})
+      </Select.Option>
+    ))}
+  </Select>
+);
+
   const calculateBMI = (height, weight) => {
     if (height && weight && height > 0 && weight > 0) {
       const heightInMeters = height / 100;
@@ -318,7 +376,7 @@ export default function PatientFormPage({
 
   const onValuesChanged = (changedValues, allValues) => {
     if (changedValues.phone !== undefined) {
-      const normalizedPhone = normalizePhoneDigits(changedValues.phone);
+      const normalizedPhone = normalizePhoneDigits(changedValues.phone, selectedCountry);
       if (normalizedPhone !== changedValues.phone) {
         form.setFieldsValue({ phone: normalizedPhone });
         allValues = { ...allValues, phone: normalizedPhone };
@@ -348,7 +406,7 @@ export default function PatientFormPage({
       const originalValue = patientData[key];
 
       if (key === 'phone') {
-        return normalizePhoneDigits(currentValue) !== normalizePhoneDigits(originalValue);
+        return normalizePhoneDigits(currentValue, selectedCountry) !== normalizePhoneDigits(originalValue, selectedCountry);
       }
       
       if (key === 'date_of_birth' && currentValue) {
@@ -397,7 +455,7 @@ export default function PatientFormPage({
         body.date_of_birth = parsedDateOfBirth.format('YYYY-MM-DD');
       }
 
-      body.phone = formatPhoneNumber(body.phone);
+      body.phone = formatPhoneNumber(body.phone, callingCode, selectedCountry);
 
       console.log('Data to be saved:', body);
 
@@ -419,7 +477,7 @@ export default function PatientFormPage({
 
       console.log('API Response:', result);
 
-      if (result && result.http_code === 200) {
+      if (result && [200, 201].includes(result.http_code)) {
         message.success(msg);
         
         if (isStandalone && onSubmitSuccess) {
@@ -503,44 +561,65 @@ export default function PatientFormPage({
     }
   };
 
-  useEffect(() => {
-    console.log('PatientFormPage useEffect triggered with patientData:', patientData);
+useEffect(() => {
+  console.log('PatientFormPage useEffect triggered with patientData:', patientData);
+
+  if (patientData) {
+    console.log('Setting form values for patient:', patientData);
     
-    if (patientData) {
-      console.log('Setting form values for patient:', patientData);
-      const formValues = {
-        patient_code: patientData.patient_code,
-        name: patientData.name,
-        date_of_birth: parseDateOfBirth(patientData.date_of_birth),
-        gender: patientData.gender,
-        phone: normalizePhoneDigits(patientData.phone),
-        email: patientData.email,
-        height: patientData.height,
-        weight: patientData.weight,
-        address: patientData.address,
-        medical_notes: patientData.medical_notes || '',
-        allergies: patientData.allergies || '',
-      };
-      
-      console.log('Form values to set:', formValues);
-      form.setFieldsValue(formValues);
-      
-      // Calculate initial BMI
-      const initialBMI = calculateBMI(patientData.height, patientData.weight);
-      setBmi(initialBMI);
-      
-      setHasChanges(false);
+    let nationalDigits = patientData.phone || '';
+    let detectedCountry = 'ID';
+    if (patientData.phone && String(patientData.phone).startsWith('+')) {
+      try {
+        const parsed = parsePhoneNumberWithError(patientData.phone);
+        if (parsed) {
+          if (parsed.country) {
+            detectedCountry = parsed.country;
+            setSelectedCountry(parsed.country);
+          }
+          if (parsed.countryCallingCode) setCallingCode(`+${parsed.countryCallingCode}`);
+          nationalDigits = parsed.nationalNumber; 
+        }
+      } catch (e) {
+        nationalDigits = normalizePhoneDigits(patientData.phone, 'ID');
+      }
     } else {
-      console.log('Resetting form for new patient');
-      form.resetFields();
-      setBmi(null);
-      setHasChanges(false);
+      nationalDigits = normalizePhoneDigits(patientData.phone, 'ID');
     }
+
+    const formValues = {
+      patient_code: patientData.patient_code,
+      name: patientData.name,
+      date_of_birth: parseDateOfBirth(patientData.date_of_birth),
+      gender: patientData.gender,
+      phone: nationalDigits, 
+      email: patientData.email,
+      height: patientData.height,
+      weight: patientData.weight,
+      address: patientData.address,
+      medical_notes: patientData.medical_notes || '',
+      allergies: patientData.allergies || '',
+    };
+
+    console.log('Form values to set:', formValues);
+    form.setFieldsValue(formValues);
+
+    const initialBMI = calculateBMI(patientData.height, patientData.weight);
+    setBmi(initialBMI);
+
+    setHasChanges(false);
+  } else {
+    console.log('Resetting form for new patient');
+    form.resetFields();
+    setSelectedCountry('ID');
+    setCallingCode('+62');
     
-    if (disabled) {
-      setFormDisabled(disabled);
-    }
-  }, [patientData, form, disabled, formKey]);
+    setBmi(null);
+    setHasChanges(false);
+  }
+
+  setFormDisabled(Boolean(disabled));
+}, [patientData, form, disabled, formKey]);
 
   return (
     <div style={{ 
@@ -848,49 +927,68 @@ export default function PatientFormPage({
                         </div>
                       )}
 
-                      {/* Phone Number */}
-                      <Form.Item
-                        label={
-                          <span style={{ 
-                            color: '#000000',
-                            fontWeight: 600, 
-                            fontSize: '14px' 
-                          }}>
-                            Phone Number
-                          </span>
-                        }
-                        name="phone"
-                        rules={[
-                          { required: true, message: 'Required!' },
-                          { pattern: /^[0-9]+$/, message: 'Numbers only!' },
-                          { min: 8, message: 'Min 8 digits!' },
-                          { max: 15, message: 'Max 15 digits!' }
-                        ]}
-                        style={{ marginBottom: '10px' }}
-                        className="patient-form-item"
-                      >
-                        <Input 
-                          className="patient-phone-input"
-                          prefix={<span>+62</span>}
-                          inputMode="numeric"
-                          placeholder="81234567890"
-                          maxLength={15}
-                          onChange={(e) => {
-                            form.setFieldsValue({
-                              phone: normalizePhoneDigits(e.target.value)
-                            });
-                          }}
-                          style={{ 
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #d9d9d9',
-                            color: '#000000',
-                            borderRadius: '4px',
-                            padding: '8px 12px',
-                            fontSize: '14px',
-                            height: '34px'
-                          }}
-                        />
-                      </Form.Item>
+                        {/* Phone Number */}
+                        <Form.Item
+                          label={
+                            <span style={{ 
+                              color: '#000000',
+                              fontWeight: 600, 
+                              fontSize: '14px' 
+                            }}>
+                              Phone Number
+                            </span>
+                          }
+                          name="phone"
+                          rules={[
+                            { required: true, message: 'Phone number is required!' },
+                            {
+                              validator: (_, value) => {
+                                if (!value) return Promise.resolve();
+                                const fullNumber = `${callingCode}${value}`;
+
+                                try {
+                                  if (isValidPhoneNumber(fullNumber, selectedCountry)) {
+                                    return Promise.resolve();
+                                  }
+                                  return Promise.reject(
+                                    new Error(`Invalid phone number format for ${selectedCountry}!`)
+                                  );
+                                } catch (error) {
+                                  return Promise.reject(new Error('Invalid phone number!'));
+                                }
+                              }
+                            }
+                          ]}
+                          style={{ marginBottom: '10px' }}
+                          className="patient-form-item"
+                        >
+                          <Input 
+                            addonBefore={countrySelect}
+                            placeholder={selectedCountry === 'ID' ? "81234567890" : "Phone number"}
+                            maxLength={15}
+                            onChange={(e) => {
+                              const rawValue = e.target.value;
+                              setHasChanges(true);
+                              if (rawValue.startsWith('+')) {
+                                try {
+                                  const parsed = parsePhoneNumberWithError(rawValue);
+                                  if (parsed && parsed.country) {
+                                    setSelectedCountry(parsed.country);
+                                    setCallingCode(`+${parsed.countryCallingCode}`);
+                                    form.setFieldsValue({
+                                      phone: parsed.nationalNumber
+                                    });
+                                    return;
+                                  }
+                                } catch (err) {}
+                              }
+                              
+                              form.setFieldsValue({
+                                phone: normalizePhoneDigits(rawValue, selectedCountry)
+                              });
+                            }}
+                          />
+                        </Form.Item>
 
                       {/* Email */}
                       <Form.Item

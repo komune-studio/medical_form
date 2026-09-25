@@ -13,7 +13,8 @@ import {
   TableHead,
   TableRow,
   TableContainer,
-  Paper
+  Paper,
+  Collapse
 } from "@mui/material";
 import Papa from "papaparse";
 import { CSVLink } from "react-csv";
@@ -23,9 +24,12 @@ import ApiRequest from '../../../utils/ApiRequest';
 
 export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
   const [patients, setPatients] = useState([]);
+  const [csvErrorList, setCsvErrorList] = useState([]);
+
   const [errorList, setErrorList] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false); 
+  const [showErrors, setShowErrors] = useState(true);
 
   const formatDateToISO = (dateStr) => {
     if (!dateStr) return null;
@@ -46,76 +50,91 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
     return cleanStr;
   };
 
-  const formatPhoneNumber = (phoneNumber) => {
-    if (!phoneNumber) return "";
-    let phoneString = String(phoneNumber).trim();
-
-    if (phoneString.includes("E") || phoneString.includes("e")) {
-      try {
-        phoneString = Number(phoneString).toFixed(0);
-      } catch (e) {
-        phoneString = phoneString.replace(/[^0-9]/g, "");
-      }
-    }
-
-    const digits = phoneString.replace(/[^0-9]/g, "");
-    if (!digits) return "";
-
-    if (digits.startsWith("08")) {
-      return `+62${digits.slice(1)}`;
-    }
-
-    if (digits.startsWith("628")) {
-      return `+${digits}`;
-    }
+const formatPhoneNumber = (rawPhone) => {
+  if (!rawPhone) return '';
+  let phone = String(rawPhone)
+  .replace(/[\u200B-\u200D\uFEFF]/g, '')
+  .trim()
+  .replace(/[\s\-\(\)]/g, '')
 
 
+  if (phone.startsWith('+620')) {
+    phone = '+62' + phone.slice(4);
+  } else if (phone.startsWith('08')) {
+    phone = `+62${phone.slice(1)}`;
+  } else if (phone.startsWith('+')) {
+    phone = phone;
+  } else if (/^\d+$/.test(phone)) {
+    phone = `+${phone}`;
+  }
+  return phone;
+};
 
-    return phoneString; 
-  };
 
-  const isValidPhoneNumber = (phone) => {
-    if (!phone) return false;
-    const phoneRegex = /^(\+?62|0)8[1-9][0-9]{7,11}$/;
-    return phoneRegex.test(String(phone).trim());
-  };
+const isValidPhoneNumber = (phone) => {
+  if (!phone) return false;
+  const phoneRegex = /^\+[1-9]\d{6,14}$/;
+  return phoneRegex.test(phone);
+};
 
   const reset = () => {
     setPatients([]);
+    setCsvErrorList([]);
     setErrorList([]);
     setSuccessMessage("");
     setIsSubmitted(false);
+    setShowErrors(false);
   };
 
   useEffect(() => {
     reset();
   }, [open]);
 
-
+  //data submittion data 
   const submitData = async () => {
     try {
       setErrorList([]);
       setSuccessMessage("");
+      setShowErrors(false);
 
-      const response = await ApiRequest.set('v1/patient/batch', 'POST', patients);
+      const submittedPatients = patients; 
+      const response = await ApiRequest.set('v1/patient/batch', 'POST', submittedPatients);
 
       if (response) {
         const backendErrors = response.errorList || response.data?.errorList || [];
-        
-        if (backendErrors.length > 0) {
-          const formattedBackendErrors = backendErrors.map((err) => ({
-            data: {
-              fullname: err.data?.fullname || err.fullname || err.patient_code || err.name || 'Patient'
-            },
-            error_message: err.error_message || err.message || String(err)
-          }));
-          setErrorList(formattedBackendErrors);
-        }
+        const successfulPatients = response.successfulPatients || response.data?.successfulPatients || [];
+
+        const formattedBackendErrors = backendErrors.map((err) => ({
+          data: {
+            fullname: err.data?.fullname || err.fullname || err.patient_code || err.name || 'Patient'
+          },
+          error_message: err.error_message || err.message || String(err)
+        }));
+        setErrorList(formattedBackendErrors);
+
+        // preview table and field mapping
+        const savedForDisplay = successfulPatients.map((sp) => ({
+          patient_code: sp.patient_code,
+          fullname: sp.name,
+          dob: sp.date_of_birth ? String(sp.date_of_birth).split('T')[0] : '',
+          gender: sp.gender,
+          phone_number: sp.phone,
+          email: sp.email,
+          address: sp.address,
+          allergies: sp.allergies,
+          medical_notes: sp.medical_notes,
+        }));
+
+        // Post-submit
+        setPatients(savedForDisplay);
 
         const failedCount = backendErrors.length;
-        const successCount = response.insertedCount ?? (patients.length - failedCount);
+        const successCount = response.insertedCount ?? successfulPatients.length;
 
-        setSuccessMessage(`Successfully processed ${successCount}/${patients.length} data`);
+        setSuccessMessage(
+          `Successfully saved ${successCount}/${submittedPatients.length} data` +
+          (failedCount > 0 ? ` — ${failedCount} gagal, lihat detail di bawah.` : '')
+        );
 
         if (onSuccess) onSuccess();
         setIsSubmitted(true);
@@ -126,6 +145,7 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
     }
   };
 
+  //send to backend
   const handleFileUpload = async (result) => {
     reset();
 
@@ -146,12 +166,12 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
       let unFormattedData = parseResult.data;
 
       if (unFormattedData.length > 5000) {
-        setErrorList([{ error_message: "Maximum upload limit is 5000 data" }]);
+        setCsvErrorList([{ error_message: "Maximum upload limit is 5000 data" }]);
         return;
       }
 
       const validGenders = ["MALE", "FEMALE"];
-
+      //email validation
       const isValidEmail = (email) => {
         if (!email) return false;
         const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -159,17 +179,23 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
       };
       
       let errors = [];
-      let seenPhones = new Set();
-      let seenEmails = new Set();
 
+      // Duplicate checks (against DB and within this file) 
       let formattedData = [];
 
       unFormattedData.forEach((obj, index) => {
+        const patientCode = (
+          obj['Patient Code'] || 
+          obj.patient_code || 
+          obj['Patient ID'] || 
+          obj.patient_id || 
+          ''
+        ).trim();
+
         const fullname = (obj['Full Name'] || obj.fullname || '').trim();
         const rawGender = (obj['Gender'] || obj.gender || '').trim().toUpperCase();
-        const phone = formatPhoneNumber(obj['Phone Number'] || obj.phone_number || '');
+        const phone = formatPhoneNumber(obj['Phone Number'] || obj.phone_number || obj.phone || '');
         const email = (obj['Email'] || obj.email || '').trim(); 
-        const lowerEmail = email.toLowerCase(); 
         
         const allergies = (obj['Allergies'] || obj.allergies || '').trim();
         const medicalNotes = (obj['Medical Notes'] || obj.medical_notes || obj.medicalNotes || '').trim();
@@ -185,9 +211,9 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
         if (!phone) {
           rowErrors.push("Phone Number tidak boleh kosong");
         } else if (!isValidPhoneNumber(phone)) {
-          rowErrors.push(`Phone Number '${phone}' tidak valid (harus diawali '08' & 10-14 digit)`);
+          rowErrors.push(`Phone Number '${phone}' tidak valid (gunakan format internasional E.164, misal: +62812..., +86139..., +1212...)`);
         }
-        
+                
         if (!email) {
           rowErrors.push("Email tidak boleh kosong");
         } else if (!isValidEmail(email)) {
@@ -198,19 +224,26 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
           rowErrors.push(`Gender '${obj['Gender'] || 'KOSONG'}' tidak valid (harus MALE/FEMALE)`);
         }
 
-        // Check duplicates within the CSV.
-        if (phone && seenPhones.has(phone)) {
-          rowErrors.push(`Phone Number '${phone}' duplikat di dalam file CSV`);
-        } else if (phone) {
-          seenPhones.add(phone);
-        }
+        const parseNumber = (val) => {
+          if (val === null || val === undefined || val === "") return null;
+          const num = Number(String(val).replace(",", "."));
+          return isNaN(num) ? null : num;
+        };
 
-        if (lowerEmail && seenEmails.has(lowerEmail)) {
-          rowErrors.push(`Email '${email}' duplikat di dalam file CSV`);
-        } else if (lowerEmail) {
-          seenEmails.add(lowerEmail);
-        }
+        const csvRowForCompare = {
+          fullname,
+          gender: rawGender,
+          dob: formattedDob,
+          phone_number: phone,
+          email: email || null,
+          address: obj['Address'] || obj.address || null,
+          allergies: allergies || null,
+          medical_notes: medicalNotes || null,
+          height: parseNumber(obj['Height (cm)'] || obj['Height'] || obj.height),
+          weight: parseNumber(obj['Weight (kg)'] || obj['Weight'] || obj.weight),
+        };
 
+        // Error Handling
         if (rowErrors.length > 0) {
           errors.push({
             data: { fullname: fullname || `Baris ${index + 1}` },
@@ -219,27 +252,45 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
           return; 
         }
 
-        const parseNumber = (val) => {
-          if (val === null || val === undefined || val === "") return null;
-          const num = Number(String(val).replace(",", "."));
-          return isNaN(num) ? null : num;
-        };
-
         formattedData.push({
-          fullname: fullname,
-          dob: formattedDob,
-          gender: rawGender,
-          height: parseNumber(obj['Height (cm)'] || obj['Height'] || obj.height),
-          weight: parseNumber(obj['Weight (kg)'] || obj['Weight'] || obj.weight),
-          phone_number: phone,
-          email: email || null,
-          address: obj['Address'] || obj.address || null,
-          allergies: allergies || null,
-          medical_notes: medicalNotes || null,
+          patient_code: patientCode || null,
+          ...csvRowForCompare,
+          status: "new",
+          csvRowNumber: index + 1 // <-- Simpan nomor baris asli CSV
         });
       });
 
-      setErrorList(errors);
+      // Ask the backend to check duplicates 
+      try {
+        const previewRes = await ApiRequest.set('v1/patient/batch/preview', 'POST', formattedData);
+        const results = previewRes.results || previewRes.data?.results || [];
+
+        const errorIndexes = new Set();
+        results.forEach((r) => {
+          if (!formattedData[r.index]) return;
+          const originalRow = formattedData[r.index].csvRowNumber || (r.index + 1);
+          if (r.status === 'error') {
+            errorIndexes.add(r.index);
+            const rowLabel = formattedData[r.index].fullname || `Baris ${originalRow}`;
+            (r.errors && r.errors.length ? r.errors : ['Data tidak valid']).forEach((msg) => {
+              errors.push({
+                data: { fullname: rowLabel },
+                error_message: `Baris ${originalRow}: ${msg}`
+              });
+            });
+          } else {
+            formattedData[r.index].status = r.status;
+          }
+        });
+
+        if (errorIndexes.size > 0) {
+          formattedData = formattedData.filter((_, i) => !errorIndexes.has(i));
+        }
+      } catch (previewErr) {
+        console.error("Error previewing import:", previewErr); // Don't block the import over a failed preview
+      }
+
+      setCsvErrorList(errors);
       setPatients(formattedData);
     };
   };
@@ -279,7 +330,7 @@ export default function BatchAddPatientModal({ open, onClose, onSuccess }) {
               data={
                 `Full Name;Date of Birth;Gender;Height (cm);Weight (kg);Phone Number;Email;Address;Allergies;Medical Notes
 John Doe;20/02/2002;MALE;170;60;\u200B+6281215469420;johnDoe@gmail.com;102 High Street, London, SW1A 1AA ;Seafood;rash 
-Jane Doe;10/01/2001;FEMALE;167;55;\u200B+6281215412345;janeDoe@gmail.com;123 Main St Apt 4B New York, IL 62701, USA ;Peanut;itching`
+Jane Doe;10/01/2001;FEMALE;167;55;\u200B+13105550143 ;janeDoe@gmail.com;123 Main St Apt 4B New York, IL 62701, USA ;Peanut;itching`
               }
               filename={`upload-patient-template.csv`}
               style={{ textDecoration: "none" }}
@@ -317,15 +368,66 @@ Jane Doe;10/01/2001;FEMALE;167;55;\u200B+6281215412345;janeDoe@gmail.com;123 Mai
             <div style={{ marginTop: 8, color: "#16a34a", fontWeight: 600, fontSize: 14 }}>{successMessage}</div>
           )}
 
-          {errorList.map((obj, idx) => (
-            <div key={idx} style={{ color: "#dc2626", fontSize: 14 }}>
-              Fail to process patient <b>{obj.data?.fullname || ''}</b>: {obj.error_message}
+          {(csvErrorList.length > 0 || errorList.length > 0) && (
+            <div
+              style={{
+                border: '1px solid #fecaca',
+                background: '#fef2f2',
+                borderRadius: 8,
+                padding: '10px 12px',
+                maxHeight: 200,
+                overflowY: 'auto',
+              }}
+            >
+              <div 
+                onClick={() => setShowErrors(!showErrors)}
+                style={{ 
+                  fontWeight: 700, 
+                  fontSize: 13, 
+                  color: "#991b1b", 
+                  display: "flex", 
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer" 
+                }}
+              >
+                <span>{csvErrorList.length + errorList.length} data gagal diproses:</span>
+                <Iconify icon={showErrors ? "mdi:chevron-up" : "mdi:chevron-down"} />
+              </div>
+
+              {/* Collapse error section */}
+              <Collapse in={showErrors}>
+                <div style={{ marginTop: 8, maxHeight: 200, overflowY: 'auto' }}>
+                  {csvErrorList.map((obj, idx) => (
+                    <div key={`csv-${idx}`} style={{ color: "#dc2626", fontSize: 13, marginBottom: 4 }}>
+                      Fail to process patient <b>{obj.data?.fullname || ''}</b>: {obj.error_message}
+                    </div>
+                  ))}
+
+                  {errorList.map((obj, idx) => (
+                    <div key={`api-${idx}`} style={{ color: "#dc2626", fontSize: 13, marginBottom: 4 }}>
+                      Fail to save patient <b>{obj.data?.fullname || ''}</b>: {obj.error_message}
+                    </div>
+                  ))}
+                </div>
+              </Collapse>
             </div>
-          ))}
+          )}
 
           {/* Tabel Preview */}
+          {isSubmitted && patients.length === 0 && (
+            <div style={{ fontSize: 13, color: "#666", fontStyle: 'italic' }}>
+              Tidak ada data yang berhasil disimpan.
+            </div>
+          )}
+
           {patients.length > 0 && (
             <>
+              {isSubmitted && (
+                <div style={{ fontWeight: 600, fontSize: 13, color: "#166534" }}>
+                  Data berhasil disimpan:
+                </div>
+              )}
               <TableContainer 
                 component={Paper} 
                 variant="outlined" 
@@ -348,7 +450,51 @@ Jane Doe;10/01/2001;FEMALE;167;55;\u200B+6281215412345;janeDoe@gmail.com;123 Mai
                   <TableBody>
                     {patients.map((row, idx) => (
                       <TableRow key={idx} hover>
-                        <TableCell sx={{ whiteSpace: 'nowrap' }}>{idx + 1}</TableCell>
+                        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span>{idx + 1}</span>
+                            
+                            {row?.status === 'new' && (
+                              <span 
+                                title="Data Baru"
+                                style={{ 
+                                  width: '8px', 
+                                  height: '8px', 
+                                  borderRadius: '50%', 
+                                  backgroundColor: '#16a34a',
+                                  display: 'inline-block' 
+                                }} 
+                              />
+                            )}
+                            {row?.status === 'edited' && (
+                              <span 
+                                title="Data Di-edit"
+                                style={{ 
+                                  width: '8px', 
+                                  height: '8px', 
+                                  borderRadius: '50%', 
+                                  backgroundColor: '#eab308', 
+                                  display: 'inline-block' 
+                                }} 
+                              />
+                            )}
+                            {/* Grey unchanged dot disabled for now */}
+                            {/* {row?.status === 'unchanged' && (
+                              <span 
+                                title="Tidak Ada Perubahan"
+                                style={{ 
+                                  width: '8px', 
+                                  height: '8px', 
+                                  borderRadius: '50%', 
+                                  backgroundColor: '#9ca3af', // Abu-abu
+                                  display: 'inline-block' 
+                                }} 
+                              />
+                            )} */}
+                          </div>
+                        </TableCell>
+
+                        {/* Kolom lainnya tetap sama */}
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{row?.fullname}</TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{row?.dob}</TableCell>
                         <TableCell sx={{ whiteSpace: 'nowrap' }}>{row?.gender}</TableCell>
@@ -362,43 +508,45 @@ Jane Doe;10/01/2001;FEMALE;167;55;\u200B+6281215412345;janeDoe@gmail.com;123 Mai
                   </TableBody>
                 </Table>
               </TableContainer>
-
-              {/* Action Buttons: Save vs Done */}
-              <Stack direction={"row"} justifyContent="flex-end" sx={{ mt: 1 }}>
-                {!isSubmitted ? (
-                  <Button 
-                    onClick={submitData} 
-                    sx={{ 
-                      backgroundColor: "#16a34a",            
-                      color: "#ffffff !important",          
-                      textTransform: "none",
-                      fontWeight: 600,
-                      px: 3,
-                      "&:hover": { backgroundColor: "#15803d" }
-                    }}
-                  >
-                    Save Patients
-                  </Button>
-                ) : (
-                  <Button 
-                    onClick={() => {
-                      if (onSuccess) onSuccess();
-                      onClose(false);
-                    }} 
-                    sx={{ 
-                      backgroundColor: "#2563eb",            
-                      color: "#ffffff !important",          
-                      textTransform: "none",
-                      fontWeight: 600,
-                      px: 4,
-                      "&:hover": { backgroundColor: "#1d4ed8" }
-                    }}
-                  >
-                    Done
-                  </Button>
-                )}
-              </Stack>
             </>
+          )}
+
+          {/* Action Buttons: Save vs Done */}
+          {(patients.length > 0 || isSubmitted) && (
+            <Stack direction={"row"} justifyContent="flex-end" sx={{ mt: 1 }}>
+              {!isSubmitted ? (
+                <Button 
+                  onClick={submitData} 
+                  sx={{ 
+                    backgroundColor: "#16a34a",            
+                    color: "#ffffff !important",          
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 3,
+                    "&:hover": { backgroundColor: "#15803d" }
+                  }}
+                >
+                  Save Patients
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => {
+                    if (onSuccess) onSuccess();
+                    onClose(false);
+                  }} 
+                  sx={{ 
+                    backgroundColor: "#2563eb",            
+                    color: "#ffffff !important",          
+                    textTransform: "none",
+                    fontWeight: 600,
+                    px: 4,
+                    "&:hover": { backgroundColor: "#1d4ed8" }
+                  }}
+                >
+                  Done
+                </Button>
+              )}
+            </Stack>
           )}
         </Stack>
       </DialogContent>
