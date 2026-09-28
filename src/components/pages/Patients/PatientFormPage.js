@@ -23,6 +23,7 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { parsePhoneNumberWithError, isValidPhoneNumber } from 'libphonenumber-js';
 import countries from '../../../countries.json';
+// const countriesData = countries;
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -69,6 +70,39 @@ const formatPhoneNumber = (value = '', currentCallingCode = '+62', countryCode =
   }
   const digits = normalizePhoneDigits(value, countryCode);
   return digits ? `${currentCallingCode}${digits}` : '';
+};
+
+const validatePhoneNumber = (value = '', selectedCountry = 'ID', currentCallingCode = '+62') => {
+  if (!value || !String(value).trim()) {
+    return Promise.resolve();
+  }
+
+  const trimmedValue = String(value).trim();
+
+  try {
+    let candidate = trimmedValue;
+    if (!candidate.startsWith('+')) {
+      candidate = `${currentCallingCode}${candidate}`;
+    }
+
+    const parsed = parsePhoneNumberWithError(candidate);
+
+    if (!parsed || !parsed.isValid()) {
+      return Promise.reject(new Error(`Invalid phone number format for ${selectedCountry}!`));
+    }
+
+    if (parsed.country && parsed.country !== selectedCountry) {
+      return Promise.reject(new Error(`This phone number does not match ${selectedCountry}.`));
+    }
+
+    if (!isValidPhoneNumber(candidate, selectedCountry)) {
+      return Promise.reject(new Error(`Invalid phone number format for ${selectedCountry}!`));
+    }
+    return Promise.resolve();
+
+  } catch (error) {
+    return Promise.reject(new Error('Invalid phone number!'));
+  }
 };
 
 const parseDateOfBirth = (value) => {
@@ -337,6 +371,10 @@ export default function PatientFormPage({
 
   const [selectedCountry, setSelectedCountry] = useState('ID');
   const [callingCode, setCallingCode] = useState('+62');
+
+  const currentCountry = countries.find((item) => item.cca2 === selectedCountry);
+  const phonePlaceholder = currentCountry?.example || "Phone number";
+
 
 const countrySelect = (
   <Select
@@ -942,21 +980,7 @@ useEffect(() => {
                           rules={[
                             { required: true, message: 'Phone number is required!' },
                             {
-                              validator: (_, value) => {
-                                if (!value) return Promise.resolve();
-                                const fullNumber = `${callingCode}${value}`;
-
-                                try {
-                                  if (isValidPhoneNumber(fullNumber, selectedCountry)) {
-                                    return Promise.resolve();
-                                  }
-                                  return Promise.reject(
-                                    new Error(`Invalid phone number format for ${selectedCountry}!`)
-                                  );
-                                } catch (error) {
-                                  return Promise.reject(new Error('Invalid phone number!'));
-                                }
-                              }
+                              validator: (_, value) => validatePhoneNumber(value, selectedCountry, callingCode)
                             }
                           ]}
                           style={{ marginBottom: '10px' }}
@@ -964,15 +988,20 @@ useEffect(() => {
                         >
                           <Input 
                             addonBefore={countrySelect}
-                            placeholder={selectedCountry === 'ID' ? "81234567890" : "Phone number"}
+                            placeholder={phonePlaceholder}
                             maxLength={15}
                             onChange={(e) => {
                               const rawValue = e.target.value;
                               setHasChanges(true);
+
                               if (rawValue.startsWith('+')) {
                                 try {
                                   const parsed = parsePhoneNumberWithError(rawValue);
                                   if (parsed && parsed.country) {
+                                    if (parsed.country !== selectedCountry) {
+                                      return;
+                                    }
+
                                     setSelectedCountry(parsed.country);
                                     setCallingCode(`+${parsed.countryCallingCode}`);
                                     form.setFieldsValue({
@@ -981,6 +1010,10 @@ useEffect(() => {
                                     return;
                                   }
                                 } catch (err) {}
+                              }
+
+                              if (rawValue.startsWith('+')) {
+                                return;
                               }
                               
                               form.setFieldsValue({

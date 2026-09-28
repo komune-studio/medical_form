@@ -256,7 +256,7 @@ const isValidPhoneNumber = (phone) => {
           patient_code: patientCode || null,
           ...csvRowForCompare,
           status: "new",
-          csvRowNumber: index + 1 // <-- Simpan nomor baris asli CSV
+          csvRowNumber: index + 1 // Simpan nomor baris asli CSV
         });
       });
 

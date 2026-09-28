@@ -4,1707 +4,1951 @@
     "name": "Afghanistan",
     "cca2": "AF",
     "flag": "🇦🇫",
-    "label": "🇦🇫 | AF | +93"
+    "label": "🇦🇫 | AF | +93",
+    "example": "0701234567"
   },
   {
     "code": "+358",
     "name": "Åland Islands",
     "cca2": "AX",
     "flag": "🇦🇽",
-    "label": "🇦🇽 | AX | +358"
+    "label": "🇦🇽 | AX | +358",
+    "example": "0412345678"
   },
   {
     "code": "+355",
     "name": "Albania",
     "cca2": "AL",
     "flag": "🇦🇱",
-    "label": "🇦🇱 | AL | +355"
+    "label": "🇦🇱 | AL | +355",
+    "example": "0672123456"
   },
   {
     "code": "+213",
     "name": "Algeria",
     "cca2": "DZ",
     "flag": "🇩🇿",
-    "label": "🇩🇿 | DZ | +213"
+    "label": "🇩🇿 | DZ | +213",
+    "example": "0551234567"
   },
   {
     "code": "+1",
     "name": "American Samoa",
     "cca2": "AS",
     "flag": "🇦🇸",
-    "label": "🇦🇸 | AS | +1"
+    "label": "🇦🇸 | AS | +1",
+    "example": "6847331234"
   },
   {
     "code": "+376",
     "name": "Andorra",
     "cca2": "AD",
     "flag": "🇦🇩",
-    "label": "🇦🇩 | AD | +376"
+    "label": "🇦🇩 | AD | +376",
+    "example": "312345"
   },
   {
     "code": "+244",
     "name": "Angola",
     "cca2": "AO",
     "flag": "🇦🇴",
-    "label": "🇦🇴 | AO | +244"
+    "label": "🇦🇴 | AO | +244",
+    "example": "923123456"
   },
   {
     "code": "+1",
     "name": "Anguilla",
     "cca2": "AI",
     "flag": "🇦🇮",
-    "label": "🇦🇮 | AI | +1"
+    "label": "🇦🇮 | AI | +1",
+    "example": "2642351234"
   },
   {
     "code": "+1",
     "name": "Antigua and Barbuda",
     "cca2": "AG",
     "flag": "🇦🇬",
-    "label": "🇦🇬 | AG | +1"
+    "label": "🇦🇬 | AG | +1",
+    "example": "2684641234"
   },
   {
     "code": "+54",
     "name": "Argentina",
     "cca2": "AR",
     "flag": "🇦🇷",
-    "label": "🇦🇷 | AR | +54"
+    "label": "🇦🇷 | AR | +54",
+    "example": "0111523456789"
   },
   {
     "code": "+374",
     "name": "Armenia",
     "cca2": "AM",
     "flag": "🇦🇲",
-    "label": "🇦🇲 | AM | +374"
+    "label": "🇦🇲 | AM | +374",
+    "example": "077123456"
   },
   {
     "code": "+297",
     "name": "Aruba",
     "cca2": "AW",
     "flag": "🇦🇼",
-    "label": "🇦🇼 | AW | +297"
+    "label": "🇦🇼 | AW | +297",
+    "example": "5601234"
   },
   {
     "code": "+61",
     "name": "Australia",
     "cca2": "AU",
     "flag": "🇦🇺",
-    "label": "🇦🇺 | AU | +61"
+    "label": "🇦🇺 | AU | +61",
+    "example": "0412345678"
   },
   {
     "code": "+43",
     "name": "Austria",
     "cca2": "AT",
     "flag": "🇦🇹",
-    "label": "🇦🇹 | AT | +43"
+    "label": "🇦🇹 | AT | +43",
+    "example": "0664123456"
   },
   {
     "code": "+994",
     "name": "Azerbaijan",
     "cca2": "AZ",
     "flag": "🇦🇿",
-    "label": "🇦🇿 | AZ | +994"
+    "label": "🇦🇿 | AZ | +994",
+    "example": "0401234567"
   },
   {
     "code": "+1",
     "name": "Bahamas",
     "cca2": "BS",
     "flag": "🇧🇸",
-    "label": "🇧🇸 | BS | +1"
+    "label": "🇧🇸 | BS | +1",
+    "example": "2423591234"
   },
   {
     "code": "+973",
     "name": "Bahrain",
     "cca2": "BH",
     "flag": "🇧🇭",
-    "label": "🇧🇭 | BH | +973"
+    "label": "🇧🇭 | BH | +973",
+    "example": "36001234"
   },
   {
     "code": "+880",
     "name": "Bangladesh",
     "cca2": "BD",
     "flag": "🇧🇩",
-    "label": "🇧🇩 | BD | +880"
+    "label": "🇧🇩 | BD | +880",
+    "example": "01812345678"
   },
   {
     "code": "+1",
     "name": "Barbados",
     "cca2": "BB",
     "flag": "🇧🇧",
-    "label": "🇧🇧 | BB | +1"
+    "label": "🇧🇧 | BB | +1",
+    "example": "2462501234"
   },
   {
     "code": "+375",
     "name": "Belarus",
     "cca2": "BY",
     "flag": "🇧🇾",
-    "label": "🇧🇾 | BY | +375"
+    "label": "🇧🇾 | BY | +375",
+    "example": "80294911911"
   },
   {
     "code": "+32",
     "name": "Belgium",
     "cca2": "BE",
     "flag": "🇧🇪",
-    "label": "🇧🇪 | BE | +32"
+    "label": "🇧🇪 | BE | +32",
+    "example": "0450001234"
   },
   {
     "code": "+501",
     "name": "Belize",
     "cca2": "BZ",
     "flag": "🇧🇿",
-    "label": "🇧🇿 | BZ | +501"
+    "label": "🇧🇿 | BZ | +501",
+    "example": "6221234"
   },
   {
     "code": "+229",
     "name": "Benin",
     "cca2": "BJ",
     "flag": "🇧🇯",
-    "label": "🇧🇯 | BJ | +229"
+    "label": "🇧🇯 | BJ | +229",
+    "example": "0195123456"
   },
   {
     "code": "+1",
     "name": "Bermuda",
     "cca2": "BM",
     "flag": "🇧🇲",
-    "label": "🇧🇲 | BM | +1"
+    "label": "🇧🇲 | BM | +1",
+    "example": "4413701234"
   },
   {
     "code": "+975",
     "name": "Bhutan",
     "cca2": "BT",
     "flag": "🇧🇹",
-    "label": "🇧🇹 | BT | +975"
+    "label": "🇧🇹 | BT | +975",
+    "example": "17123456"
   },
   {
     "code": "+591",
     "name": "Bolivia",
     "cca2": "BO",
     "flag": "🇧🇴",
-    "label": "🇧🇴 | BO | +591"
+    "label": "🇧🇴 | BO | +591",
+    "example": "71234567"
   },
   {
     "code": "+387",
     "name": "Bosnia and Herzegovina",
     "cca2": "BA",
     "flag": "🇧🇦",
-    "label": "🇧🇦 | BA | +387"
+    "label": "🇧🇦 | BA | +387",
+    "example": "061123456"
   },
   {
     "code": "+267",
     "name": "Botswana",
     "cca2": "BW",
     "flag": "🇧🇼",
-    "label": "🇧🇼 | BW | +267"
+    "label": "🇧🇼 | BW | +267",
+    "example": "71123456"
   },
   {
     "code": "+55",
     "name": "Brazil",
     "cca2": "BR",
     "flag": "🇧🇷",
-    "label": "🇧🇷 | BR | +55"
+    "label": "🇧🇷 | BR | +55",
+    "example": "11961234567"
   },
   {
     "code": "+246",
     "name": "British Indian Ocean Territory",
     "cca2": "IO",
     "flag": "🇮🇴",
-    "label": "🇮🇴 | IO | +246"
+    "label": "🇮🇴 | IO | +246",
+    "example": "3801234"
   },
   {
     "code": "+1",
     "name": "British Virgin Islands",
     "cca2": "VG",
     "flag": "🇻🇬",
-    "label": "🇻🇬 | VG | +1"
+    "label": "🇻🇬 | VG | +1",
+    "example": "2843001234"
   },
   {
     "code": "+673",
     "name": "Brunei",
     "cca2": "BN",
     "flag": "🇧🇳",
-    "label": "🇧🇳 | BN | +673"
+    "label": "🇧🇳 | BN | +673",
+    "example": "7123456"
   },
   {
     "code": "+359",
     "name": "Bulgaria",
     "cca2": "BG",
     "flag": "🇧🇬",
-    "label": "🇧🇬 | BG | +359"
+    "label": "🇧🇬 | BG | +359",
+    "example": "043012345"
   },
   {
     "code": "+226",
     "name": "Burkina Faso",
     "cca2": "BF",
     "flag": "🇧🇫",
-    "label": "🇧🇫 | BF | +226"
+    "label": "🇧🇫 | BF | +226",
+    "example": "70123456"
   },
   {
     "code": "+257",
     "name": "Burundi",
     "cca2": "BI",
     "flag": "🇧🇮",
-    "label": "🇧🇮 | BI | +257"
+    "label": "🇧🇮 | BI | +257",
+    "example": "79561234"
   },
   {
     "code": "+855",
     "name": "Cambodia",
     "cca2": "KH",
     "flag": "🇰🇭",
-    "label": "🇰🇭 | KH | +855"
+    "label": "🇰🇭 | KH | +855",
+    "example": "091234567"
   },
   {
     "code": "+237",
     "name": "Cameroon",
     "cca2": "CM",
     "flag": "🇨🇲",
-    "label": "🇨🇲 | CM | +237"
+    "label": "🇨🇲 | CM | +237",
+    "example": "671234567"
   },
   {
     "code": "+1",
     "name": "Canada",
     "cca2": "CA",
     "flag": "🇨🇦",
-    "label": "🇨🇦 | CA | +1"
+    "label": "🇨🇦 | CA | +1",
+    "example": "5062345678"
   },
   {
     "code": "+238",
     "name": "Cape Verde",
     "cca2": "CV",
     "flag": "🇨🇻",
-    "label": "🇨🇻 | CV | +238"
+    "label": "🇨🇻 | CV | +238",
+    "example": "9911234"
   },
   {
     "code": "+1",
     "name": "Caribbean Netherlands",
     "cca2": "BQ",
     "flag": "🇧🇶",
-    "label": "🇧🇶 | BQ | +1"
+    "label": "🇧🇶 | BQ | +1",
+    "example": "3181234"
   },
   {
     "code": "+1",
     "name": "Cayman Islands",
     "cca2": "KY",
     "flag": "🇰🇾",
-    "label": "🇰🇾 | KY | +1"
+    "label": "🇰🇾 | KY | +1",
+    "example": "3453231234"
   },
   {
     "code": "+236",
     "name": "Central African Republic",
     "cca2": "CF",
     "flag": "🇨🇫",
-    "label": "🇨🇫 | CF | +236"
+    "label": "🇨🇫 | CF | +236",
+    "example": "70012345"
   },
   {
     "code": "+235",
     "name": "Chad",
     "cca2": "TD",
     "flag": "🇹🇩",
-    "label": "🇹🇩 | TD | +235"
+    "label": "🇹🇩 | TD | +235",
+    "example": "63012345"
   },
   {
     "code": "+56",
     "name": "Chile",
     "cca2": "CL",
     "flag": "🇨🇱",
-    "label": "🇨🇱 | CL | +56"
+    "label": "🇨🇱 | CL | +56",
+    "example": "221234567"
   },
   {
     "code": "+86",
     "name": "China",
     "cca2": "CN",
     "flag": "🇨🇳",
-    "label": "🇨🇳 | CN | +86"
+    "label": "🇨🇳 | CN | +86",
+    "example": "13123456789"
   },
   {
     "code": "+61",
     "name": "Christmas Island",
     "cca2": "CX",
     "flag": "🇨🇽",
-    "label": "🇨🇽 | CX | +61"
+    "label": "🇨🇽 | CX | +61",
+    "example": "0412345678"
   },
   {
     "code": "+61",
     "name": "Cocos (Keeling) Islands",
     "cca2": "CC",
     "flag": "🇨🇨",
-    "label": "🇨🇨 | CC | +61"
+    "label": "🇨🇨 | CC | +61",
+    "example": "0412345678"
   },
   {
     "code": "+57",
     "name": "Colombia",
     "cca2": "CO",
     "flag": "🇨🇴",
-    "label": "🇨🇴 | CO | +57"
+    "label": "🇨🇴 | CO | +57",
+    "example": "3211234567"
   },
   {
     "code": "+269",
     "name": "Comoros",
     "cca2": "KM",
     "flag": "🇰🇲",
-    "label": "🇰🇲 | KM | +269"
+    "label": "🇰🇲 | KM | +269",
+    "example": "3212345"
   },
   {
     "code": "+682",
     "name": "Cook Islands",
     "cca2": "CK",
     "flag": "🇨🇰",
-    "label": "🇨🇰 | CK | +682"
+    "label": "🇨🇰 | CK | +682",
+    "example": "71234"
   },
   {
     "code": "+506",
     "name": "Costa Rica",
     "cca2": "CR",
     "flag": "🇨🇷",
-    "label": "🇨🇷 | CR | +506"
+    "label": "🇨🇷 | CR | +506",
+    "example": "83123456"
   },
   {
     "code": "+385",
     "name": "Croatia",
     "cca2": "HR",
     "flag": "🇭🇷",
-    "label": "🇭🇷 | HR | +385"
+    "label": "🇭🇷 | HR | +385",
+    "example": "0921234567"
   },
   {
     "code": "+53",
     "name": "Cuba",
     "cca2": "CU",
     "flag": "🇨🇺",
-    "label": "🇨🇺 | CU | +53"
+    "label": "🇨🇺 | CU | +53",
+    "example": "051234567"
   },
   {
     "code": "+599",
     "name": "Curaçao",
     "cca2": "CW",
     "flag": "🇨🇼",
-    "label": "🇨🇼 | CW | +599"
+    "label": "🇨🇼 | CW | +599",
+    "example": "95181234"
   },
   {
     "code": "+357",
     "name": "Cyprus",
     "cca2": "CY",
     "flag": "🇨🇾",
-    "label": "🇨🇾 | CY | +357"
+    "label": "🇨🇾 | CY | +357",
+    "example": "96123456"
   },
   {
     "code": "+420",
     "name": "Czech Republic",
     "cca2": "CZ",
     "flag": "🇨🇿",
-    "label": "🇨🇿 | CZ | +420"
+    "label": "🇨🇿 | CZ | +420",
+    "example": "601123456"
   },
   {
     "code": "+243",
     "name": "DR Congo",
     "cca2": "CD",
     "flag": "🇨🇩",
-    "label": "🇨🇩 | CD | +243"
+    "label": "🇨🇩 | CD | +243",
+    "example": "0991234567"
   },
   {
     "code": "+45",
     "name": "Denmark",
     "cca2": "DK",
     "flag": "🇩🇰",
-    "label": "🇩🇰 | DK | +45"
+    "label": "🇩🇰 | DK | +45",
+    "example": "34412345"
   },
   {
     "code": "+253",
     "name": "Djibouti",
     "cca2": "DJ",
     "flag": "🇩🇯",
-    "label": "🇩🇯 | DJ | +253"
+    "label": "🇩🇯 | DJ | +253",
+    "example": "77831001"
   },
   {
     "code": "+1",
     "name": "Dominica",
     "cca2": "DM",
     "flag": "🇩🇲",
-    "label": "🇩🇲 | DM | +1"
+    "label": "🇩🇲 | DM | +1",
+    "example": "7672251234"
   },
   {
     "code": "+1",
     "name": "Dominican Republic",
     "cca2": "DO",
     "flag": "🇩🇴",
-    "label": "🇩🇴 | DO | +1"
+    "label": "🇩🇴 | DO | +1",
+    "example": "8092345678"
   },
   {
     "code": "+593",
     "name": "Ecuador",
     "cca2": "EC",
     "flag": "🇪🇨",
-    "label": "🇪🇨 | EC | +593"
+    "label": "🇪🇨 | EC | +593",
+    "example": "0991234567"
   },
   {
     "code": "+20",
     "name": "Egypt",
     "cca2": "EG",
     "flag": "🇪🇬",
-    "label": "🇪🇬 | EG | +20"
+    "label": "🇪🇬 | EG | +20",
+    "example": "01001234567"
   },
   {
     "code": "+503",
     "name": "El Salvador",
     "cca2": "SV",
     "flag": "🇸🇻",
-    "label": "🇸🇻 | SV | +503"
+    "label": "🇸🇻 | SV | +503",
+    "example": "70123456"
   },
   {
     "code": "+240",
     "name": "Equatorial Guinea",
     "cca2": "GQ",
     "flag": "🇬🇶",
-    "label": "🇬🇶 | GQ | +240"
+    "label": "🇬🇶 | GQ | +240",
+    "example": "222123456"
   },
   {
     "code": "+291",
     "name": "Eritrea",
     "cca2": "ER",
     "flag": "🇪🇷",
-    "label": "🇪🇷 | ER | +291"
+    "label": "🇪🇷 | ER | +291",
+    "example": "07123456"
   },
   {
     "code": "+372",
     "name": "Estonia",
     "cca2": "EE",
     "flag": "🇪🇪",
-    "label": "🇪🇪 | EE | +372"
+    "label": "🇪🇪 | EE | +372",
+    "example": "51234567"
   },
   {
     "code": "+268",
     "name": "Eswatini",
     "cca2": "SZ",
     "flag": "🇸🇿",
-    "label": "🇸🇿 | SZ | +268"
+    "label": "🇸🇿 | SZ | +268",
+    "example": "76123456"
   },
   {
     "code": "+251",
     "name": "Ethiopia",
     "cca2": "ET",
     "flag": "🇪🇹",
-    "label": "🇪🇹 | ET | +251"
+    "label": "🇪🇹 | ET | +251",
+    "example": "0911234567"
   },
   {
     "code": "+500",
     "name": "Falkland Islands",
     "cca2": "FK",
     "flag": "🇫🇰",
-    "label": "🇫🇰 | FK | +500"
+    "label": "🇫🇰 | FK | +500",
+    "example": "51234"
   },
   {
     "code": "+298",
     "name": "Faroe Islands",
     "cca2": "FO",
     "flag": "🇫🇴",
-    "label": "🇫🇴 | FO | +298"
+    "label": "🇫🇴 | FO | +298",
+    "example": "211234"
   },
   {
     "code": "+679",
     "name": "Fiji",
     "cca2": "FJ",
     "flag": "🇫🇯",
-    "label": "🇫🇯 | FJ | +679"
+    "label": "🇫🇯 | FJ | +679",
+    "example": "7012345"
   },
   {
     "code": "+358",
     "name": "Finland",
     "cca2": "FI",
     "flag": "🇫🇮",
-    "label": "🇫🇮 | FI | +358"
+    "label": "🇫🇮 | FI | +358",
+    "example": "0412345678"
   },
   {
     "code": "+33",
     "name": "France",
     "cca2": "FR",
     "flag": "🇫🇷",
-    "label": "🇫🇷 | FR | +33"
+    "label": "🇫🇷 | FR | +33",
+    "example": "0612345678"
   },
   {
     "code": "+594",
     "name": "French Guiana",
     "cca2": "GF",
     "flag": "🇬🇫",
-    "label": "🇬🇫 | GF | +594"
+    "label": "🇬🇫 | GF | +594",
+    "example": "0694201234"
   },
   {
     "code": "+689",
     "name": "French Polynesia",
     "cca2": "PF",
     "flag": "🇵🇫",
-    "label": "🇵🇫 | PF | +689"
+    "label": "🇵🇫 | PF | +689",
+    "example": "87123456"
   },
   {
     "code": "+262",
     "name": "French Southern and Antarctic Lands",
     "cca2": "TF",
     "flag": "🇹🇫",
-    "label": "🇹🇫 | TF | +262"
+    "label": "🇹🇫 | TF | +262",
+    "example": "0692123456"
   },
   {
     "code": "+241",
     "name": "Gabon",
     "cca2": "GA",
     "flag": "🇬🇦",
-    "label": "🇬🇦 | GA | +241"
+    "label": "🇬🇦 | GA | +241",
+    "example": "06031234"
   },
   {
     "code": "+220",
     "name": "Gambia",
     "cca2": "GM",
     "flag": "🇬🇲",
-    "label": "🇬🇲 | GM | +220"
+    "label": "🇬🇲 | GM | +220",
+    "example": "3012345"
   },
   {
     "code": "+995",
     "name": "Georgia",
     "cca2": "GE",
     "flag": "🇬🇪",
-    "label": "🇬🇪 | GE | +995"
+    "label": "🇬🇪 | GE | +995",
+    "example": "555123456"
   },
   {
     "code": "+49",
     "name": "Germany",
     "cca2": "DE",
     "flag": "🇩🇪",
-    "label": "🇩🇪 | DE | +49"
+    "label": "🇩🇪 | DE | +49",
+    "example": "015123456789"
   },
   {
     "code": "+233",
     "name": "Ghana",
     "cca2": "GH",
     "flag": "🇬🇭",
-    "label": "🇬🇭 | GH | +233"
+    "label": "🇬🇭 | GH | +233",
+    "example": "0231234567"
   },
   {
     "code": "+350",
     "name": "Gibraltar",
     "cca2": "GI",
     "flag": "🇬🇮",
-    "label": "🇬🇮 | GI | +350"
+    "label": "🇬🇮 | GI | +350",
+    "example": "57123456"
   },
   {
     "code": "+30",
     "name": "Greece",
     "cca2": "GR",
     "flag": "🇬🇷",
-    "label": "🇬🇷 | GR | +30"
+    "label": "🇬🇷 | GR | +30",
+    "example": "6912345678"
   },
   {
     "code": "+299",
     "name": "Greenland",
     "cca2": "GL",
     "flag": "🇬🇱",
-    "label": "🇬🇱 | GL | +299"
+    "label": "🇬🇱 | GL | +299",
+    "example": "221234"
   },
   {
     "code": "+1",
     "name": "Grenada",
     "cca2": "GD",
     "flag": "🇬🇩",
-    "label": "🇬🇩 | GD | +1"
+    "label": "🇬🇩 | GD | +1",
+    "example": "4734031234"
   },
   {
     "code": "+590",
     "name": "Guadeloupe",
     "cca2": "GP",
     "flag": "🇬🇵",
-    "label": "🇬🇵 | GP | +590"
+    "label": "🇬🇵 | GP | +590",
+    "example": "0690001234"
   },
   {
     "code": "+1",
     "name": "Guam",
     "cca2": "GU",
     "flag": "🇬🇺",
-    "label": "🇬🇺 | GU | +1"
+    "label": "🇬🇺 | GU | +1",
+    "example": "6713001234"
   },
   {
     "code": "+502",
     "name": "Guatemala",
     "cca2": "GT",
     "flag": "🇬🇹",
-    "label": "🇬🇹 | GT | +502"
+    "label": "🇬🇹 | GT | +502",
+    "example": "51234567"
   },
   {
     "code": "+44",
     "name": "Guernsey",
     "cca2": "GG",
     "flag": "🇬🇬",
-    "label": "🇬🇬 | GG | +44"
+    "label": "🇬🇬 | GG | +44",
+    "example": "07781123456"
   },
   {
     "code": "+224",
     "name": "Guinea",
     "cca2": "GN",
     "flag": "🇬🇳",
-    "label": "🇬🇳 | GN | +224"
+    "label": "🇬🇳 | GN | +224",
+    "example": "601123456"
   },
   {
     "code": "+245",
     "name": "Guinea-Bissau",
     "cca2": "GW",
     "flag": "🇬🇼",
-    "label": "🇬🇼 | GW | +245"
+    "label": "🇬🇼 | GW | +245",
+    "example": "955012345"
   },
   {
     "code": "+592",
     "name": "Guyana",
     "cca2": "GY",
     "flag": "🇬🇾",
-    "label": "🇬🇾 | GY | +592"
+    "label": "🇬🇾 | GY | +592",
+    "example": "6091234"
   },
   {
     "code": "+509",
     "name": "Haiti",
     "cca2": "HT",
     "flag": "🇭🇹",
-    "label": "🇭🇹 | HT | +509"
+    "label": "🇭🇹 | HT | +509",
+    "example": "34101234"
   },
   {
     "code": "+379",
     "name": "Holy See",
     "cca2": "VA",
     "flag": "🇻🇦",
-    "label": "🇻🇦 | VA | +379"
+    "label": "🇻🇦 | VA | +379",
+    "example": "3123456789"
   },
   {
     "code": "+504",
     "name": "Honduras",
     "cca2": "HN",
     "flag": "🇭🇳",
-    "label": "🇭🇳 | HN | +504"
+    "label": "🇭🇳 | HN | +504",
+    "example": "91234567"
   },
   {
     "code": "+852",
     "name": "Hong Kong",
     "cca2": "HK",
     "flag": "🇭🇰",
-    "label": "🇭🇰 | HK | +852"
+    "label": "🇭🇰 | HK | +852",
+    "example": "51234567"
   },
   {
     "code": "+36",
     "name": "Hungary",
     "cca2": "HU",
     "flag": "🇭🇺",
-    "label": "🇭🇺 | HU | +36"
+    "label": "🇭🇺 | HU | +36",
+    "example": "06201234567"
   },
   {
     "code": "+354",
     "name": "Iceland",
     "cca2": "IS",
     "flag": "🇮🇸",
-    "label": "🇮🇸 | IS | +354"
+    "label": "🇮🇸 | IS | +354",
+    "example": "6111234"
   },
   {
     "code": "+91",
     "name": "India",
     "cca2": "IN",
     "flag": "🇮🇳",
-    "label": "🇮🇳 | IN | +91"
+    "label": "🇮🇳 | IN | +91",
+    "example": "08123456789"
   },
   {
     "code": "+62",
     "name": "Indonesia",
     "cca2": "ID",
     "flag": "🇮🇩",
-    "label": "🇮🇩 | ID | +62"
+    "label": "🇮🇩 | ID | +62",
+    "example": "0812345678"
   },
   {
     "code": "+98",
     "name": "Iran",
     "cca2": "IR",
     "flag": "🇮🇷",
-    "label": "🇮🇷 | IR | +98"
+    "label": "🇮🇷 | IR | +98",
+    "example": "09123456789"
   },
   {
     "code": "+964",
     "name": "Iraq",
     "cca2": "IQ",
     "flag": "🇮🇶",
-    "label": "🇮🇶 | IQ | +964"
+    "label": "🇮🇶 | IQ | +964",
+    "example": "07912345678"
   },
   {
     "code": "+353",
     "name": "Ireland",
     "cca2": "IE",
     "flag": "🇮🇪",
-    "label": "🇮🇪 | IE | +353"
+    "label": "🇮🇪 | IE | +353",
+    "example": "0850123456"
   },
   {
     "code": "+44",
     "name": "Isle of Man",
     "cca2": "IM",
     "flag": "🇮🇲",
-    "label": "🇮🇲 | IM | +44"
+    "label": "🇮🇲 | IM | +44",
+    "example": "07924123456"
   },
   {
     "code": "+972",
     "name": "Israel",
     "cca2": "IL",
     "flag": "🇮🇱",
-    "label": "🇮🇱 | IL | +972"
+    "label": "🇮🇱 | IL | +972",
+    "example": "0502345678"
   },
   {
     "code": "+39",
     "name": "Italy",
     "cca2": "IT",
     "flag": "🇮🇹",
-    "label": "🇮🇹 | IT | +39"
+    "label": "🇮🇹 | IT | +39",
+    "example": "3123456789"
   },
   {
     "code": "+225",
     "name": "Ivory Coast",
     "cca2": "CI",
     "flag": "🇨🇮",
-    "label": "🇨🇮 | CI | +225"
+    "label": "🇨🇮 | CI | +225",
+    "example": "0123456789"
   },
   {
     "code": "+1",
     "name": "Jamaica",
     "cca2": "JM",
     "flag": "🇯🇲",
-    "label": "🇯🇲 | JM | +1"
+    "label": "🇯🇲 | JM | +1",
+    "example": "8762101234"
   },
   {
     "code": "+81",
     "name": "Japan",
     "cca2": "JP",
     "flag": "🇯🇵",
-    "label": "🇯🇵 | JP | +81"
+    "label": "🇯🇵 | JP | +81",
+    "example": "09012345678"
   },
   {
     "code": "+44",
     "name": "Jersey",
     "cca2": "JE",
     "flag": "🇯🇪",
-    "label": "🇯🇪 | JE | +44"
+    "label": "🇯🇪 | JE | +44",
+    "example": "07797712345"
   },
   {
     "code": "+962",
     "name": "Jordan",
     "cca2": "JO",
     "flag": "🇯🇴",
-    "label": "🇯🇴 | JO | +962"
+    "label": "🇯🇴 | JO | +962",
+    "example": "0790123456"
   },
   {
     "code": "+7",
     "name": "Kazakhstan",
     "cca2": "KZ",
     "flag": "🇰🇿",
-    "label": "🇰🇿 | KZ | +7"
+    "label": "🇰🇿 | KZ | +7",
+    "example": "87710009998"
   },
   {
     "code": "+254",
     "name": "Kenya",
     "cca2": "KE",
     "flag": "🇰🇪",
-    "label": "🇰🇪 | KE | +254"
+    "label": "🇰🇪 | KE | +254",
+    "example": "0712123456"
   },
   {
     "code": "+686",
     "name": "Kiribati",
     "cca2": "KI",
     "flag": "🇰🇮",
-    "label": "🇰🇮 | KI | +686"
+    "label": "🇰🇮 | KI | +686",
+    "example": "72001234"
   },
   {
     "code": "+383",
     "name": "Kosovo",
     "cca2": "XK",
     "flag": "🇽🇰",
-    "label": "🇽🇰 | XK | +383"
+    "label": "🇽🇰 | XK | +383",
+    "example": "043201234"
   },
   {
     "code": "+965",
     "name": "Kuwait",
     "cca2": "KW",
     "flag": "🇰🇼",
-    "label": "🇰🇼 | KW | +965"
+    "label": "🇰🇼 | KW | +965",
+    "example": "50012345"
   },
   {
     "code": "+996",
     "name": "Kyrgyzstan",
     "cca2": "KG",
     "flag": "🇰🇬",
-    "label": "🇰🇬 | KG | +996"
+    "label": "🇰🇬 | KG | +996",
+    "example": "0700123456"
   },
   {
     "code": "+856",
     "name": "Laos",
     "cca2": "LA",
     "flag": "🇱🇦",
-    "label": "🇱🇦 | LA | +856"
+    "label": "🇱🇦 | LA | +856",
+    "example": "02023123456"
   },
   {
     "code": "+371",
     "name": "Latvia",
     "cca2": "LV",
     "flag": "🇱🇻",
-    "label": "🇱🇻 | LV | +371"
+    "label": "🇱🇻 | LV | +371",
+    "example": "21234567"
   },
   {
     "code": "+961",
     "name": "Lebanon",
     "cca2": "LB",
     "flag": "🇱🇧",
-    "label": "🇱🇧 | LB | +961"
+    "label": "🇱🇧 | LB | +961",
+    "example": "71123456"
   },
   {
     "code": "+266",
     "name": "Lesotho",
     "cca2": "LS",
     "flag": "🇱🇸",
-    "label": "🇱🇸 | LS | +266"
+    "label": "🇱🇸 | LS | +266",
+    "example": "50123456"
   },
   {
     "code": "+231",
     "name": "Liberia",
     "cca2": "LR",
     "flag": "🇱🇷",
-    "label": "🇱🇷 | LR | +231"
+    "label": "🇱🇷 | LR | +231",
+    "example": "0770123456"
   },
   {
     "code": "+218",
     "name": "Libya",
     "cca2": "LY",
     "flag": "🇱🇾",
-    "label": "🇱🇾 | LY | +218"
+    "label": "🇱🇾 | LY | +218",
+    "example": "0912345678"
   },
   {
     "code": "+423",
     "name": "Liechtenstein",
     "cca2": "LI",
     "flag": "🇱🇮",
-    "label": "🇱🇮 | LI | +423"
+    "label": "🇱🇮 | LI | +423",
+    "example": "660234567"
   },
   {
     "code": "+370",
     "name": "Lithuania",
     "cca2": "LT",
     "flag": "🇱🇹",
-    "label": "🇱🇹 | LT | +370"
+    "label": "🇱🇹 | LT | +370",
+    "example": "061234567"
   },
   {
     "code": "+352",
     "name": "Luxembourg",
     "cca2": "LU",
     "flag": "🇱🇺",
-    "label": "🇱🇺 | LU | +352"
+    "label": "🇱🇺 | LU | +352",
+    "example": "628123456"
   },
   {
     "code": "+853",
     "name": "Macau",
     "cca2": "MO",
     "flag": "🇲🇴",
-    "label": "🇲🇴 | MO | +853"
+    "label": "🇲🇴 | MO | +853",
+    "example": "66123456"
   },
   {
     "code": "+389",
     "name": "North Macedonia",
     "cca2": "MK",
     "flag": "🇲🇰",
-    "label": "🇲🇰 | MK | +389"
+    "label": "🇲🇰 | MK | +389",
+    "example": "072345678"
   },
   {
     "code": "+261",
     "name": "Madagascar",
     "cca2": "MG",
     "flag": "🇲🇬",
-    "label": "🇲🇬 | MG | +261"
+    "label": "🇲🇬 | MG | +261",
+    "example": "0321234567"
   },
   {
     "code": "+265",
     "name": "Malawi",
     "cca2": "MW",
     "flag": "🇲🇼",
-    "label": "🇲🇼 | MW | +265"
+    "label": "🇲🇼 | MW | +265",
+    "example": "0991234567"
   },
   {
     "code": "+60",
     "name": "Malaysia",
     "cca2": "MY",
     "flag": "🇲🇾",
-    "label": "🇲🇾 | MY | +60"
+    "label": "🇲🇾 | MY | +60",
+    "example": "0123456789"
   },
   {
     "code": "+960",
     "name": "Maldives",
     "cca2": "MV",
     "flag": "🇲🇻",
-    "label": "🇲🇻 | MV | +960"
+    "label": "🇲🇻 | MV | +960",
+    "example": "7712345"
   },
   {
     "code": "+223",
     "name": "Mali",
     "cca2": "ML",
     "flag": "🇲🇱",
-    "label": "🇲🇱 | ML | +223"
+    "label": "🇲🇱 | ML | +223",
+    "example": "65012345"
   },
   {
     "code": "+356",
     "name": "Malta",
     "cca2": "MT",
     "flag": "🇲🇹",
-    "label": "🇲🇹 | MT | +356"
+    "label": "🇲🇹 | MT | +356",
+    "example": "96961234"
   },
   {
     "code": "+692",
     "name": "Marshall Islands",
     "cca2": "MH",
     "flag": "🇲🇭",
-    "label": "🇲🇭 | MH | +692"
+    "label": "🇲🇭 | MH | +692",
+    "example": "2351234"
   },
   {
     "code": "+596",
     "name": "Martinique",
     "cca2": "MQ",
     "flag": "🇲🇶",
-    "label": "🇲🇶 | MQ | +596"
+    "label": "🇲🇶 | MQ | +596",
+    "example": "0696201234"
   },
   {
     "code": "+222",
     "name": "Mauritania",
     "cca2": "MR",
     "flag": "🇲🇷",
-    "label": "🇲🇷 | MR | +222"
+    "label": "🇲🇷 | MR | +222",
+    "example": "22123456"
   },
   {
     "code": "+230",
     "name": "Mauritius",
     "cca2": "MU",
     "flag": "🇲🇺",
-    "label": "🇲🇺 | MU | +230"
+    "label": "🇲🇺 | MU | +230",
+    "example": "52512345"
   },
   {
     "code": "+262",
     "name": "Mayotte",
     "cca2": "YT",
     "flag": "🇾🇹",
-    "label": "🇾🇹 | YT | +262"
+    "label": "🇾🇹 | YT | +262",
+    "example": "0639012345"
   },
   {
     "code": "+52",
     "name": "Mexico",
     "cca2": "MX",
     "flag": "🇲🇽",
-    "label": "🇲🇽 | MX | +52"
+    "label": "🇲🇽 | MX | +52",
+    "example": "2221234567"
   },
   {
     "code": "+691",
     "name": "Micronesia",
     "cca2": "FM",
     "flag": "🇫🇲",
-    "label": "🇫🇲 | FM | +691"
+    "label": "🇫🇲 | FM | +691",
+    "example": "3501234"
   },
   {
     "code": "+373",
     "name": "Moldova",
     "cca2": "MD",
     "flag": "🇲🇩",
-    "label": "🇲🇩 | MD | +373"
+    "label": "🇲🇩 | MD | +373",
+    "example": "062112345"
   },
   {
     "code": "+377",
     "name": "Monaco",
     "cca2": "MC",
     "flag": "🇲🇨",
-    "label": "🇲🇨 | MC | +377"
+    "label": "🇲🇨 | MC | +377",
+    "example": "0612345678"
   },
   {
     "code": "+976",
     "name": "Mongolia",
     "cca2": "MN",
     "flag": "🇲🇳",
-    "label": "🇲🇳 | MN | +976"
+    "label": "🇲🇳 | MN | +976",
+    "example": "88123456"
   },
   {
     "code": "+382",
     "name": "Montenegro",
     "cca2": "ME",
     "flag": "🇲🇪",
-    "label": "🇲🇪 | ME | +382"
+    "label": "🇲🇪 | ME | +382",
+    "example": "060123456"
   },
   {
     "code": "+1",
     "name": "Montserrat",
     "cca2": "MS",
     "flag": "🇲🇸",
-    "label": "🇲🇸 | MS | +1"
+    "label": "🇲🇸 | MS | +1",
+    "example": "6644923456"
   },
   {
     "code": "+212",
     "name": "Morocco",
     "cca2": "MA",
     "flag": "🇲🇦",
-    "label": "🇲🇦 | MA | +212"
+    "label": "🇲🇦 | MA | +212",
+    "example": "0650123456"
   },
   {
     "code": "+258",
     "name": "Mozambique",
     "cca2": "MZ",
     "flag": "🇲🇿",
-    "label": "🇲🇿 | MZ | +258"
+    "label": "🇲🇿 | MZ | +258",
+    "example": "821234567"
   },
   {
     "code": "+95",
     "name": "Myanmar",
     "cca2": "MM",
     "flag": "🇲🇲",
-    "label": "🇲🇲 | MM | +95"
+    "label": "🇲🇲 | MM | +95",
+    "example": "092123456"
   },
   {
     "code": "+264",
     "name": "Namibia",
     "cca2": "NA",
     "flag": "🇳🇦",
-    "label": "🇳🇦 | NA | +264"
+    "label": "🇳🇦 | NA | +264",
+    "example": "0811234567"
   },
   {
     "code": "+674",
     "name": "Nauru",
     "cca2": "NR",
     "flag": "🇳🇷",
-    "label": "🇳🇷 | NR | +674"
+    "label": "🇳🇷 | NR | +674",
+    "example": "5551234"
   },
   {
     "code": "+977",
     "name": "Nepal",
     "cca2": "NP",
     "flag": "🇳🇵",
-    "label": "🇳🇵 | NP | +977"
+    "label": "🇳🇵 | NP | +977",
+    "example": "9841234567"
   },
   {
     "code": "+31",
     "name": "Netherlands",
     "cca2": "NL",
     "flag": "🇳🇱",
-    "label": "🇳🇱 | NL | +31"
+    "label": "🇳🇱 | NL | +31",
+    "example": "0612345678"
   },
   {
     "code": "+687",
     "name": "New Caledonia",
     "cca2": "NC",
     "flag": "🇳🇨",
-    "label": "🇳🇨 | NC | +687"
+    "label": "🇳🇨 | NC | +687",
+    "example": "751234"
   },
   {
     "code": "+64",
     "name": "New Zealand",
     "cca2": "NZ",
     "flag": "🇳🇿",
-    "label": "🇳🇿 | NZ | +64"
+    "label": "🇳🇿 | NZ | +64",
+    "example": "0211234567"
   },
   {
     "code": "+505",
     "name": "Nicaragua",
     "cca2": "NI",
     "flag": "🇳🇮",
-    "label": "🇳🇮 | NI | +505"
+    "label": "🇳🇮 | NI | +505",
+    "example": "81234567"
   },
   {
     "code": "+227",
     "name": "Niger",
     "cca2": "NE",
     "flag": "🇳🇪",
-    "label": "🇳🇪 | NE | +227"
+    "label": "🇳🇪 | NE | +227",
+    "example": "93123456"
   },
   {
     "code": "+234",
     "name": "Nigeria",
     "cca2": "NG",
     "flag": "🇳🇬",
-    "label": "🇳🇬 | NG | +234"
+    "label": "🇳🇬 | NG | +234",
+    "example": "08021234567"
   },
   {
     "code": "+683",
     "name": "Niue",
     "cca2": "NU",
     "flag": "🇳🇺",
-    "label": "🇳🇺 | NU | +683"
+    "label": "🇳🇺 | NU | +683",
+    "example": "8884012"
   },
   {
     "code": "+672",
     "name": "Norfolk Island",
     "cca2": "NF",
     "flag": "🇳🇫",
-    "label": "🇳🇫 | NF | +672"
+    "label": "🇳🇫 | NF | +672",
+    "example": "381234"
   },
   {
     "code": "+850",
     "name": "North Korea",
     "cca2": "KP",
     "flag": "🇰🇵",
-    "label": "🇰🇵 | KP | +850"
+    "label": "🇰🇵 | KP | +850",
+    "example": "01921234567"
   },
   {
     "code": "+1",
     "name": "Northern Mariana Islands",
     "cca2": "MP",
     "flag": "🇲🇵",
-    "label": "🇲🇵 | MP | +1"
+    "label": "🇲🇵 | MP | +1",
+    "example": "6702345678"
   },
   {
     "code": "+47",
     "name": "Norway",
     "cca2": "NO",
     "flag": "🇳🇴",
-    "label": "🇳🇴 | NO | +47"
+    "label": "🇳🇴 | NO | +47",
+    "example": "40612345"
   },
   {
     "code": "+968",
     "name": "Oman",
     "cca2": "OM",
     "flag": "🇴🇲",
-    "label": "🇴🇲 | OM | +968"
+    "label": "🇴🇲 | OM | +968",
+    "example": "92123456"
   },
   {
     "code": "+92",
     "name": "Pakistan",
     "cca2": "PK",
     "flag": "🇵🇰",
-    "label": "🇵🇰 | PK | +92"
+    "label": "🇵🇰 | PK | +92",
+    "example": "03012345678"
   },
   {
     "code": "+680",
     "name": "Palau",
     "cca2": "PW",
     "flag": "🇵🇼",
-    "label": "🇵🇼 | PW | +680"
+    "label": "🇵🇼 | PW | +680",
+    "example": "6201234"
   },
   {
     "code": "+970",
     "name": "Palestine",
     "cca2": "PS",
     "flag": "🇵🇸",
-    "label": "🇵🇸 | PS | +970"
+    "label": "🇵🇸 | PS | +970",
+    "example": "0599123456"
   },
   {
     "code": "+507",
     "name": "Panama",
     "cca2": "PA",
     "flag": "🇵🇦",
-    "label": "🇵🇦 | PA | +507"
+    "label": "🇵🇦 | PA | +507",
+    "example": "61234567"
   },
   {
     "code": "+675",
     "name": "Papua New Guinea",
     "cca2": "PG",
     "flag": "🇵🇬",
-    "label": "🇵🇬 | PG | +675"
+    "label": "🇵🇬 | PG | +675",
+    "example": "70123456"
   },
   {
     "code": "+595",
     "name": "Paraguay",
     "cca2": "PY",
     "flag": "🇵🇾",
-    "label": "🇵🇾 | PY | +595"
+    "label": "🇵🇾 | PY | +595",
+    "example": "0961456789"
   },
   {
     "code": "+51",
     "name": "Peru",
     "cca2": "PE",
     "flag": "🇵🇪",
-    "label": "🇵🇪 | PE | +51"
+    "label": "🇵🇪 | PE | +51",
+    "example": "912345678"
   },
   {
     "code": "+63",
     "name": "Philippines",
     "cca2": "PH",
     "flag": "🇵🇭",
-    "label": "🇵🇭 | PH | +63"
+    "label": "🇵🇭 | PH | +63",
+    "example": "09051234567"
   },
   {
     "code": "+48",
     "name": "Poland",
     "cca2": "PL",
     "flag": "🇵🇱",
-    "label": "🇵🇱 | PL | +48"
+    "label": "🇵🇱 | PL | +48",
+    "example": "512345678"
   },
   {
     "code": "+351",
     "name": "Portugal",
     "cca2": "PT",
     "flag": "🇵🇹",
-    "label": "🇵🇹 | PT | +351"
+    "label": "🇵🇹 | PT | +351",
+    "example": "912345678"
   },
   {
     "code": "+1",
     "name": "Puerto Rico",
     "cca2": "PR",
     "flag": "🇵🇷",
-    "label": "🇵🇷 | PR | +1"
+    "label": "🇵🇷 | PR | +1",
+    "example": "7872345678"
   },
   {
     "code": "+974",
     "name": "Qatar",
     "cca2": "QA",
     "flag": "🇶🇦",
-    "label": "🇶🇦 | QA | +974"
+    "label": "🇶🇦 | QA | +974",
+    "example": "33123456"
   },
   {
     "code": "+242",
     "name": "Republic of the Congo",
     "cca2": "CG",
     "flag": "🇨🇬",
-    "label": "🇨🇬 | CG | +242"
+    "label": "🇨🇬 | CG | +242",
+    "example": "061234567"
   },
   {
     "code": "+40",
     "name": "Romania",
     "cca2": "RO",
     "flag": "🇷🇴",
-    "label": "🇷🇴 | RO | +40"
+    "label": "🇷🇴 | RO | +40",
+    "example": "0712034567"
   },
   {
     "code": "+7",
     "name": "Russia",
     "cca2": "RU",
     "flag": "🇷🇺",
-    "label": "🇷🇺 | RU | +7"
+    "label": "🇷🇺 | RU | +7",
+    "example": "89123456789"
   },
   {
     "code": "+250",
     "name": "Rwanda",
     "cca2": "RW",
     "flag": "🇷🇼",
-    "label": "🇷🇼 | RW | +250"
+    "label": "🇷🇼 | RW | +250",
+    "example": "0720123456"
   },
   {
     "code": "+262",
     "name": "Réunion",
     "cca2": "RE",
     "flag": "🇷🇪",
-    "label": "🇷🇪 | RE | +262"
+    "label": "🇷🇪 | RE | +262",
+    "example": "0692123456"
   },
   {
     "code": "+590",
     "name": "Saint Barthélemy",
     "cca2": "BL",
     "flag": "🇧🇱",
-    "label": "🇧🇱 | BL | +590"
+    "label": "🇧🇱 | BL | +590",
+    "example": "0690001234"
   },
   {
     "code": "+290",
     "name": "Saint Helena",
     "cca2": "SH",
     "flag": "🇸🇭",
-    "label": "🇸🇭 | SH | +290"
+    "label": "🇸🇭 | SH | +290",
+    "example": "51234"
   },
   {
     "code": "+1",
     "name": "Saint Kitts and Nevis",
     "cca2": "KN",
     "flag": "🇰🇳",
-    "label": "🇰🇳 | KN | +1"
+    "label": "🇰🇳 | KN | +1",
+    "example": "8697652917"
   },
   {
     "code": "+1",
     "name": "Saint Lucia",
     "cca2": "LC",
     "flag": "🇱🇨",
-    "label": "🇱🇨 | LC | +1"
+    "label": "🇱🇨 | LC | +1",
+    "example": "7582845678"
   },
   {
     "code": "+590",
     "name": "Saint Martin",
     "cca2": "MF",
     "flag": "🇲🇫",
-    "label": "🇲🇫 | MF | +590"
+    "label": "🇲🇫 | MF | +590",
+    "example": "0690001234"
   },
   {
     "code": "+508",
     "name": "Saint Pierre and Miquelon",
     "cca2": "PM",
     "flag": "🇵🇲",
-    "label": "🇵🇲 | PM | +508"
+    "label": "🇵🇲 | PM | +508",
+    "example": "0551234"
   },
   {
     "code": "+1",
     "name": "Saint Vincent and the Grenadines",
     "cca2": "VC",
     "flag": "🇻🇨",
-    "label": "🇻🇨 | VC | +1"
+    "label": "🇻🇨 | VC | +1",
+    "example": "7844301234"
   },
   {
     "code": "+685",
     "name": "Samoa",
     "cca2": "WS",
     "flag": "🇼🇸",
-    "label": "🇼🇸 | WS | +685"
+    "label": "🇼🇸 | WS | +685",
+    "example": "7212345"
   },
   {
     "code": "+378",
     "name": "San Marino",
     "cca2": "SM",
     "flag": "🇸🇲",
-    "label": "🇸🇲 | SM | +378"
+    "label": "🇸🇲 | SM | +378",
+    "example": "66661212"
   },
   {
     "code": "+239",
     "name": "Sao Tome and Principe",
     "cca2": "ST",
     "flag": "🇸🇹",
-    "label": "🇸🇹 | ST | +239"
+    "label": "🇸🇹 | ST | +239",
+    "example": "9812345"
   },
   {
     "code": "+966",
     "name": "Saudi Arabia",
     "cca2": "SA",
     "flag": "🇸🇦",
-    "label": "🇸🇦 | SA | +966"
+    "label": "🇸🇦 | SA | +966",
+    "example": "0512345678"
   },
   {
     "code": "+221",
     "name": "Senegal",
     "cca2": "SN",
     "flag": "🇸🇳",
-    "label": "🇸🇳 | SN | +221"
+    "label": "🇸🇳 | SN | +221",
+    "example": "701234567"
   },
   {
     "code": "+381",
     "name": "Serbia",
     "cca2": "RS",
     "flag": "🇷🇸",
-    "label": "🇷🇸 | RS | +381"
+    "label": "🇷🇸 | RS | +381",
+    "example": "0601234567"
   },
   {
     "code": "+248",
     "name": "Seychelles",
     "cca2": "SC",
     "flag": "🇸🇨",
-    "label": "🇸🇨 | SC | +248"
+    "label": "🇸🇨 | SC | +248",
+    "example": "2510123"
   },
   {
     "code": "+232",
     "name": "Sierra Leone",
     "cca2": "SL",
     "flag": "🇸🇱",
-    "label": "🇸🇱 | SL | +232"
+    "label": "🇸🇱 | SL | +232",
+    "example": "025123456"
   },
   {
     "code": "+65",
     "name": "Singapore",
     "cca2": "SG",
     "flag": "🇸🇬",
-    "label": "🇸🇬 | SG | +65"
+    "label": "🇸🇬 | SG | +65",
+    "example": "81234567"
   },
   {
     "code": "+1",
     "name": "Sint Maarten",
     "cca2": "SX",
     "flag": "🇸🇽",
-    "label": "🇸🇽 | SX | +1"
+    "label": "🇸🇽 | SX | +1",
+    "example": "7215205678"
   },
   {
     "code": "+421",
     "name": "Slovakia",
     "cca2": "SK",
     "flag": "🇸🇰",
-    "label": "🇸🇰 | SK | +421"
+    "label": "🇸🇰 | SK | +421",
+    "example": "0912123456"
   },
   {
     "code": "+386",
     "name": "Slovenia",
     "cca2": "SI",
     "flag": "🇸🇮",
-    "label": "🇸🇮 | SI | +386"
+    "label": "🇸🇮 | SI | +386",
+    "example": "031234567"
   },
   {
     "code": "+677",
     "name": "Solomon Islands",
     "cca2": "SB",
     "flag": "🇸🇧",
-    "label": "🇸🇧 | SB | +677"
+    "label": "🇸🇧 | SB | +677",
+    "example": "7421234"
   },
   {
     "code": "+252",
     "name": "Somalia",
     "cca2": "SO",
     "flag": "🇸🇴",
-    "label": "🇸🇴 | SO | +252"
+    "label": "🇸🇴 | SO | +252",
+    "example": "71123456"
   },
   {
     "code": "+27",
     "name": "South Africa",
     "cca2": "ZA",
     "flag": "🇿🇦",
-    "label": "🇿🇦 | ZA | +27"
+    "label": "🇿🇦 | ZA | +27",
+    "example": "0711234567"
   },
   {
     "code": "+82",
     "name": "South Korea",
     "cca2": "KR",
     "flag": "🇰🇷",
-    "label": "🇰🇷 | KR | +82"
+    "label": "🇰🇷 | KR | +82",
+    "example": "01020000000"
   },
   {
     "code": "+211",
     "name": "South Sudan",
     "cca2": "SS",
     "flag": "🇸🇸",
-    "label": "🇸🇸 | SS | +211"
+    "label": "🇸🇸 | SS | +211",
+    "example": "0977123456"
   },
   {
     "code": "+34",
     "name": "Spain",
     "cca2": "ES",
     "flag": "🇪🇸",
-    "label": "🇪🇸 | ES | +34"
+    "label": "🇪🇸 | ES | +34",
+    "example": "612345678"
   },
   {
     "code": "+94",
     "name": "Sri Lanka",
     "cca2": "LK",
     "flag": "🇱🇰",
-    "label": "🇱🇰 | LK | +94"
+    "label": "🇱🇰 | LK | +94",
+    "example": "0712345678"
   },
   {
     "code": "+249",
     "name": "Sudan",
     "cca2": "SD",
     "flag": "🇸🇩",
-    "label": "🇸🇩 | SD | +249"
+    "label": "🇸🇩 | SD | +249",
+    "example": "0911231234"
   },
   {
     "code": "+597",
     "name": "Suriname",
     "cca2": "SR",
     "flag": "🇸🇷",
-    "label": "🇸🇷 | SR | +597"
+    "label": "🇸🇷 | SR | +597",
+    "example": "7412345"
   },
   {
     "code": "+47",
     "name": "Svalbard and Jan Mayen",
     "cca2": "SJ",
     "flag": "🇸🇯",
-    "label": "🇸🇯 | SJ | +47"
+    "label": "🇸🇯 | SJ | +47",
+    "example": "41234567"
   },
   {
     "code": "+46",
     "name": "Sweden",
     "cca2": "SE",
     "flag": "🇸🇪",
-    "label": "🇸🇪 | SE | +46"
+    "label": "🇸🇪 | SE | +46",
+    "example": "0701234567"
   },
   {
     "code": "+41",
     "name": "Switzerland",
     "cca2": "CH",
     "flag": "🇨🇭",
-    "label": "🇨🇭 | CH | +41"
+    "label": "🇨🇭 | CH | +41",
+    "example": "0781234567"
   },
   {
     "code": "+963",
     "name": "Syria",
     "cca2": "SY",
     "flag": "🇸🇾",
-    "label": "🇸🇾 | SY | +963"
+    "label": "🇸🇾 | SY | +963",
+    "example": "0944567890"
   },
   {
     "code": "+886",
     "name": "Taiwan",
     "cca2": "TW",
     "flag": "🇹🇼",
-    "label": "🇹🇼 | TW | +886"
+    "label": "🇹🇼 | TW | +886",
+    "example": "0912345678"
   },
   {
     "code": "+992",
     "name": "Tajikistan",
     "cca2": "TJ",
     "flag": "🇹🇯",
-    "label": "🇹🇯 | TJ | +992"
+    "label": "🇹🇯 | TJ | +992",
+    "example": "917123456"
   },
   {
     "code": "+255",
     "name": "Tanzania",
     "cca2": "TZ",
     "flag": "🇹🇿",
-    "label": "🇹🇿 | TZ | +255"
+    "label": "🇹🇿 | TZ | +255",
+    "example": "0621234567"
   },
   {
     "code": "+66",
     "name": "Thailand",
     "cca2": "TH",
     "flag": "🇹🇭",
-    "label": "🇹🇭 | TH | +66"
+    "label": "🇹🇭 | TH | +66",
+    "example": "0812345678"
   },
   {
     "code": "+670",
     "name": "Timor-Leste",
     "cca2": "TL",
     "flag": "🇹🇱",
-    "label": "🇹🇱 | TL | +670"
+    "label": "🇹🇱 | TL | +670",
+    "example": "77212345"
   },
   {
     "code": "+228",
     "name": "Togo",
     "cca2": "TG",
     "flag": "🇹🇬",
-    "label": "🇹🇬 | TG | +228"
+    "label": "🇹🇬 | TG | +228",
+    "example": "90112345"
   },
   {
     "code": "+690",
     "name": "Tokelau",
     "cca2": "TK",
     "flag": "🇹🇰",
-    "label": "🇹🇰 | TK | +690"
+    "label": "🇹🇰 | TK | +690",
+    "example": "7290"
   },
   {
     "code": "+676",
     "name": "Tonga",
     "cca2": "TO",
     "flag": "🇹🇴",
-    "label": "🇹🇴 | TO | +676"
+    "label": "🇹🇴 | TO | +676",
+    "example": "7715123"
   },
   {
     "code": "+1",
     "name": "Trinidad and Tobago",
     "cca2": "TT",
     "flag": "🇹🇹",
-    "label": "🇹🇹 | TT | +1"
+    "label": "🇹🇹 | TT | +1",
+    "example": "8682911234"
   },
   {
     "code": "+216",
     "name": "Tunisia",
     "cca2": "TN",
     "flag": "🇹🇳",
-    "label": "🇹🇳 | TN | +216"
+    "label": "🇹🇳 | TN | +216",
+    "example": "20123456"
   },
   {
     "code": "+90",
     "name": "Turkey",
     "cca2": "TR",
     "flag": "🇹🇷",
-    "label": "🇹🇷 | TR | +90"
+    "label": "🇹🇷 | TR | +90",
+    "example": "05012345678"
   },
   {
     "code": "+993",
     "name": "Turkmenistan",
     "cca2": "TM",
     "flag": "🇹🇲",
-    "label": "🇹🇲 | TM | +993"
+    "label": "🇹🇲 | TM | +993",
+    "example": "866123456"
   },
   {
     "code": "+1",
     "name": "Turks and Caicos Islands",
     "cca2": "TC",
     "flag": "🇹🇨",
-    "label": "🇹🇨 | TC | +1"
+    "label": "🇹🇨 | TC | +1",
+    "example": "6492311234"
   },
   {
     "code": "+688",
     "name": "Tuvalu",
     "cca2": "TV",
     "flag": "🇹🇻",
-    "label": "🇹🇻 | TV | +688"
+    "label": "🇹🇻 | TV | +688",
+    "example": "901234"
   },
   {
     "code": "+1",
     "name": "U.S. Virgin Islands",
     "cca2": "VI",
     "flag": "🇻🇮",
-    "label": "🇻🇮 | VI | +1"
+    "label": "🇻🇮 | VI | +1",
+    "example": "3406421234"
   },
   {
     "code": "+256",
     "name": "Uganda",
     "cca2": "UG",
     "flag": "🇺🇬",
-    "label": "🇺🇬 | UG | +256"
+    "label": "🇺🇬 | UG | +256",
+    "example": "0712345678"
   },
   {
     "code": "+380",
     "name": "Ukraine",
     "cca2": "UA",
     "flag": "🇺🇦",
-    "label": "🇺🇦 | UA | +380"
+    "label": "🇺🇦 | UA | +380",
+    "example": "0501234567"
   },
   {
     "code": "+971",
     "name": "United Arab Emirates",
     "cca2": "AE",
     "flag": "🇦🇪",
-    "label": "🇦🇪 | AE | +971"
+    "label": "🇦🇪 | AE | +971",
+    "example": "0501234567"
   },
   {
     "code": "+44",
     "name": "United Kingdom",
     "cca2": "GB",
     "flag": "🇬🇧",
-    "label": "🇬🇧 | GB | +44"
+    "label": "🇬🇧 | GB | +44",
+    "example": "07400123456"
   },
   {
     "code": "+1",
     "name": "United States",
     "cca2": "US",
     "flag": "🇺🇸",
-    "label": "🇺🇸 | US | +1"
+    "label": "🇺🇸 | US | +1",
+    "example": "2015550123"
   },
   {
     "code": "+598",
     "name": "Uruguay",
     "cca2": "UY",
     "flag": "🇺🇾",
-    "label": "🇺🇾 | UY | +598"
+    "label": "🇺🇾 | UY | +598",
+    "example": "094231234"
   },
   {
     "code": "+998",
     "name": "Uzbekistan",
     "cca2": "UZ",
     "flag": "🇺🇿",
-    "label": "🇺🇿 | UZ | +998"
+    "label": "🇺🇿 | UZ | +998",
+    "example": "912345678"
   },
   {
     "code": "+678",
     "name": "Vanuatu",
     "cca2": "VU",
     "flag": "🇻🇺",
-    "label": "🇻🇺 | VU | +678"
+    "label": "🇻🇺 | VU | +678",
+    "example": "5912345"
   },
   {
     "code": "+58",
     "name": "Venezuela",
     "cca2": "VE",
     "flag": "🇻🇪",
-    "label": "🇻🇪 | VE | +58"
+    "label": "🇻🇪 | VE | +58",
+    "example": "04121234567"
   },
   {
     "code": "+84",
     "name": "Vietnam",
     "cca2": "VN",
     "flag": "🇻🇳",
-    "label": "🇻🇳 | VN | +84"
+    "label": "🇻🇳 | VN | +84",
+    "example": "0912345678"
   },
   {
     "code": "+681",
     "name": "Wallis and Futuna",
     "cca2": "WF",
     "flag": "🇼🇫",
-    "label": "🇼🇫 | WF | +681"
+    "label": "🇼🇫 | WF | +681",
+    "example": "821234"
   },
   {
     "code": "+212",
     "name": "Western Sahara",
     "cca2": "EH",
     "flag": "🇪🇨",
-    "label": "🇪🇨 | EH | +212"
+    "label": "🇪🇨 | EH | +212",
+    "example": "0650123456"
   },
   {
     "code": "+967",
     "name": "Yemen",
     "cca2": "YE",
     "flag": "🇾🇪",
-    "label": "🇾🇪 | YE | +967"
+    "label": "🇾🇪 | YE | +967",
+    "example": "0712345678"
   },
   {
     "code": "+260",
     "name": "Zambia",
     "cca2": "ZM",
     "flag": "🇿🇲",
-    "label": "🇿🇲 | ZM | +260"
+    "label": "🇿🇲 | ZM | +260",
+    "example": "0955123456"
   },
   {
     "code": "+263",
     "name": "Zimbabwe",
     "cca2": "ZW",
     "flag": "🇿🇼",
-    "label": "🇿🇼 | ZW | +263"
+    "label": "🇿🇼 | ZW | +263",
+    "example": "0712345678"
   }
 ]
